@@ -10,6 +10,7 @@
     "dotnet sln": true,
     "dotnet test": true,
     "yarn add": true,
-    "yarn install": true
+    "yarn install": true,
+    "dotnet package": true
   }
 }
