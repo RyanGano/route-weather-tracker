@@ -57,15 +57,57 @@ public class PassAggregatorService : IPassAggregatorService
 
         await Task.WhenAll(conditionTask, camerasTask, weatherTask);
 
+        var weather = await weatherTask;
+        var condition = await conditionTask ?? DeriveCondition(passId, weather);
+
         var summary = new PassSummary
         {
             Info      = info,
-            Condition = await conditionTask,
+            Condition = condition,
             Cameras   = (await camerasTask).ToList(),
-            Weather   = await weatherTask
+            Weather   = weather
         };
 
         _cache.Set(cacheKey, summary, CacheTtl);
         return summary;
+    }
+
+    /// <summary>
+    /// Derives a PassCondition from weather data for passes that don't have an
+    /// official road condition source (i.e. Idaho/Montana passes).
+    /// </summary>
+    private static PassCondition? DeriveCondition(string passId, PassWeatherForecast? weather)
+    {
+        if (weather is null) return null;
+
+        var roadCondition = InferRoadCondition(
+            weather.CurrentDescription, weather.CurrentTempFahrenheit);
+
+        return new PassCondition
+        {
+            PassId = passId,
+            RoadCondition = roadCondition,
+            WeatherCondition = weather.CurrentDescription,
+            TemperatureFahrenheit = (int)weather.CurrentTempFahrenheit,
+            EastboundRestriction = TravelRestriction.None,
+            WestboundRestriction = TravelRestriction.None,
+            LastUpdated = DateTime.UtcNow
+        };
+    }
+
+    private static string InferRoadCondition(string description, double tempF)
+    {
+        var d = description.ToLowerInvariant();
+        if (d.Contains("blizzard") || d.Contains("heavy snow"))
+            return tempF < 28 ? "Icy / Snow packed" : "Heavy snow";
+        if (d.Contains("snow") || d.Contains("sleet"))
+            return tempF < 30 ? "Snow packed / Icy" : "Snow covered";
+        if (d.Contains("freezing") || d.Contains("ice"))
+            return "Icy / Freezing";
+        if (d.Contains("rain") || d.Contains("drizzle") || d.Contains("shower"))
+            return tempF < 32 ? "Freezing rain" : "Bare and wet";
+        if (d.Contains("mist") || d.Contains("fog"))
+            return "Bare and wet";
+        return "Bare and dry";
     }
 }

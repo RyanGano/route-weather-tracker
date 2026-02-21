@@ -5,9 +5,11 @@ import Alert from 'react-bootstrap/Alert';
 import Placeholder from 'react-bootstrap/Placeholder';
 import Card from 'react-bootstrap/Card';
 import RouteHeader from './components/RouteHeader';
+import RouteStatus from './components/RouteStatus';
 import PassCard from './components/PassCard';
 import { getAllPasses } from './services/passService';
 import type { PassSummary } from './types/passTypes';
+import './App.css';
 
 function PassCardSkeleton() {
   return (
@@ -86,9 +88,14 @@ export default function App() {
           <Alert variant="warning">No pass data returned from the service.</Alert>
         )}
 
-        {!loading && !error && passes.map((pass) => (
-          <PassCard key={pass.info.id} pass={pass} />
-        ))}
+        {!loading && !error && (
+          <>
+            <RouteStatus passes={passes} />
+            {passes.map((pass) => (
+              <PassCard key={pass.info.id} pass={pass} />
+            ))}
+          </>
+        )}
       </Container>
     </>
   );

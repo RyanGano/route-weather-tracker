@@ -14,6 +14,7 @@ export interface PassInfo {
   latitude: number;
   longitude: number;
   state: string;
+  officialUrl: string;
 }
 
 export interface PassCondition {

@@ -50,6 +50,17 @@ export default function PassCard({ pass }: PassCardProps) {
           <Badge bg="secondary">{info.highway}</Badge>
           <Badge bg="light" text="dark">{info.elevationFeet.toLocaleString()} ft</Badge>
           <Badge bg="dark">{info.state}</Badge>
+          {info.officialUrl && (
+            <a
+              href={info.officialUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="badge bg-primary text-decoration-none"
+              title="Official pass conditions page"
+            >
+              Official &#8599;
+            </a>
+          )}
         </div>
         {condition && conditionBadge(condition.roadCondition)}
       </Card.Header>

@@ -14,7 +14,8 @@ public static class PassRegistry
             ElevationFeet = 3022,
             Latitude = 47.4245,
             Longitude = -121.4116,
-            State = "WA"
+            State = "WA",
+            OfficialUrl = "https://wsdot.wa.gov/travel/roads-bridges/mountain-pass-reports"
         },
         new PassInfo
         {
@@ -24,7 +25,8 @@ public static class PassRegistry
             ElevationFeet = 3081,
             Latitude = 47.5333,
             Longitude = -116.3667,
-            State = "ID"
+            State = "ID",
+            OfficialUrl = "https://511.idaho.gov/"
         },
         new PassInfo
         {
@@ -34,7 +36,8 @@ public static class PassRegistry
             ElevationFeet = 4738,
             Latitude = 47.4576,
             Longitude = -115.6990,
-            State = "MT/ID"
+            State = "MT/ID",
+            OfficialUrl = "https://www.mdt.mt.gov/travinfo/"
         }
     };
 

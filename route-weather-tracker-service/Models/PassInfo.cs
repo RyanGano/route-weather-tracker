@@ -9,4 +9,5 @@ public class PassInfo
     public double Latitude { get; set; }
     public double Longitude { get; set; }
     public string State { get; set; } = string.Empty;
+    public string OfficialUrl { get; set; } = string.Empty;
 }
