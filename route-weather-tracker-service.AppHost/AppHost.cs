@@ -1,11 +1,15 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var api = builder.AddProject<Projects.route_weather_tracker_service>("api");
+var api = builder.AddProject<Projects.route_weather_tracker_service>("api")
+    .WithExternalHttpEndpoints();
 
-builder.AddYarnApp("frontend", "../route-weather-tracker-app", "dev")
+builder.AddViteApp("frontend", "../route-weather-tracker-app")
+       .WithYarn()
        .WithReference(api)
-       .WithEnvironment("VITE_API_URL", api.GetEndpoint("https"))
+       .WaitFor(api)
+       .WithEnvironment("BROWSER", "none")
        .WithHttpEndpoint(env: "PORT")
+       .WithExternalHttpEndpoints()
        .PublishAsDockerFile();
 
 builder.Build().Run();
