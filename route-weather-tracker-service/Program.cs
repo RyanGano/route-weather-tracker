@@ -19,7 +19,7 @@ builder.Services.AddMemoryCache();
 
 // ----- HTTP clients for external APIs -----
 builder.Services.AddHttpClient<IWsdotService, WsdotService>();
-builder.Services.AddHttpClient<IIdahoTransportService, IdahoTransportService>();
+builder.Services.AddScoped<IIdahoTransportService, IdahoTransportService>();
 builder.Services.AddHttpClient<IOpenWeatherService, OpenWeatherService>();
 builder.Services.AddScoped<IPassAggregatorService, PassAggregatorService>();
 
