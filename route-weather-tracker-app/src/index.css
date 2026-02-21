@@ -1,0 +1,7 @@
+/* Minimal global styles — Bootstrap handles the rest */
+body {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+

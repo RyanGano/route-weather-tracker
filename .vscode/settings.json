@@ -8,6 +8,8 @@
     "git commit": true,
     "dotnet new": true,
     "dotnet sln": true,
-    "dotnet test": true
+    "dotnet test": true,
+    "yarn add": true,
+    "yarn install": true
   }
 }

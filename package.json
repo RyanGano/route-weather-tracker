@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "axios": "^1.13.5",
+    "bootstrap": "^5.3.8",
+    "react-bootstrap": "^2.10.10"
+  },
+  "devDependencies": {
+    "@types/bootstrap": "^5.2.10"
+  }
+}
