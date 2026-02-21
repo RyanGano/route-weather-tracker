@@ -18,5 +18,19 @@ export default defineConfig({
       },
     },
   },
+  // Mirror the dev-server proxy for `vite preview` (used by the production Docker image).
+  // Aspire / Azure Container Apps injects the same service-discovery env vars at container start.
+  preview: {
+    host: true,
+    port: parseInt(process.env["PORT"] ?? "4173"),
+    proxy: {
+      "/api": {
+        target:
+          process.env["services__api__https__0"] ||
+          process.env["services__api__http__0"],
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 });
-

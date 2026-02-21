@@ -40,6 +40,11 @@ dist-ssr/
 .env.local
 .env.*.local
 
+# Azure Developer CLI (azd)
+# Contains local environment state (subscription ID, env name, generated config).
+# Commit azure.yaml and infra/ but not this folder.
+.azure/
+
 # OS
 .DS_Store
 Thumbs.db

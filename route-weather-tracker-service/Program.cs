@@ -4,12 +4,16 @@ using route_weather_tracker_service.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // ----- Azure Key Vault -----
-// DefaultAzureCredential resolves via:
+// URI is read from config so it can be overridden per environment without
+// touching code. Set KeyVaultUri in appsettings.json or as an environment
+// variable. DefaultAzureCredential resolves via:
 //   - Local dev: `az login` or Visual Studio credentials
-//   - Production: Managed Identity
-// Requires "Key Vault Secrets User" role on route-weather-tracker-kv.
-var keyVaultUri = new Uri("https://route-weather-tracker-kv.vault.azure.net/");
-builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
+//   - Production: Managed Identity on the Container App
+// The Managed Identity must hold the "Key Vault Secrets User" role on the vault.
+var keyVaultUri = builder.Configuration["KeyVaultUri"]
+    ?? throw new InvalidOperationException(
+        "KeyVaultUri is not configured. Set it in appsettings.json or as an environment variable.");
+builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
 
 // ----- Aspire service defaults (OpenTelemetry, health checks, service discovery) -----
 builder.AddServiceDefaults();
@@ -27,13 +31,24 @@ builder.Services.AddScoped<IPassAggregatorService, PassAggregatorService>();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-// ----- CORS: allow Aspire-launched Vite frontend -----
+// ----- CORS -----
+// AllowedOrigins is populated at runtime:
+//   - Dev: empty → falls back to AllowAnyOrigin (Aspire vite proxy covers this)
+//   - Production: Aspire AppHost injects the frontend Container App FQDN via
+//     the AllowedOrigins__0 environment variable.
+var allowedOrigins = builder.Configuration
+    .GetSection("AllowedOrigins")
+    .Get<string[]>() ?? [];
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
-        policy.AllowAnyOrigin()  // Aspire injects the origin; tighten for production
-              .AllowAnyHeader()
-              .AllowAnyMethod());
+    {
+        if (allowedOrigins.Length > 0)
+            policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
+        else
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    });
 });
 
 var app = builder.Build();
