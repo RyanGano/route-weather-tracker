@@ -5,6 +5,9 @@
     "dotnet build": true,
     "dotnet remove": true,
     "git add": true,
-    "git commit": true
+    "git commit": true,
+    "dotnet new": true,
+    "dotnet sln": true,
+    "dotnet test": true
   }
 }
