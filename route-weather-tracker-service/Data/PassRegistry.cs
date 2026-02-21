@@ -4,7 +4,7 @@ namespace route_weather_tracker_service.Data;
 
 public static class PassRegistry
 {
-    public static readonly IReadOnlyList<PassInfo> Passes = new List<PassInfo>
+  public static readonly IReadOnlyList<PassInfo> Passes = new List<PassInfo>
     {
         new PassInfo
         {
@@ -15,7 +15,7 @@ public static class PassRegistry
             Latitude = 47.4245,
             Longitude = -121.4116,
             State = "WA",
-            OfficialUrl = "https://wsdot.wa.gov/travel/roads-bridges/mountain-pass-reports"
+            OfficialUrl = "https://wsdot.com/travel/real-time/mountainpasses/snoqualmie"
         },
         new PassInfo
         {
@@ -26,7 +26,7 @@ public static class PassRegistry
             Latitude = 47.5333,
             Longitude = -116.3667,
             State = "ID",
-            OfficialUrl = "https://511.idaho.gov/"
+            OfficialUrl = "https://511.idaho.gov/List/Cameras?search=july"
         },
         new PassInfo
         {
@@ -37,10 +37,10 @@ public static class PassRegistry
             Latitude = 47.4576,
             Longitude = -115.6990,
             State = "MT/ID",
-            OfficialUrl = "https://www.mdt.mt.gov/travinfo/"
+            OfficialUrl = "https://511.idaho.gov/List/Cameras?search=lookout"
         }
     };
 
-    public static PassInfo? GetById(string id) =>
-        Passes.FirstOrDefault(p => p.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
+  public static PassInfo? GetById(string id) =>
+      Passes.FirstOrDefault(p => p.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
 }
