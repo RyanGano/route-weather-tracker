@@ -1,0 +1,50 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+_ReSharper*/
+*.DotSettings.user
+TestResults/
+*.ncrunchproject
+
+# Secrets - never commit
+appsettings.Development.json
+appsettings.*.json
+!appsettings.json
+secrets.json
+
+# dotnet user-secrets
+%APPDATA%/Microsoft/UserSecrets/
+
+# NuGet
+*.nupkg
+.nuget/
+packages/
+
+# Node / Yarn
+node_modules/
+dist/
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.pnp.*
+*.local
+
+# Vite
+dist-ssr/
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
