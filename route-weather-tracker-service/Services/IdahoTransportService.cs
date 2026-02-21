@@ -21,7 +21,7 @@ public class IdahoTransportService : IIdahoTransportService
       = new(StringComparer.OrdinalIgnoreCase)
       {
         ["fourth-of-july"] = ("4th of July Pass", ["246.C1--2", "246.C2--2"]),
-        ["lookout"]        = ("Lookout Pass",      ["242.C1--2", "242.C2--2"])
+        ["lookout"] = ("Lookout Pass", ["242.C1--2", "242.C2--2"])
       };
 
   public Task<List<CameraImage>> GetPassCamerasAsync(string passId, CancellationToken ct = default)
