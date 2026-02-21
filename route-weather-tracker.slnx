@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="route-weather-tracker-service.AppHost/route-weather-tracker-service.AppHost.csproj" />
+  <Project Path="route-weather-tracker-service.ServiceDefaults/route-weather-tracker-service.ServiceDefaults.csproj" />
+  <Project Path="route-weather-tracker-service/route-weather-tracker-service.csproj" />
+</Solution>

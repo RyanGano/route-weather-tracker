@@ -1,0 +1,6 @@
+@route_weather_tracker_service_HostAddress = http://localhost:5283
+
+GET {{route_weather_tracker_service_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
