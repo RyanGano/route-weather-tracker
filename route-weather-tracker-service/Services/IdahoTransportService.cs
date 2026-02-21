@@ -62,7 +62,7 @@ public class IdahoTransportService : IIdahoTransportService
                 if (Math.Abs(lat - pass.Lat) > pass.Radius || Math.Abs(lon - pass.Lon) > pass.Radius)
                     continue;
 
-                var cameraId = idEl.GetInt32().ToString();
+                var cameraId = idEl.GetString() ?? idEl.GetRawText().Trim('"');
                 cameras.Add(new CameraImage
                 {
                     CameraId = cameraId,
