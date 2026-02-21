@@ -1,0 +1,21 @@
+root = true
+
+[*]
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# C# — 4-space indent
+[*.{cs,csproj,props,targets,sln}]
+indent_style = space
+indent_size = 4
+
+# TypeScript / React / JSON / CSS / HTML — 2-space indent
+[*.{ts,tsx,js,jsx,json,css,html}]
+indent_style = space
+indent_size = 2
+
+# Markdown — preserve trailing spaces (used for line breaks)
+[*.md]
+trim_trailing_whitespace = false

@@ -1,0 +1,17 @@
+# Normalize all text files to LF in the repository.
+# On Windows, git will check out LF (not CRLF) — editors and formatters
+# should respect .editorconfig to stay consistent.
+
+* text=auto eol=lf
+
+# Explicitly mark binary files so git never touches their line endings.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.woff binary
+*.woff2 binary
+*.ttf  binary
+*.eot  binary
+*.zip  binary
