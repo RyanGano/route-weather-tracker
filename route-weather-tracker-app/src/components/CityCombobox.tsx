@@ -43,9 +43,7 @@ export default function CityCombobox({
 
   const candidates = endpoints.filter((ep) => {
     if (exclude && ep.id === exclude) return false;
-    return endpointLabel(ep)
-      .toLowerCase()
-      .includes(inputText.toLowerCase());
+    return endpointLabel(ep).toLowerCase().includes(inputText.toLowerCase());
   });
 
   function handleInputChange(text: string) {
@@ -102,7 +100,11 @@ export default function CityCombobox({
   }
 
   return (
-    <Form.Group className="mb-3 position-relative" onBlur={handleBlur} ref={containerRef}>
+    <Form.Group
+      className="mb-3 position-relative"
+      onBlur={handleBlur}
+      ref={containerRef}
+    >
       <Form.Label className="fw-semibold" htmlFor={inputId}>
         {label}
       </Form.Label>
@@ -118,7 +120,10 @@ export default function CityCombobox({
         placeholder={disabled ? "" : placeholder}
         disabled={disabled}
         onChange={(e) => handleInputChange(e.target.value)}
-        onFocus={() => setIsOpen(true)}
+        onFocus={(e) => {
+          e.target.select();
+          setIsOpen(true);
+        }}
         onKeyDown={handleKeyDown}
       />
 
@@ -154,8 +159,7 @@ export default function CityCombobox({
                       : ep.id === value
                         ? "var(--bs-secondary-bg)"
                         : undefined,
-                  color:
-                    i === highlightedIndex ? "white" : undefined,
+                  color: i === highlightedIndex ? "white" : undefined,
                 }}
                 onMouseDown={(e) => e.preventDefault()} // prevent blur before click
                 onClick={() => selectEndpoint(ep)}
