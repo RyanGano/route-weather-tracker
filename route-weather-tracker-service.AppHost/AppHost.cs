@@ -8,8 +8,6 @@ builder.AddViteApp("frontend", "../route-weather-tracker-app")
        .WithReference(api)
        .WaitFor(api)
        .WithEnvironment("BROWSER", "none")
-       .WithHttpEndpoint(env: "PORT")
-       .WithExternalHttpEndpoints()
        .PublishAsDockerFile();
 
 builder.Build().Run();
