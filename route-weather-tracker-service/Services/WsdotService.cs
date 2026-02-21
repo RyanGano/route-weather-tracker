@@ -13,18 +13,22 @@ public class WsdotService : IWsdotService
 {
     private readonly HttpClient _http;
     private readonly string _apiKey;
-    private const string BaseUrl = "https://wsdot.wa.gov/Traffic/api";
 
-    // WSDOT Mountain Pass IDs (from the MountainPassConditions API)
+    // Correct REST .svc endpoint URLs (see https://wsdot.wa.gov/traffic/api/)
+    private const string CamerasUrl = "https://wsdot.wa.gov/Traffic/api/HighwayCameras/HighwayCamerasREST.svc/GetCamerasAsJson";
+    // Note: WSDOT has a typo in the method name — "AsJon" not "AsJson"
+    private const string PassConditionUrl = "https://wsdot.wa.gov/Traffic/api/MountainPassConditions/MountainPassConditionsREST.svc/GetMountainPassConditionAsJon";
+
+    // WSDOT Mountain Pass IDs — verified from GetMountainPassConditionsAsJson
     private static readonly Dictionary<string, int> PassIdMap = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["snoqualmie"] = 1   // Snoqualmie Pass I-90 (PassConditionID=1 in WSDOT data)
+        ["snoqualmie"] = 11   // Snoqualmie Pass I-90 (MountainPassId=11 in WSDOT data)
     };
 
-    // Camera location substrings used to filter the HighwayCameras response
+    // Camera Title substrings used to filter the HighwayCameras response
     private static readonly Dictionary<string, string[]> CameraLocationFilters = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["snoqualmie"] = ["Snoqualmie", "I-90 @ MP 52", "Summit"]
+        ["snoqualmie"] = ["Snoqualmie", "I-90 at MP 52", "I-90 at MP 53"]
     };
 
     public WsdotService(HttpClient http, IConfiguration configuration)
@@ -39,7 +43,7 @@ public class WsdotService : IWsdotService
         if (!PassIdMap.TryGetValue(passId, out var wsdotId))
             return null;
 
-        var url = $"{BaseUrl}/MountainPassConditions/GetMountainPassConditionAsJson?AccessCode={_apiKey}&PassConditionID={wsdotId}";
+        var url = $"{PassConditionUrl}?AccessCode={_apiKey}&PassConditionID={wsdotId}";
 
         try
         {
@@ -75,7 +79,7 @@ public class WsdotService : IWsdotService
         if (!CameraLocationFilters.TryGetValue(passId, out var filters))
             return [];
 
-        var url = $"{BaseUrl}/HighwayCameras/GetCameraInventoryAsJson?AccessCode={_apiKey}";
+        var url = $"{CamerasUrl}?AccessCode={_apiKey}";
 
         try
         {

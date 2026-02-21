@@ -13,37 +13,20 @@ namespace route_weather_tracker_service.Services;
 public class IdahoTransportService : IIdahoTransportService
 {
     private readonly HttpClient _http;
-    private const string CamerasApiUrl = "https://511.idaho.gov/api/cameras";
 
-    // Substrings present in Idaho 511 camera names/descriptions for each pass.
-    private static readonly Dictionary<string, string[]> CameraFilters = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["fourth-of-july"] = ["Fourth of July", "4th of July", "I-90 12"],
-        ["lookout"]        = ["Lookout Pass", "Lookout", "I-90 0"]
-    };
+    // Idaho 511 endpoints (discovered from page source — no public API key needed)
+    // Map icons endpoint returns items with itemId + location [lat, lon]
+    private const string MapIconsUrl = "https://511.idaho.gov/map/mapIcons/Cameras";
+    // Camera image endpoint: returns a JPEG snapshot directly
+    private const string CameraImageBaseUrl = "https://511.idaho.gov/map/Cctv/";
 
-    // Fallback image URLs sourced from Idaho 511 live camera feed (used if API is unavailable).
-    private static readonly Dictionary<string, List<CameraImage>> FallbackCameras = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["fourth-of-july"] = [
-            new CameraImage
-            {
-                CameraId = "id-4thjuly-1",
-                Description = "4th of July Pass - I-90 Westbound",
-                ImageUrl = "https://511.idaho.gov/map/Layers/roadConditions.aspx?type=camera&id=1171",
-                CapturedAt = DateTime.UtcNow
-            }
-        ],
-        ["lookout"] = [
-            new CameraImage
-            {
-                CameraId = "id-lookout-1",
-                Description = "Lookout Pass - I-90 at MT/ID Border",
-                ImageUrl = "https://511.idaho.gov/map/Layers/roadConditions.aspx?type=camera&id=1172",
-                CapturedAt = DateTime.UtcNow
-            }
-        ]
-    };
+    // Pass center coordinates and search radius (degrees ≈ miles/69)
+    private static readonly Dictionary<string, (double Lat, double Lon, double Radius, string Label)> PassCoords
+        = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["fourth-of-july"] = (47.5333, -116.3667, 0.12, "4th of July Pass"),
+            ["lookout"]        = (47.4576, -115.699,  0.10, "Lookout Pass")
+        };
 
     public IdahoTransportService(HttpClient http)
     {
@@ -52,44 +35,48 @@ public class IdahoTransportService : IIdahoTransportService
 
     public async Task<List<CameraImage>> GetPassCamerasAsync(string passId, CancellationToken ct = default)
     {
-        if (!CameraFilters.TryGetValue(passId, out var filters))
+        if (!PassCoords.TryGetValue(passId, out var pass))
             return [];
 
         try
         {
-            var doc = await _http.GetFromJsonAsync<JsonDocument>(CamerasApiUrl, ct);
-            if (doc is null) return GetFallback(passId);
+            var doc = await _http.GetFromJsonAsync<JsonDocument>(MapIconsUrl, ct);
+            if (doc is null) return [];
+
+            // The response has { item1: {icon meta}, item2: [{itemId, location:[lat,lon], ...}] }
+            if (!doc.RootElement.TryGetProperty("item2", out var items))
+                return [];
 
             var cameras = new List<CameraImage>();
-            foreach (var cam in doc.RootElement.EnumerateArray())
+            int seq = 1;
+            foreach (var cam in items.EnumerateArray())
             {
-                var name = cam.TryGetProperty("name", out var n) ? n.GetString() ?? string.Empty : string.Empty;
-                var location = cam.TryGetProperty("location", out var loc) ? loc.GetString() ?? string.Empty : string.Empty;
-                var label = $"{name} {location}";
-
-                if (!filters.Any(f => label.Contains(f, StringComparison.OrdinalIgnoreCase)))
+                if (!cam.TryGetProperty("location", out var locArr) || locArr.GetArrayLength() < 2)
+                    continue;
+                if (!cam.TryGetProperty("itemId", out var idEl))
                     continue;
 
-                var imageUrl = cam.TryGetProperty("imageUrl", out var img) ? img.GetString() ?? string.Empty : string.Empty;
-                if (string.IsNullOrWhiteSpace(imageUrl)) continue;
+                var lat = locArr[0].GetDouble();
+                var lon = locArr[1].GetDouble();
 
+                if (Math.Abs(lat - pass.Lat) > pass.Radius || Math.Abs(lon - pass.Lon) > pass.Radius)
+                    continue;
+
+                var cameraId = idEl.GetInt32().ToString();
                 cameras.Add(new CameraImage
                 {
-                    CameraId = cam.TryGetProperty("id", out var cid) ? cid.ToString() : Guid.NewGuid().ToString(),
-                    Description = string.IsNullOrWhiteSpace(name) ? location : name,
-                    ImageUrl = imageUrl,
+                    CameraId = cameraId,
+                    Description = $"{pass.Label} - Camera {seq++}",
+                    ImageUrl = $"{CameraImageBaseUrl}{cameraId}",
                     CapturedAt = DateTime.UtcNow
                 });
             }
 
-            return cameras.Count > 0 ? cameras : GetFallback(passId);
+            return cameras;
         }
         catch
         {
-            return GetFallback(passId);
+            return [];
         }
     }
-
-    private static List<CameraImage> GetFallback(string passId) =>
-        FallbackCameras.TryGetValue(passId, out var fallback) ? fallback : [];
 }
