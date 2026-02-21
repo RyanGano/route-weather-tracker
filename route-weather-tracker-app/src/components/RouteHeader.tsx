@@ -4,9 +4,9 @@ import Navbar from "react-bootstrap/Navbar";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Offcanvas from "react-bootstrap/Offcanvas";
-import Form from "react-bootstrap/Form";
 import type { Route, RouteEndpoint, SelectedRoute } from "../types/routeTypes";
 import { passesOnRoute } from "../types/routeTypes";
+import CityCombobox from "./CityCombobox";
 
 interface Props {
   endpoints: RouteEndpoint[];
@@ -108,41 +108,24 @@ export default function RouteHeader({
           <Offcanvas.Title>Choose Route</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-          <Form>
-            <Form.Group className="mb-3" controlId="routeFrom">
-              <Form.Label className="fw-semibold">From</Form.Label>
-              <Form.Select
-                value={draftFromId}
-                onChange={(e) => setDraftFromId(e.target.value)}
-                disabled={endpoints.length === 0}
-              >
-                <option value="">Select a starting point…</option>
-                {endpoints.map((ep) => (
-                  <option key={ep.id} value={ep.id}>
-                    {endpointLabel(ep)}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-
-            <Form.Group className="mb-4" controlId="routeTo">
-              <Form.Label className="fw-semibold">To</Form.Label>
-              <Form.Select
-                value={draftToId}
-                onChange={(e) => setDraftToId(e.target.value)}
-                disabled={endpoints.length === 0}
-              >
-                <option value="">Select a destination…</option>
-                {endpoints
-                  .filter((ep) => ep.id !== draftFromId)
-                  .map((ep) => (
-                    <option key={ep.id} value={ep.id}>
-                      {endpointLabel(ep)}
-                    </option>
-                  ))}
-              </Form.Select>
-            </Form.Group>
-          </Form>
+          <CityCombobox
+            label="From"
+            endpoints={endpoints}
+            value={draftFromId}
+            onChange={setDraftFromId}
+            disabled={endpoints.length === 0}
+            placeholder="Type a city or state…"
+            exclude={draftToId}
+          />
+          <CityCombobox
+            label="To"
+            endpoints={endpoints}
+            value={draftToId}
+            onChange={setDraftToId}
+            disabled={endpoints.length === 0}
+            placeholder="Type a city or state…"
+            exclude={draftFromId}
+          />
 
           {/* Route option buttons — shown once a valid pair is selected */}
           {draftFrom && draftTo && draftFrom.id !== draftTo.id && (
