@@ -3,6 +3,7 @@
 Shows current conditions, webcams, and weather forecasts for mountain passes along the route from **Stanwood, WA** to **Kalispell, MT**.
 
 **Passes covered:**
+
 - Snoqualmie Pass (I-90, WA)
 - Fourth of July Pass (I-90, ID)
 - Lookout Pass (I-90, MT/ID)
@@ -17,20 +18,23 @@ Shows current conditions, webcams, and weather forecasts for mountain passes alo
 
 The following secrets must exist in the `route-weather-tracker-kv` Azure Key Vault at `https://route-weather-tracker-kv.vault.azure.net/`:
 
-| Secret Name | How to obtain |
-|---|---|
-| `WsdotApiKey` | Request a free key at https://wsdot.wa.gov/traffic/api/ |
-| `OpenWeatherApiKey` | Sign up free at https://openweathermap.org/ |
+| Secret Name         | How to obtain                                           |
+| ------------------- | ------------------------------------------------------- |
+| `WsdotApiKey`       | Request a free key at https://wsdot.wa.gov/traffic/api/ |
+| `OpenWeatherApiKey` | Sign up free at https://openweathermap.org/             |
 
 ## Local Development Setup
 
 1. Sign in to Azure so `DefaultAzureCredential` can resolve Key Vault secrets:
+
    ```bash
    az login
    ```
+
    Your account needs the **Key Vault Secrets User** role on `route-weather-tracker-kv`.
 
 2. Restore dependencies:
+
    ```bash
    dotnet restore
    cd route-weather-tracker-app && yarn install && cd ..

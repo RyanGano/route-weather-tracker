@@ -1,5 +1,5 @@
-import type { CameraImage } from '../types/passTypes';
-import { useEffect, useState } from 'react';
+import type { CameraImage } from "../types/passTypes";
+import { useEffect, useState } from "react";
 
 interface WebcamViewerProps {
   cameras: CameraImage[];
@@ -21,7 +21,9 @@ export default function WebcamViewer({ cameras }: WebcamViewerProps) {
 
   if (cameras.length === 0) {
     return (
-      <div className="text-muted small fst-italic py-2">No webcam available</div>
+      <div className="text-muted small fst-italic py-2">
+        No webcam available
+      </div>
     );
   }
 
@@ -34,9 +36,9 @@ export default function WebcamViewer({ cameras }: WebcamViewerProps) {
               src={`${cam.imageUrl}?t=${cacheBuster}`}
               alt={cam.description}
               className="img-fluid rounded border"
-              style={{ maxHeight: '200px', objectFit: 'cover', width: '100%' }}
+              style={{ maxHeight: "200px", objectFit: "cover", width: "100%" }}
               onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
+                (e.target as HTMLImageElement).style.display = "none";
               }}
             />
             <div className="text-muted small mt-1">{cam.description}</div>

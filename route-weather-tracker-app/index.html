@@ -7,10 +7,16 @@
     <title>Route Weather Tracker</title>
     <script>
       (function () {
-        var mq = window.matchMedia('(prefers-color-scheme: dark)');
-        document.documentElement.setAttribute('data-bs-theme', mq.matches ? 'dark' : 'light');
-        mq.addEventListener('change', function (e) {
-          document.documentElement.setAttribute('data-bs-theme', e.matches ? 'dark' : 'light');
+        var mq = window.matchMedia("(prefers-color-scheme: dark)");
+        document.documentElement.setAttribute(
+          "data-bs-theme",
+          mq.matches ? "dark" : "light",
+        );
+        mq.addEventListener("change", function (e) {
+          document.documentElement.setAttribute(
+            "data-bs-theme",
+            e.matches ? "dark" : "light",
+          );
         });
       })();
     </script>
@@ -20,3 +26,4 @@
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+

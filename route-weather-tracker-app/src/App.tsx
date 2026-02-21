@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
-import Container from 'react-bootstrap/Container';
-import Spinner from 'react-bootstrap/Spinner';
-import Alert from 'react-bootstrap/Alert';
-import Placeholder from 'react-bootstrap/Placeholder';
-import Card from 'react-bootstrap/Card';
-import RouteHeader from './components/RouteHeader';
-import RouteStatus from './components/RouteStatus';
-import PassCard from './components/PassCard';
-import { getAllPasses } from './services/passService';
-import type { PassSummary } from './types/passTypes';
-import './App.css';
+import { useEffect, useState } from "react";
+import Container from "react-bootstrap/Container";
+import Spinner from "react-bootstrap/Spinner";
+import Alert from "react-bootstrap/Alert";
+import Placeholder from "react-bootstrap/Placeholder";
+import Card from "react-bootstrap/Card";
+import RouteHeader from "./components/RouteHeader";
+import RouteStatus from "./components/RouteStatus";
+import PassCard from "./components/PassCard";
+import { getAllPasses } from "./services/passService";
+import type { PassSummary } from "./types/passTypes";
+import "./App.css";
 
 function PassCardSkeleton() {
   return (
@@ -49,7 +49,7 @@ export default function App() {
           setError(
             err instanceof Error
               ? err.message
-              : 'Unable to load pass data. The backend service may be unavailable.'
+              : "Unable to load pass data. The backend service may be unavailable.",
           );
         }
       } finally {
@@ -58,7 +58,9 @@ export default function App() {
     }
 
     fetchPasses();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -85,7 +87,9 @@ export default function App() {
         )}
 
         {!loading && !error && passes.length === 0 && (
-          <Alert variant="warning">No pass data returned from the service.</Alert>
+          <Alert variant="warning">
+            No pass data returned from the service.
+          </Alert>
         )}
 
         {!loading && !error && (
@@ -100,3 +104,4 @@ export default function App() {
     </>
   );
 }
+

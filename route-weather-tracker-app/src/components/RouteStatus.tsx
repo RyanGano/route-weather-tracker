@@ -1,5 +1,5 @@
-import Alert from 'react-bootstrap/Alert';
-import type { PassSummary } from '../types/passTypes';
+import Alert from "react-bootstrap/Alert";
+import type { PassSummary } from "../types/passTypes";
 
 /** Number of days ahead to inspect for worst-case conditions */
 const DAYS_AHEAD = 2;
@@ -17,32 +17,47 @@ type Severity = 0 | 1 | 2 | 3 | 4 | 5;
  */
 function getSeverity(description: string, iconCode: string): Severity {
   const d = description.toLowerCase();
-  if (d.includes('blizzard') || d.includes('heavy snow')) return 5;
-  if (d.includes('snow') || d.includes('sleet') || iconCode.startsWith('13')) return 4;
-  if (d.includes('freezing') || d.includes('ice')) return 4;
-  if (d.includes('thunderstorm') || iconCode.startsWith('11')) return 3;
-  if (d.includes('heavy rain') || d.includes('rain') || d.includes('drizzle') || d.includes('shower')
-    || iconCode.startsWith('09') || iconCode.startsWith('10')) return 2;
-  if (d.includes('cloud') || d.includes('overcast') || d.includes('fog') || d.includes('mist')
-    || iconCode.startsWith('04') || iconCode.startsWith('50')) return 1;
+  if (d.includes("blizzard") || d.includes("heavy snow")) return 5;
+  if (d.includes("snow") || d.includes("sleet") || iconCode.startsWith("13"))
+    return 4;
+  if (d.includes("freezing") || d.includes("ice")) return 4;
+  if (d.includes("thunderstorm") || iconCode.startsWith("11")) return 3;
+  if (
+    d.includes("heavy rain") ||
+    d.includes("rain") ||
+    d.includes("drizzle") ||
+    d.includes("shower") ||
+    iconCode.startsWith("09") ||
+    iconCode.startsWith("10")
+  )
+    return 2;
+  if (
+    d.includes("cloud") ||
+    d.includes("overcast") ||
+    d.includes("fog") ||
+    d.includes("mist") ||
+    iconCode.startsWith("04") ||
+    iconCode.startsWith("50")
+  )
+    return 1;
   return 0;
 }
 
 function severityVariant(s: Severity): string {
-  if (s >= 5) return 'danger';
-  if (s >= 4) return 'warning';
-  if (s >= 3) return 'warning';
-  if (s >= 2) return 'info';
-  return 'success';
+  if (s >= 5) return "danger";
+  if (s >= 4) return "warning";
+  if (s >= 3) return "warning";
+  if (s >= 2) return "info";
+  return "success";
 }
 
 function severityIcon(s: Severity): string {
-  if (s >= 5) return '🌨️';
-  if (s >= 4) return '❄️';
-  if (s >= 3) return '⛈️';
-  if (s >= 2) return '🌧️';
-  if (s >= 1) return '🌥️';
-  return '✅';
+  if (s >= 5) return "🌨️";
+  if (s >= 4) return "❄️";
+  if (s >= 3) return "⛈️";
+  if (s >= 2) return "🌧️";
+  if (s >= 1) return "🌥️";
+  return "✅";
 }
 
 function capitalize(s: string) {
@@ -62,7 +77,7 @@ export default function RouteStatus({ passes }: Props) {
   cutoff.setDate(cutoff.getDate() + DAYS_AHEAD);
 
   let worstSeverity: Severity = 0;
-  let worstDescription = 'clear skies';
+  let worstDescription = "clear skies";
 
   for (const pass of passes) {
     if (!pass.weather) continue;
@@ -82,7 +97,7 @@ export default function RouteStatus({ passes }: Props) {
 
   let message: string;
   if (worstSeverity === 0) {
-    message = 'Clear conditions expected across all passes.';
+    message = "Clear conditions expected across all passes.";
   } else if (worstSeverity === 1) {
     message = `${capitalize(worstDescription)} expected on route in the next ${DAYS_AHEAD} days.`;
   } else {
@@ -94,7 +109,9 @@ export default function RouteStatus({ passes }: Props) {
       variant={variant}
       className="py-2 d-flex align-items-center gap-2 mb-4"
     >
-      <span role="img" aria-label="status" style={{ fontSize: '1.25rem' }}>{icon}</span>
+      <span role="img" aria-label="status" style={{ fontSize: "1.25rem" }}>
+        {icon}
+      </span>
       <div>
         <strong>Route status:</strong> {message}
       </div>

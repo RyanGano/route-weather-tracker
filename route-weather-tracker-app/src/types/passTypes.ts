@@ -4,7 +4,8 @@ export const TravelRestriction = {
   ChainsRequired: 2,
   Closed: 3,
 } as const;
-export type TravelRestriction = typeof TravelRestriction[keyof typeof TravelRestriction];
+export type TravelRestriction =
+  (typeof TravelRestriction)[keyof typeof TravelRestriction];
 
 export interface PassInfo {
   id: string;

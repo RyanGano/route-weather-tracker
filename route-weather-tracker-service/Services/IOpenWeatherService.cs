@@ -4,5 +4,5 @@ namespace route_weather_tracker_service.Services;
 
 public interface IOpenWeatherService
 {
-    Task<PassWeatherForecast?> GetForecastAsync(string passId, double latitude, double longitude, CancellationToken ct = default);
+  Task<PassWeatherForecast?> GetForecastAsync(string passId, double latitude, double longitude, CancellationToken ct = default);
 }
