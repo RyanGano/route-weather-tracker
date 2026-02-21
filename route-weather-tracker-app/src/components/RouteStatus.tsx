@@ -89,14 +89,17 @@ export default function RouteStatus({ passes }: Props) {
   today.setHours(0, 0, 0, 0);
 
   // Aggregate worst severity per day-offset across all passes
-  const byOffset = new Map<number, { severity: Severity; description: string }>();
+  const byOffset = new Map<
+    number,
+    { severity: Severity; description: string }
+  >();
   for (const pass of passes) {
     if (!pass.weather) continue;
     for (const day of pass.weather.dailyForecasts) {
       const date = new Date(day.date);
       date.setHours(0, 0, 0, 0);
       const offset = Math.round(
-        (date.getTime() - today.getTime()) / 86_400_000
+        (date.getTime() - today.getTime()) / 86_400_000,
       );
       if (offset < 0 || offset >= LOOK_AHEAD_DAYS) continue;
       const s = getSeverity(day.description, day.iconCode);
@@ -109,8 +112,16 @@ export default function RouteStatus({ passes }: Props) {
   const slots: DaySlot[] = Array.from({ length: LOOK_AHEAD_DAYS }, (_, i) => {
     const date = new Date(today);
     date.setDate(today.getDate() + i);
-    const data = byOffset.get(i) ?? { severity: 0 as Severity, description: "clear skies" };
-    return { date, offset: i, severity: data.severity as Severity, worstDescription: data.description };
+    const data = byOffset.get(i) ?? {
+      severity: 0 as Severity,
+      description: "clear skies",
+    };
+    return {
+      date,
+      offset: i,
+      severity: data.severity as Severity,
+      worstDescription: data.description,
+    };
   });
 
   if (slots.length === 0) return null;
@@ -144,7 +155,9 @@ export default function RouteStatus({ passes }: Props) {
     icon = severityIcon(nowSlot.severity);
     const nextGood = slots.slice(1).find((s) => s.severity < BAD_THRESHOLD);
     if (!nextGood) {
-      const leastBad = slots.reduce((a, b) => (b.severity < a.severity ? b : a));
+      const leastBad = slots.reduce((a, b) =>
+        b.severity < a.severity ? b : a,
+      );
       message = `Challenging conditions forecast all week — ${dayLabel(leastBad.offset, leastBad.date)} may be the best window.`;
     } else if (nextGood.offset === 1) {
       message = `${capitalize(nowSlot.worstDescription)} today — conditions improve tomorrow.`;
