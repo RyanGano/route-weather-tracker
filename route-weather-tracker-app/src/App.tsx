@@ -7,9 +7,13 @@ import Card from "react-bootstrap/Card";
 import RouteHeader from "./components/RouteHeader";
 import RouteStatus from "./components/RouteStatus";
 import PassCard from "./components/PassCard";
-import { getRouteEndpoints, getAllPasses } from "./services/passService";
+import {
+  getRouteEndpoints,
+  getAllPasses,
+  getRoutes,
+} from "./services/passService";
 import type { PassSummary } from "./types/passTypes";
-import type { RouteEndpoint, SelectedRoute } from "./types/routeTypes";
+import type { Route, RouteEndpoint, SelectedRoute } from "./types/routeTypes";
 import "./App.css";
 
 function PassCardSkeleton() {
@@ -33,6 +37,7 @@ function PassCardSkeleton() {
 
 export default function App() {
   const [endpoints, setEndpoints] = useState<RouteEndpoint[]>([]);
+  const [routes, setRoutes] = useState<Route[]>([]);
   const [selectedRoute, setSelectedRoute] = useState<SelectedRoute | null>(
     null,
   );
@@ -40,14 +45,15 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load route endpoints once on mount and default to Stanwood → Kalispell
+  // Load endpoints and routes once on mount; default to Stanwood → Kalispell via I-90
   useEffect(() => {
-    getRouteEndpoints()
-      .then((eps) => {
+    Promise.all([getRouteEndpoints(), getRoutes()])
+      .then(([eps, rts]) => {
         setEndpoints(eps);
+        setRoutes(rts);
         const from = eps.find((e) => e.id === "stanwood");
         const to = eps.find((e) => e.id === "kalispell");
-        if (from && to) setSelectedRoute({ from, to });
+        if (from && to) setSelectedRoute({ from, to, highway: "I-90" });
       })
       .catch(() => {
         // Non-fatal — the pass fetch will show the real error
@@ -67,6 +73,7 @@ export default function App() {
         const data = await getAllPasses(
           selectedRoute!.from.id,
           selectedRoute!.to.id,
+          selectedRoute!.highway,
         );
         if (!cancelled) setPasses(data);
       } catch (err) {
@@ -92,6 +99,7 @@ export default function App() {
     <>
       <RouteHeader
         endpoints={endpoints}
+        routes={routes}
         selectedRoute={selectedRoute}
         onRouteChange={setSelectedRoute}
       />

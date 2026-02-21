@@ -20,17 +20,24 @@ public class PassesController : ControllerBase
   /// <summary>
   /// Returns pass summaries. Pass <c>from</c> and <c>to</c> endpoint IDs to filter
   /// to only the passes that fall between those two locations (in trip order).
-  /// Omit both to get all known passes.
+  /// Optionally pass <c>highway</c> (e.g. "I-90" or "US-2") to restrict results
+  /// to a specific highway corridor. Omit all params to get every known pass.
   /// </summary>
   [HttpGet]
   public async Task<IActionResult> GetAll(
       [FromQuery] string? from,
       [FromQuery] string? to,
+      [FromQuery] string? highway,
       CancellationToken ct)
   {
     try
     {
       List<string> passIds;
+
+      // Start with all passes, optionally pre-filtered by highway
+      var candidates = string.IsNullOrWhiteSpace(highway)
+          ? PassRegistry.Passes
+          : PassRegistry.Passes.Where(p => p.Highway.Equals(highway, StringComparison.OrdinalIgnoreCase)).ToList();
 
       if (from is not null && to is not null)
       {
@@ -43,7 +50,7 @@ public class PassesController : ControllerBase
         var maxLon = Math.Max(fromEp.Longitude, toEp.Longitude);
         var eastward = toEp.Longitude > fromEp.Longitude;
 
-        passIds = PassRegistry.Passes
+        passIds = candidates
             .Where(p => p.Longitude > minLon && p.Longitude < maxLon)
             .OrderBy(p => eastward ? p.Longitude : -p.Longitude)
             .Select(p => p.Id)
@@ -51,7 +58,7 @@ public class PassesController : ControllerBase
       }
       else
       {
-        passIds = PassRegistry.Passes.Select(p => p.Id).ToList();
+        passIds = candidates.Select(p => p.Id).ToList();
       }
 
       var passes = await _aggregator.GetPassesAsync(passIds, ct);

@@ -22,13 +22,15 @@ public class WsdotService : IWsdotService
   // WSDOT Mountain Pass IDs — verified from GetMountainPassConditionsAsJson
   private static readonly Dictionary<string, int> PassIdMap = new(StringComparer.OrdinalIgnoreCase)
   {
-    ["snoqualmie"] = 11   // Snoqualmie Pass I-90 (MountainPassId=11 in WSDOT data)
+    ["snoqualmie"] = 11,  // Snoqualmie Pass I-90 (MountainPassId=11 in WSDOT data)
+    ["stevens-pass"] = 2    // Stevens Pass US-2 (MountainPassId=2 in WSDOT data)
   };
 
   // Camera Title substrings used to filter the HighwayCameras response
   private static readonly Dictionary<string, string[]> CameraLocationFilters = new(StringComparer.OrdinalIgnoreCase)
   {
-    ["snoqualmie"] = ["Snoqualmie", "I-90 at MP 52", "I-90 at MP 53"]
+    ["snoqualmie"] = ["Snoqualmie", "I-90 at MP 52", "I-90 at MP 53"],
+    ["stevens-pass"] = ["Stevens Pass Summit", "MP 64.6", "MP 65"]
   };
 
   public WsdotService(HttpClient http, IConfiguration configuration)
@@ -63,6 +65,8 @@ public class WsdotService : IWsdotService
         TemperatureFahrenheit = root.TryGetProperty("TemperatureInFahrenheit", out var temp) ? temp.GetInt32() : 0,
         EastboundRestriction = restriction.Eastbound,
         WestboundRestriction = restriction.Westbound,
+        EastboundRestrictionText = restriction.EastboundText,
+        WestboundRestrictionText = restriction.WestboundText,
         LastUpdated = root.TryGetProperty("DateUpdated", out var dt)
               ? DateTime.TryParse(dt.GetString(), out var parsed) ? parsed : DateTime.UtcNow
               : DateTime.UtcNow
@@ -112,27 +116,28 @@ public class WsdotService : IWsdotService
     }
   }
 
-  private static (TravelRestriction Eastbound, TravelRestriction Westbound) ParseRestriction(
+  private static (TravelRestriction Eastbound, TravelRestriction Westbound, string EastboundText, string WestboundText) ParseRestriction(
       bool advisoryActive, JsonElement? restriction1, JsonElement? restriction2)
   {
     if (!advisoryActive)
-      return (TravelRestriction.None, TravelRestriction.None);
+      return (TravelRestriction.None, TravelRestriction.None, string.Empty, string.Empty);
 
-    var eb = ParseSingleRestriction(restriction1);
-    var wb = ParseSingleRestriction(restriction2);
-    return (eb, wb);
+    var (ebEnum, ebText) = ParseSingleRestriction(restriction1);
+    var (wbEnum, wbText) = ParseSingleRestriction(restriction2);
+    return (ebEnum, wbEnum, ebText, wbText);
   }
 
-  private static TravelRestriction ParseSingleRestriction(JsonElement? r)
+  private static (TravelRestriction Restriction, string Text) ParseSingleRestriction(JsonElement? r)
   {
-    if (r is null) return TravelRestriction.None;
+    if (r is null) return (TravelRestriction.None, string.Empty);
     var text = r.Value.TryGetProperty("RestrictionText", out var rt) ? rt.GetString() ?? "" : "";
-    return text.ToLowerInvariant() switch
+    var restriction = text.ToLowerInvariant() switch
     {
       var t when t.Contains("chain") => TravelRestriction.ChainsRequired,
       var t when t.Contains("traction") || t.Contains("tires") => TravelRestriction.TiresOrTraction,
       var t when t.Contains("closed") => TravelRestriction.Closed,
       _ => TravelRestriction.None
     };
+    return (restriction, text);
   }
 }

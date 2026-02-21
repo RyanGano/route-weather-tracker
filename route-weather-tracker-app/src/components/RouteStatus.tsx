@@ -1,5 +1,7 @@
 import Alert from "react-bootstrap/Alert";
+import Badge from "react-bootstrap/Badge";
 import type { PassSummary } from "../types/passTypes";
+import { TravelRestriction } from "../types/passTypes";
 
 /** Days ahead to scan for drive-planning advice */
 const LOOK_AHEAD_DAYS = 7;
@@ -167,17 +169,74 @@ export default function RouteStatus({ passes }: Props) {
     }
   }
 
+  // Collect passes with active restrictions for the overview banner
+  const restrictedPasses = passes
+    .filter(
+      (p) =>
+        p.condition &&
+        (p.condition.eastboundRestriction !== TravelRestriction.None ||
+          p.condition.westboundRestriction !== TravelRestriction.None),
+    )
+    .map((p) => {
+      const eb = p.condition!.eastboundRestriction;
+      const wb = p.condition!.westboundRestriction;
+      const ebText = p.condition!.eastboundRestrictionText;
+      const wbText = p.condition!.westboundRestrictionText;
+
+      // Build a concise per-pass restriction description
+      const sameRestriction = eb === wb && ebText === wbText;
+
+      const label = (restriction: TravelRestriction, text: string) => {
+        if (text) return text;
+        if (restriction === TravelRestriction.Closed) return "Closed";
+        if (restriction === TravelRestriction.ChainsRequired)
+          return "Chains Required";
+        if (restriction === TravelRestriction.TiresOrTraction)
+          return "Traction Tires Required";
+        return "";
+      };
+
+      const detail = sameRestriction
+        ? label(eb, ebText)
+        : `EB: ${label(eb, ebText)} / WB: ${label(wb, wbText)}`;
+
+      return { name: p.info.name, detail };
+    });
+
   return (
-    <Alert
-      variant={variant}
-      className="py-2 d-flex align-items-center gap-2 mb-4"
-    >
-      <span role="img" aria-label="status" style={{ fontSize: "1.25rem" }}>
-        {icon}
-      </span>
-      <div>
-        <strong>Best time to drive:</strong> {message}
-      </div>
-    </Alert>
+    <>
+      <Alert
+        variant={variant}
+        className="py-2 d-flex align-items-center gap-2 mb-2"
+      >
+        <span role="img" aria-label="status" style={{ fontSize: "1.25rem" }}>
+          {icon}
+        </span>
+        <div>
+          <strong>Best time to drive:</strong> {message}
+        </div>
+      </Alert>
+
+      {restrictedPasses.length > 0 && (
+        <Alert variant="warning" className="py-2 mb-4">
+          <span className="me-2">⚠️</span>
+          <strong>Active Restrictions:</strong>{" "}
+          {restrictedPasses.map((rp, i) => (
+            <span key={rp.name}>
+              {i > 0 && <span className="mx-1 text-muted">·</span>}
+              <span className="fw-semibold">{rp.name}</span>
+              {rp.detail && (
+                <>
+                  {" — "}
+                  <Badge bg="warning" text="dark">
+                    {rp.detail}
+                  </Badge>
+                </>
+              )}
+            </span>
+          ))}
+        </Alert>
+      )}
+    </>
   );
 }

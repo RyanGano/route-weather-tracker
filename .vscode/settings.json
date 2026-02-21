@@ -11,6 +11,7 @@
     "dotnet test": true,
     "yarn add": true,
     "yarn install": true,
-    "dotnet package": true
+    "dotnet package": true,
+    "npx tsc": true
   }
 }

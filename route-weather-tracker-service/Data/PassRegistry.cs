@@ -4,7 +4,7 @@ namespace route_weather_tracker_service.Data;
 
 public static class PassRegistry
 {
-  public static readonly IReadOnlyList<PassInfo> Passes = new List<PassInfo>
+    public static readonly IReadOnlyList<PassInfo> Passes = new List<PassInfo>
     {
         new PassInfo
         {
@@ -16,6 +16,17 @@ public static class PassRegistry
             Longitude = -121.4116,
             State = "WA",
             OfficialUrl = "https://wsdot.com/travel/real-time/mountainpasses/snoqualmie"
+        },
+        new PassInfo
+        {
+            Id = "stevens-pass",
+            Name = "Stevens Pass",
+            Highway = "US-2",
+            ElevationFeet = 4061,
+            Latitude = 47.7447,
+            Longitude = -121.0891,
+            State = "WA",
+            OfficialUrl = "https://wsdot.com/travel/real-time/mountainpasses/stevens"
         },
         new PassInfo
         {
@@ -41,6 +52,6 @@ public static class PassRegistry
         }
     };
 
-  public static PassInfo? GetById(string id) =>
-      Passes.FirstOrDefault(p => p.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
+    public static PassInfo? GetById(string id) =>
+        Passes.FirstOrDefault(p => p.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
 }

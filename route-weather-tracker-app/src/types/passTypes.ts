@@ -24,6 +24,9 @@ export interface PassCondition {
   weatherCondition: string;
   eastboundRestriction: TravelRestriction;
   westboundRestriction: TravelRestriction;
+  /** Raw restriction text from the data source (e.g. "Traction Tires Advised, Oversize Vehicles Prohibited"). Empty for derived conditions. */
+  eastboundRestrictionText: string;
+  westboundRestrictionText: string;
   temperatureFahrenheit: number;
   lastUpdated: string;
 }

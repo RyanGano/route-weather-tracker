@@ -10,24 +10,42 @@ interface PassCardProps {
   pass: PassSummary;
 }
 
-function restrictionBadge(restriction: TravelRestriction) {
+/**
+ * Returns a human-readable label for a travel restriction.
+ * Prefers the raw source text (which includes "Advised" or "Required") over
+ * the generic enum-derived fallback.
+ */
+function restrictionLabel(
+  restriction: TravelRestriction,
+  text?: string,
+): string {
+  if (text) return text;
   switch (restriction) {
     case TravelRestriction.Closed:
-      return <Badge bg="danger">Closed</Badge>;
+      return "Closed";
     case TravelRestriction.ChainsRequired:
-      return (
-        <Badge bg="warning" text="dark">
-          Chains Required
-        </Badge>
-      );
+      return "Chains Required";
+    case TravelRestriction.TiresOrTraction:
+      return "Traction Tires Required";
+    default:
+      return "No Restrictions";
+  }
+}
+
+function restrictionBadge(restriction: TravelRestriction, text?: string) {
+  const label = restrictionLabel(restriction, text);
+  switch (restriction) {
+    case TravelRestriction.Closed:
+      return <Badge bg="danger">{label}</Badge>;
+    case TravelRestriction.ChainsRequired:
     case TravelRestriction.TiresOrTraction:
       return (
         <Badge bg="warning" text="dark">
-          Tires/Traction
+          {label}
         </Badge>
       );
     default:
-      return <Badge bg="success">No Restrictions</Badge>;
+      return <Badge bg="success">{label}</Badge>;
   }
 }
 
@@ -96,9 +114,23 @@ export default function PassCard({ pass }: PassCardProps) {
           variant="warning"
           className="mb-0 rounded-0 py-2 px-3 border-0 border-bottom"
         >
-          <strong>Travel Restrictions:</strong> EB:{" "}
-          {restrictionBadge(condition!.eastboundRestriction)} WB:{" "}
-          {restrictionBadge(condition!.westboundRestriction)}
+          <strong>Travel Restrictions</strong>
+          <div className="d-flex flex-wrap gap-3 mt-1 small">
+            <span>
+              <span className="fw-semibold">EB:</span>{" "}
+              {restrictionBadge(
+                condition!.eastboundRestriction,
+                condition!.eastboundRestrictionText || undefined,
+              )}
+            </span>
+            <span>
+              <span className="fw-semibold">WB:</span>{" "}
+              {restrictionBadge(
+                condition!.westboundRestriction,
+                condition!.westboundRestrictionText || undefined,
+              )}
+            </span>
+          </div>
         </Alert>
       )}
 

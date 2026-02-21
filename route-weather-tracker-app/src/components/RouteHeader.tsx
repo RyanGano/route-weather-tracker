@@ -5,12 +5,12 @@ import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Form from "react-bootstrap/Form";
-import ListGroup from "react-bootstrap/ListGroup";
-import type { RouteEndpoint, SelectedRoute } from "../types/routeTypes";
+import type { Route, RouteEndpoint, SelectedRoute } from "../types/routeTypes";
 import { passesOnRoute } from "../types/routeTypes";
 
 interface Props {
   endpoints: RouteEndpoint[];
+  routes: Route[];
   selectedRoute: SelectedRoute | null;
   onRouteChange: (route: SelectedRoute) => void;
 }
@@ -19,10 +19,13 @@ function endpointLabel(ep: RouteEndpoint) {
   return `${ep.name}, ${ep.state}`;
 }
 
-export default function RouteHeader({ endpoints, selectedRoute, onRouteChange }: Props) {
+export default function RouteHeader({
+  endpoints,
+  routes,
+  selectedRoute,
+  onRouteChange,
+}: Props) {
   const [showDrawer, setShowDrawer] = useState(false);
-
-  // Draft state inside the drawer — committed only when the user clicks Apply
   const [draftFromId, setDraftFromId] = useState<string>("");
   const [draftToId, setDraftToId] = useState<string>("");
 
@@ -35,22 +38,22 @@ export default function RouteHeader({ endpoints, selectedRoute, onRouteChange }:
   }, [showDrawer, selectedRoute]);
 
   const draftFrom = endpoints.find((e) => e.id === draftFromId) ?? null;
-  const draftTo   = endpoints.find((e) => e.id === draftToId) ?? null;
+  const draftTo = endpoints.find((e) => e.id === draftToId) ?? null;
 
-  const previewPasses =
+  // Routes that have ≥1 pass between the chosen endpoints — used to render the option buttons.
+  const routeOptions =
     draftFrom && draftTo && draftFrom.id !== draftTo.id
-      ? passesOnRoute(draftFrom, draftTo)
+      ? routes
+          .map((r) => ({
+            route: r,
+            passes: passesOnRoute(draftFrom, draftTo, r.highway),
+          }))
+          .filter(({ passes }) => passes.length > 0)
       : [];
 
-  const canApply =
-    draftFrom !== null &&
-    draftTo !== null &&
-    draftFrom.id !== draftTo.id &&
-    previewPasses.length > 0;
-
-  function handleApply() {
+  function handleSelectRoute(r: Route) {
     if (!draftFrom || !draftTo) return;
-    onRouteChange({ from: draftFrom, to: draftTo });
+    onRouteChange({ from: draftFrom, to: draftTo, highway: r.highway });
     setShowDrawer(false);
   }
 
@@ -79,7 +82,7 @@ export default function RouteHeader({ endpoints, selectedRoute, onRouteChange }:
                 <span className="text-white fw-semibold">
                   {endpointLabel(selectedRoute.to)}
                 </span>
-                <Badge bg="info">I-90</Badge>
+                <Badge bg="info">{selectedRoute.highway}</Badge>
               </span>
             )}
 
@@ -141,44 +144,33 @@ export default function RouteHeader({ endpoints, selectedRoute, onRouteChange }:
             </Form.Group>
           </Form>
 
-          {/* Live pass preview */}
+          {/* Route option buttons — shown once a valid pair is selected */}
           {draftFrom && draftTo && draftFrom.id !== draftTo.id && (
-            <div className="mb-4">
-              <p className="fw-semibold mb-2">
-                {previewPasses.length > 0
-                  ? `${previewPasses.length} pass${previewPasses.length > 1 ? "es" : ""} on this route:`
-                  : "No tracked passes on this segment."}
-              </p>
-              {previewPasses.length > 0 && (
-                <ListGroup variant="flush">
-                  {previewPasses.map((p) => (
-                    <ListGroup.Item
-                      key={p.id}
-                      className="px-0 py-1 d-flex justify-content-between align-items-center"
-                    >
-                      <span>{p.name}</span>
-                      <Badge bg="secondary">{p.state}</Badge>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
+            <div className="d-grid gap-2">
+              {routeOptions.length === 0 ? (
+                <p className="text-muted small mb-0">
+                  No tracked passes found on any route between these cities.
+                </p>
+              ) : (
+                routeOptions.map(({ route, passes }) => (
+                  <Button
+                    key={route.id}
+                    variant="outline-primary"
+                    className="text-start py-2 px-3"
+                    onClick={() => handleSelectRoute(route)}
+                  >
+                    <div className="d-flex align-items-center gap-2">
+                      <span className="fw-semibold">{route.name}</span>
+                      <Badge bg="info">{route.highway}</Badge>
+                    </div>
+                    <div className="text-muted small mt-1">
+                      {passes.map((p) => p.name).join(" • ")}
+                    </div>
+                  </Button>
+                ))
               )}
             </div>
           )}
-
-          <div className="d-grid">
-            <Button
-              variant="primary"
-              onClick={handleApply}
-              disabled={!canApply}
-            >
-              Apply Route
-            </Button>
-          </div>
-
-          <p className="text-muted small mt-3">
-            All routes track I-90 mountain passes with live webcam images,
-            weather forecasts, and road conditions.
-          </p>
         </Offcanvas.Body>
       </Offcanvas>
     </>
