@@ -28,10 +28,12 @@ public class PassAggregatorService : IPassAggregatorService
     _cache = cache;
   }
 
-  public async Task<List<PassSummary>> GetAllPassesAsync(CancellationToken ct = default)
+  public Task<List<PassSummary>> GetAllPassesAsync(CancellationToken ct = default) =>
+      GetPassesAsync(PassRegistry.Passes.Select(p => p.Id), ct);
+
+  public async Task<List<PassSummary>> GetPassesAsync(IEnumerable<string> passIds, CancellationToken ct = default)
   {
-    var summaries = await Task.WhenAll(
-        PassRegistry.Passes.Select(p => GetPassAsync(p.Id, ct)));
+    var summaries = await Task.WhenAll(passIds.Select(id => GetPassAsync(id, ct)));
     return summaries.Where(s => s is not null).Select(s => s!).ToList();
   }
 

@@ -7,8 +7,9 @@ import Card from "react-bootstrap/Card";
 import RouteHeader from "./components/RouteHeader";
 import RouteStatus from "./components/RouteStatus";
 import PassCard from "./components/PassCard";
-import { getAllPasses } from "./services/passService";
+import { getRouteEndpoints, getAllPasses } from "./services/passService";
 import type { PassSummary } from "./types/passTypes";
+import type { RouteEndpoint, SelectedRoute } from "./types/routeTypes";
 import "./App.css";
 
 function PassCardSkeleton() {
@@ -31,18 +32,42 @@ function PassCardSkeleton() {
 }
 
 export default function App() {
+  const [endpoints, setEndpoints] = useState<RouteEndpoint[]>([]);
+  const [selectedRoute, setSelectedRoute] = useState<SelectedRoute | null>(
+    null,
+  );
   const [passes, setPasses] = useState<PassSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Load route endpoints once on mount and default to Stanwood → Kalispell
   useEffect(() => {
+    getRouteEndpoints()
+      .then((eps) => {
+        setEndpoints(eps);
+        const from = eps.find((e) => e.id === "stanwood");
+        const to = eps.find((e) => e.id === "kalispell");
+        if (from && to) setSelectedRoute({ from, to });
+      })
+      .catch(() => {
+        // Non-fatal — the pass fetch will show the real error
+      });
+  }, []);
+
+  // Fetch pass data whenever the selected route changes
+  useEffect(() => {
+    if (!selectedRoute) return;
+
     let cancelled = false;
 
     async function fetchPasses() {
       try {
         setLoading(true);
         setError(null);
-        const data = await getAllPasses();
+        const data = await getAllPasses(
+          selectedRoute!.from.id,
+          selectedRoute!.to.id,
+        );
         if (!cancelled) setPasses(data);
       } catch (err) {
         if (!cancelled) {
@@ -57,15 +82,19 @@ export default function App() {
       }
     }
 
-    fetchPasses();
+    void fetchPasses();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [selectedRoute]);
 
   return (
     <>
-      <RouteHeader />
+      <RouteHeader
+        endpoints={endpoints}
+        selectedRoute={selectedRoute}
+        onRouteChange={setSelectedRoute}
+      />
       <Container>
         {loading && (
           <>
@@ -104,4 +133,3 @@ export default function App() {
     </>
   );
 }
-
