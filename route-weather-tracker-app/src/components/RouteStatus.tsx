@@ -98,7 +98,7 @@ export default function RouteStatus({ passes }: Props) {
   for (const pass of passes) {
     if (!pass.weather) continue;
     for (const day of pass.weather.dailyForecasts) {
-      const date = new Date(day.date);
+      const date = new Date(day.date + "T00:00:00");
       date.setHours(0, 0, 0, 0);
       const offset = Math.round(
         (date.getTime() - today.getTime()) / 86_400_000,

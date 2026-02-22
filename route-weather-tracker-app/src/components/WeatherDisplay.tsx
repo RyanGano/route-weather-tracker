@@ -47,7 +47,7 @@ export default function WeatherDisplay({ weather }: WeatherDisplayProps) {
       {weather.dailyForecasts.length > 0 && (
         <div className="d-flex gap-2 flex-wrap">
           {weather.dailyForecasts.map((day) => {
-            const date = new Date(day.date);
+            const date = new Date(day.date + "T00:00:00");
             const label = date.toLocaleDateString("en-US", {
               weekday: "short",
               month: "short",
