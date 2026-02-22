@@ -48,7 +48,7 @@ function getSeverity(description: string, iconCode: string): Severity {
 }
 
 function severityVariant(s: Severity): string {
-  if (s >= 4) return "warning";
+  if (s >= 5) return "danger";
   if (s >= 3) return "warning";
   return "success";
 }
