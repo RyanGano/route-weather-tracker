@@ -34,6 +34,10 @@ public class PassesController : ControllerBase
     {
       List<string> passIds;
 
+      // Require both from and to, or neither
+      if ((from is null) != (to is null))
+        return BadRequest("Both 'from' and 'to' must be provided together, or both omitted.");
+
       // Start with all passes, optionally pre-filtered by highway
       var candidates = string.IsNullOrWhiteSpace(highway)
           ? PassRegistry.Passes
