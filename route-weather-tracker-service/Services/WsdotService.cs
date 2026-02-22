@@ -33,9 +33,12 @@ public class WsdotService : IWsdotService
     ["stevens-pass"] = ["Stevens Pass Summit", "MP 64.6", "MP 65"]
   };
 
-  public WsdotService(HttpClient http, IConfiguration configuration)
+  private readonly ILogger<WsdotService> _logger;
+
+  public WsdotService(HttpClient http, IConfiguration configuration, ILogger<WsdotService> logger)
   {
     _http = http;
+    _logger = logger;
     _apiKey = configuration["WsdotApiKey"]
         ?? throw new InvalidOperationException("WsdotApiKey secret not found. Ensure it is set in Azure Key Vault.");
   }
@@ -72,9 +75,20 @@ public class WsdotService : IWsdotService
               : DateTime.UtcNow
       };
     }
-    catch
+    catch (HttpRequestException ex)
     {
+      _logger.LogError(ex, "HTTP error fetching WSDOT condition for pass {PassId}", passId);
       return null;
+    }
+    catch (JsonException ex)
+    {
+      _logger.LogError(ex, "Failed to parse WSDOT condition response for pass {PassId}", passId);
+      return null;
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError(ex, "Unexpected error fetching WSDOT condition for pass {PassId}", passId);
+      throw;
     }
   }
 
@@ -110,9 +124,20 @@ public class WsdotService : IWsdotService
       }
       return cameras;
     }
-    catch
+    catch (HttpRequestException ex)
     {
+      _logger.LogError(ex, "HTTP error fetching WSDOT cameras for pass {PassId}", passId);
       return [];
+    }
+    catch (JsonException ex)
+    {
+      _logger.LogError(ex, "Failed to parse WSDOT cameras response for pass {PassId}", passId);
+      return [];
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError(ex, "Unexpected error fetching WSDOT cameras for pass {PassId}", passId);
+      throw;
     }
   }
 

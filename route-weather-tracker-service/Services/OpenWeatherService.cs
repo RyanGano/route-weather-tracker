@@ -13,11 +13,13 @@ public class OpenWeatherService : IOpenWeatherService
 {
   private readonly HttpClient _http;
   private readonly string _apiKey;
+  private readonly ILogger<OpenWeatherService> _logger;
   private const string BaseUrl = "https://api.openweathermap.org/data/2.5";
 
-  public OpenWeatherService(HttpClient http, IConfiguration configuration)
+  public OpenWeatherService(HttpClient http, IConfiguration configuration, ILogger<OpenWeatherService> logger)
   {
     _http = http;
+    _logger = logger;
     _apiKey = configuration["OpenWeatherApiKey"]
         ?? throw new InvalidOperationException("OpenWeatherApiKey secret not found. Ensure it is set in Azure Key Vault.");
   }
@@ -88,9 +90,20 @@ public class OpenWeatherService : IOpenWeatherService
         DailyForecasts = dailyForecasts
       };
     }
-    catch
+    catch (HttpRequestException ex)
     {
+      _logger.LogError(ex, "HTTP error fetching OpenWeather data for pass {PassId}", passId);
       return null;
+    }
+    catch (JsonException ex)
+    {
+      _logger.LogError(ex, "Failed to parse OpenWeather response for pass {PassId}", passId);
+      return null;
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError(ex, "Unexpected error fetching OpenWeather data for pass {PassId}", passId);
+      throw;
     }
   }
 }

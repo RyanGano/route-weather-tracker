@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging.Abstractions;
 using route_weather_tracker_service.Services;
 using route_weather_tracker_service.Tests.Helpers;
 
@@ -44,7 +45,7 @@ public class WsdotServiceTests
   public async Task GetPassConditionAsync_ReturnsCondition_ForSnoqualmie()
   {
     var http = MockHttpFactory.CreateWithJson(PassConditionJson);
-    var service = new WsdotService(http, BuildConfig());
+    var service = new WsdotService(http, BuildConfig(), NullLogger<WsdotService>.Instance);
 
     var condition = await service.GetPassConditionAsync("snoqualmie");
 
@@ -59,7 +60,7 @@ public class WsdotServiceTests
   public async Task GetPassConditionAsync_ReturnsNull_ForUnknownPass()
   {
     var http = MockHttpFactory.CreateWithJson(PassConditionJson);
-    var service = new WsdotService(http, BuildConfig());
+    var service = new WsdotService(http, BuildConfig(), NullLogger<WsdotService>.Instance);
 
     var condition = await service.GetPassConditionAsync("unknown-pass");
 
@@ -70,7 +71,7 @@ public class WsdotServiceTests
   public async Task GetPassConditionAsync_ReturnsNull_OnHttpFailure()
   {
     var http = MockHttpFactory.CreateFailing();
-    var service = new WsdotService(http, BuildConfig());
+    var service = new WsdotService(http, BuildConfig(), NullLogger<WsdotService>.Instance);
 
     var condition = await service.GetPassConditionAsync("snoqualmie");
 
@@ -81,7 +82,7 @@ public class WsdotServiceTests
   public async Task GetPassCamerasAsync_ReturnsCameras_FilteredByLocation()
   {
     var http = MockHttpFactory.CreateWithJson(CamerasJson);
-    var service = new WsdotService(http, BuildConfig());
+    var service = new WsdotService(http, BuildConfig(), NullLogger<WsdotService>.Instance);
 
     var cameras = await service.GetPassCamerasAsync("snoqualmie");
 
@@ -94,7 +95,7 @@ public class WsdotServiceTests
   public async Task GetPassCamerasAsync_ReturnsEmpty_ForIdahoPass()
   {
     var http = MockHttpFactory.CreateWithJson(CamerasJson);
-    var service = new WsdotService(http, BuildConfig());
+    var service = new WsdotService(http, BuildConfig(), NullLogger<WsdotService>.Instance);
 
     // Idaho passes are not served by WSDOT
     var cameras = await service.GetPassCamerasAsync("fourth-of-july");
@@ -106,7 +107,7 @@ public class WsdotServiceTests
   public async Task GetPassCamerasAsync_ReturnsEmpty_OnHttpFailure()
   {
     var http = MockHttpFactory.CreateFailing();
-    var service = new WsdotService(http, BuildConfig());
+    var service = new WsdotService(http, BuildConfig(), NullLogger<WsdotService>.Instance);
 
     var cameras = await service.GetPassCamerasAsync("snoqualmie");
 

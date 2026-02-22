@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Moq.Protected;
 using route_weather_tracker_service.Services;
@@ -78,7 +79,7 @@ public class OpenWeatherServiceTests
   [Fact]
   public async Task GetForecastAsync_ReturnsCurrentConditions()
   {
-    var service = new OpenWeatherService(BuildMultiResponseClient(), BuildConfig());
+    var service = new OpenWeatherService(BuildMultiResponseClient(), BuildConfig(), NullLogger<OpenWeatherService>.Instance);
 
     var forecast = await service.GetForecastAsync("snoqualmie", 47.4245, -121.4116);
 
@@ -92,7 +93,7 @@ public class OpenWeatherServiceTests
   [Fact]
   public async Task GetForecastAsync_ReturnsDailyForecasts()
   {
-    var service = new OpenWeatherService(BuildMultiResponseClient(), BuildConfig());
+    var service = new OpenWeatherService(BuildMultiResponseClient(), BuildConfig(), NullLogger<OpenWeatherService>.Instance);
 
     var forecast = await service.GetForecastAsync("snoqualmie", 47.4245, -121.4116);
 
@@ -115,7 +116,7 @@ public class OpenWeatherServiceTests
         .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized });
 
     var http = new HttpClient(handler.Object);
-    var service = new OpenWeatherService(http, BuildConfig());
+    var service = new OpenWeatherService(http, BuildConfig(), NullLogger<OpenWeatherService>.Instance);
 
     var forecast = await service.GetForecastAsync("snoqualmie", 47.4245, -121.4116);
 
