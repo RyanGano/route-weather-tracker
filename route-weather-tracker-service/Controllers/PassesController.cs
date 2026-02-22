@@ -46,6 +46,18 @@ public class PassesController : ControllerBase
       if ((from is null) != (to is null))
         return BadRequest("Both 'from' and 'to' must be provided together, or both omitted.");
 
+      // Validate the highway value is one we know about
+      if (!string.IsNullOrWhiteSpace(highway))
+      {
+        var knownHighways = PassRegistry.Passes
+            .Select(p => p.Highway)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        if (!knownHighways.Contains(highway))
+          return BadRequest(
+              $"Unknown highway '{highway}'. Valid values: {string.Join(", ", knownHighways.Order())}");
+      }
+
       // Start with all passes, optionally pre-filtered by highway
       var candidates = string.IsNullOrWhiteSpace(highway)
           ? PassRegistry.Passes
