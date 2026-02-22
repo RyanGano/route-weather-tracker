@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { PassSummary } from "../types/passTypes";
-import type { Route, RouteEndpoint } from "../types/routeTypes";
+import type { Route, RouteEndpoint, PassWaypoint } from "../types/routeTypes";
 
 // Aspire injects VITE_API_URL at runtime with the backend's service-discovered URL.
 // Fallback to empty string so the Vite dev-server proxy can also be used.
@@ -17,6 +17,12 @@ export async function getRouteEndpoints(): Promise<RouteEndpoint[]> {
 /** Returns all known highway routes (I-90, US-2, etc.). */
 export async function getRoutes(): Promise<Route[]> {
   const response = await api.get<Route[]>("/api/routes");
+  return response.data;
+}
+
+/** Returns minimal waypoint data (id, name, state, longitude, highway) for all known passes. */
+export async function getPassWaypoints(): Promise<PassWaypoint[]> {
+  const response = await api.get<PassWaypoint[]>("/api/passes/waypoints");
   return response.data;
 }
 

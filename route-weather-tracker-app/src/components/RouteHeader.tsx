@@ -4,7 +4,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Offcanvas from "react-bootstrap/Offcanvas";
-import type { Route, RouteEndpoint, SelectedRoute } from "../types/routeTypes";
+import type { Route, RouteEndpoint, SelectedRoute, PassWaypoint } from "../types/routeTypes";
 import { passesOnRoute } from "../types/routeTypes";
 import { endpointLabel } from "../utils/formatters";
 import CityCombobox from "./CityCombobox";
@@ -12,6 +12,7 @@ import CityCombobox from "./CityCombobox";
 interface Props {
   endpoints: RouteEndpoint[];
   routes: Route[];
+  waypoints: PassWaypoint[];
   selectedRoute: SelectedRoute | null;
   onRouteChange: (route: SelectedRoute) => void;
 }
@@ -19,6 +20,7 @@ interface Props {
 export default function RouteHeader({
   endpoints,
   routes,
+  waypoints,
   selectedRoute,
   onRouteChange,
 }: Props) {
@@ -43,7 +45,7 @@ export default function RouteHeader({
       ? routes
           .map((r) => ({
             route: r,
-            passes: passesOnRoute(draftFrom, draftTo, r.highway),
+            passes: passesOnRoute(draftFrom, draftTo, r.highway, waypoints),
           }))
           .filter(({ passes }) => passes.length > 0)
       : [];

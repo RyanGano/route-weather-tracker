@@ -11,9 +11,15 @@ import {
   getRouteEndpoints,
   getAllPasses,
   getRoutes,
+  getPassWaypoints,
 } from "./services/passService";
 import type { PassSummary } from "./types/passTypes";
-import type { Route, RouteEndpoint, SelectedRoute } from "./types/routeTypes";
+import type {
+  Route,
+  RouteEndpoint,
+  SelectedRoute,
+  PassWaypoint,
+} from "./types/routeTypes";
 import "./App.css";
 
 function PassCardSkeleton() {
@@ -38,6 +44,7 @@ function PassCardSkeleton() {
 export default function App() {
   const [endpoints, setEndpoints] = useState<RouteEndpoint[]>([]);
   const [routes, setRoutes] = useState<Route[]>([]);
+  const [waypoints, setWaypoints] = useState<PassWaypoint[]>([]);
   const [selectedRoute, setSelectedRoute] = useState<SelectedRoute | null>(
     null,
   );
@@ -47,10 +54,11 @@ export default function App() {
 
   // Load endpoints and routes once on mount; default to Stanwood → Kalispell via I-90
   useEffect(() => {
-    Promise.all([getRouteEndpoints(), getRoutes()])
-      .then(([eps, rts]) => {
+    Promise.all([getRouteEndpoints(), getRoutes(), getPassWaypoints()])
+      .then(([eps, rts, wps]) => {
         setEndpoints(eps);
         setRoutes(rts);
+        setWaypoints(wps);
         const from = eps.find((e) => e.id === "stanwood");
         const to = eps.find((e) => e.id === "kalispell");
         if (from && to) setSelectedRoute({ from, to, highway: "I-90" });
@@ -100,6 +108,7 @@ export default function App() {
       <RouteHeader
         endpoints={endpoints}
         routes={routes}
+        waypoints={waypoints}
         selectedRoute={selectedRoute}
         onRouteChange={setSelectedRoute}
       />

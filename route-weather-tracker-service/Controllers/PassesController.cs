@@ -17,6 +17,14 @@ public class PassesController : ControllerBase
     _logger = logger;
   }
 
+  /// <summary>Returns minimal waypoint data for all known passes (id, name, state, longitude, highway).</summary>
+  [HttpGet("waypoints")]
+  public IActionResult GetWaypoints()
+  {
+    return Ok(PassRegistry.Passes
+        .Select(p => new { p.Id, p.Name, p.State, p.Longitude, p.Highway }));
+  }
+
   /// <summary>
   /// Returns pass summaries. Pass <c>from</c> and <c>to</c> endpoint IDs to filter
   /// to only the passes that fall between those two locations (in trip order).
