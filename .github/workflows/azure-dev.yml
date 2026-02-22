@@ -54,7 +54,8 @@ jobs:
       - name: Configure CORS
         shell: pwsh
         run: |
-          $rg = (azd env get-value AZURE_RESOURCE_GROUP).Trim()
+          # azd names the resource group rg-{AZURE_ENV_NAME}
+          $rg = "rg-$env:AZURE_ENV_NAME"
 
           $fqdn = (az containerapp show `
             --name frontend `
