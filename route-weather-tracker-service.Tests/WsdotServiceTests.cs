@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
+using route_weather_tracker_service.Models;
 using route_weather_tracker_service.Services;
 using route_weather_tracker_service.Tests.Helpers;
 
@@ -112,5 +113,65 @@ public class WsdotServiceTests
     var cameras = await service.GetPassCamerasAsync("snoqualmie");
 
     Assert.Empty(cameras);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Restriction parsing tests — exercised via GetPassConditionAsync responses
+  // ---------------------------------------------------------------------------
+
+  [Fact]
+  public async Task ParseRestriction_ReturnsNone_WhenAdvisoryInactive()
+  {
+    const string json = """
+        {
+            "PassConditionID": 11,
+            "RoadCondition": "Bare and dry",
+            "WeatherCondition": "Clear",
+            "TemperatureInFahrenheit": 40,
+            "TravelAdvisoryActive": false
+        }
+        """;
+
+    var service = new WsdotService(MockHttpFactory.CreateWithJson(json), BuildConfig(), NullLogger<WsdotService>.Instance);
+    var condition = await service.GetPassConditionAsync("snoqualmie");
+
+    Assert.NotNull(condition);
+    Assert.Equal(TravelRestriction.None, condition.EastboundRestriction);
+    Assert.Equal(TravelRestriction.None, condition.WestboundRestriction);
+    Assert.Equal(string.Empty, condition.EastboundRestrictionText);
+  }
+
+  public static TheoryData<string, TravelRestriction> RestrictionTextCases() => new()
+  {
+    { "Chains required on all vehicles",         TravelRestriction.ChainsRequired  },
+    { "Traction tires required",                 TravelRestriction.TiresOrTraction },
+    { "Snow tires required",                     TravelRestriction.TiresOrTraction },
+    { "Road is closed to all traffic",           TravelRestriction.Closed          },
+    { "Winter driving advisory — drive slowly",  TravelRestriction.None            },
+  };
+
+  [Theory]
+  [MemberData(nameof(RestrictionTextCases))]
+  public async Task ParseRestriction_MapsRestrictionText_ToCorrectEnum(
+      string restrictionText, TravelRestriction expectedRestriction)
+  {
+    var json = $$"""
+        {
+            "PassConditionID": 11,
+            "RoadCondition": "Snow covered",
+            "WeatherCondition": "Snowing",
+            "TemperatureInFahrenheit": 28,
+            "TravelAdvisoryActive": true,
+            "RestrictionOne": { "RestrictionText": "{{restrictionText}}" },
+            "RestrictionTwo": { "RestrictionText": "" }
+        }
+        """;
+
+    var service = new WsdotService(MockHttpFactory.CreateWithJson(json), BuildConfig(), NullLogger<WsdotService>.Instance);
+    var condition = await service.GetPassConditionAsync("snoqualmie");
+
+    Assert.NotNull(condition);
+    Assert.Equal(expectedRestriction, condition.EastboundRestriction);
+    Assert.Equal(restrictionText, condition.EastboundRestrictionText);
   }
 }
