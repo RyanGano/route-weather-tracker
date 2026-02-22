@@ -104,6 +104,52 @@ public static class PassRegistry
             Longitude = -115.6990,
             State = "MT/ID",
             OfficialUrl = "https://511.idaho.gov/List/Cameras?search=lookout"
+        },
+
+        // ── Idaho — OpenWeather-only (camera IDs unconfirmed) ────────────────────
+        new PassInfo
+        {
+            Id = "lolo",
+            Name = "Lolo Pass",
+            Highway = "US-12",
+            ElevationFeet = 5233,
+            Latitude = 46.6494,
+            Longitude = -114.5983,
+            State = "ID/MT",
+            HasOfficialConditions = false
+        },
+        new PassInfo
+        {
+            Id = "lost-trail",
+            Name = "Lost Trail Pass",
+            Highway = "US-93",
+            ElevationFeet = 6995,
+            Latitude = 45.6800,
+            Longitude = -113.9500,
+            State = "ID/MT",
+            HasOfficialConditions = false
+        },
+        new PassInfo
+        {
+            Id = "banner-summit",
+            Name = "Banner Summit",
+            Highway = "ID-21",
+            ElevationFeet = 6989,
+            Latitude = 44.2608,
+            Longitude = -114.9731,
+            State = "ID",
+            HasOfficialConditions = false
+        },
+        new PassInfo
+        {
+            Id = "galena-summit",
+            Name = "Galena Summit",
+            Highway = "ID-75",
+            ElevationFeet = 8701,
+            Latitude = 43.8742,
+            Longitude = -114.6978,
+            State = "ID",
+            HasOfficialConditions = false
         }
     ];
 
