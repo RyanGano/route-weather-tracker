@@ -10,14 +10,14 @@ public enum TravelRestriction
 
 public class PassCondition
 {
-  public string PassId { get; set; } = string.Empty;
-  public string RoadCondition { get; set; } = string.Empty;
-  public string WeatherCondition { get; set; } = string.Empty;
-  public TravelRestriction EastboundRestriction { get; set; }
-  public TravelRestriction WestboundRestriction { get; set; }
+  public string PassId { get; init; } = string.Empty;
+  public string RoadCondition { get; init; } = string.Empty;
+  public string WeatherCondition { get; init; } = string.Empty;
+  public TravelRestriction EastboundRestriction { get; init; }
+  public TravelRestriction WestboundRestriction { get; init; }
   /// <summary>Raw restriction text from the data source (e.g. "Traction Tires Advised, Oversize Vehicles Prohibited").</summary>
-  public string EastboundRestrictionText { get; set; } = string.Empty;
-  public string WestboundRestrictionText { get; set; } = string.Empty;
-  public int TemperatureFahrenheit { get; set; }
-  public DateTime LastUpdated { get; set; }
+  public string EastboundRestrictionText { get; init; } = string.Empty;
+  public string WestboundRestrictionText { get; init; } = string.Empty;
+  public int TemperatureFahrenheit { get; init; }
+  public DateTime LastUpdated { get; init; }
 }
