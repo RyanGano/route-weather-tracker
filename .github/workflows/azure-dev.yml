@@ -50,4 +50,23 @@ jobs:
 
       - name: Deploy Application
         run: azd deploy --no-prompt
-        
+
+      - name: Configure CORS
+        shell: pwsh
+        run: |
+          # Read the resource group azd provisioned into
+          $vals = (azd env get-values) -join "`n" | ConvertFrom-StringData
+          $rg = $vals.AZURE_RESOURCE_GROUP
+
+          # The frontend Container App FQDN is only known after deploy
+          $fqdn = az containerapp show `
+            --name frontend `
+            --resource-group $rg `
+            --query "properties.configuration.ingress.fqdn" `
+            --output tsv
+
+          az containerapp update `
+            --name api `
+            --resource-group $rg `
+            --set-env-vars "AllowedOrigins__0=https://$fqdn"
+
