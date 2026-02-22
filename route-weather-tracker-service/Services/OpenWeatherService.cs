@@ -38,8 +38,8 @@ public class OpenWeatherService : IOpenWeatherService
 
       await Task.WhenAll(currentTask, forecastTask);
 
-      var currentDoc = currentTask.Result;
-      var forecastDoc = forecastTask.Result;
+      var currentDoc = await currentTask;
+      var forecastDoc = await forecastTask;
 
       if (currentDoc is null || forecastDoc is null) return null;
 
