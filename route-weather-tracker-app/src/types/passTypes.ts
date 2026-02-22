@@ -35,7 +35,7 @@ export interface CameraImage {
   cameraId: string;
   description: string;
   imageUrl: string;
-  capturedAt: string;
+  fetchedAt: string;
 }
 
 export interface WeatherForecastDay {

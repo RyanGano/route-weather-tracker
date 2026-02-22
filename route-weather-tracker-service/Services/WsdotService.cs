@@ -119,7 +119,7 @@ public class WsdotService : IWsdotService
           CameraId = cam.TryGetProperty("CameraID", out var cid) ? cid.ToString() : StableId(imageUrl),
           Description = description,
           ImageUrl = imageUrl,
-          CapturedAt = DateTime.UtcNow
+          FetchedAt = DateTime.UtcNow
         });
       }
       return cameras;

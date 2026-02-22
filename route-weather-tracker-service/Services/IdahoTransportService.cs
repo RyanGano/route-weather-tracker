@@ -36,7 +36,7 @@ public class IdahoTransportService : IIdahoTransportService
           CameraId = id,
           Description = $"{pass.Label} – {(i < labels.Length ? labels[i] : $"Camera {i + 1}")}",
           ImageUrl = $"{CameraImageBaseUrl}{id}",
-          CapturedAt = DateTime.UtcNow
+          FetchedAt = DateTime.UtcNow
         })
         .ToList();
 
