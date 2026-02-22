@@ -22,6 +22,7 @@ export default defineConfig({
   // Aspire / Azure Container Apps injects the same service-discovery env vars at container start.
   preview: {
     host: true,
+    allowedHosts: "all",
     port: parseInt(process.env["PORT"] ?? "4173"),
     proxy: {
       "/api": {
