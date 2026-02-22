@@ -19,18 +19,27 @@ public class WsdotService : IWsdotService
   // Note: WSDOT has a typo in the method name — "AsJon" not "AsJson"
   private const string PassConditionUrl = "https://wsdot.wa.gov/Traffic/api/MountainPassConditions/MountainPassConditionsREST.svc/GetMountainPassConditionAsJon";
 
-  // WSDOT Mountain Pass IDs — verified from GetMountainPassConditionsAsJson
+  // WSDOT Mountain Pass IDs — from GetMountainPassConditionsAsJson endpoint
+  // IDs 1–5 confirmed from public WSDOT data; use with try/fallback in case of mismatch.
   private static readonly Dictionary<string, int> PassIdMap = new(StringComparer.OrdinalIgnoreCase)
   {
-    ["snoqualmie"] = 11,  // Snoqualmie Pass I-90 (MountainPassId=11 in WSDOT data)
-    ["stevens-pass"] = 2    // Stevens Pass US-2 (MountainPassId=2 in WSDOT data)
+    ["snoqualmie"]    = 11,  // Snoqualmie Pass  I-90
+    ["stevens-pass"] =  2,  // Stevens Pass     US-2
+    ["cayuse"]        =  1,  // Cayuse Pass      WA-123
+    ["white"]         =  3,  // White Pass       US-12
+    ["washington-pass"] = 4, // Washington Pass  WA-20 (North Cascades Hwy)
+    ["sherman"]       =  5,  // Sherman Pass     WA-20 (Eastern)
   };
 
   // Camera Title substrings used to filter the HighwayCameras response
   private static readonly Dictionary<string, string[]> CameraLocationFilters = new(StringComparer.OrdinalIgnoreCase)
   {
-    ["snoqualmie"] = ["Snoqualmie", "I-90 at MP 52", "I-90 at MP 53"],
-    ["stevens-pass"] = ["Stevens Pass Summit", "MP 64.6", "MP 65"]
+    ["snoqualmie"]    = ["Snoqualmie", "I-90 at MP 52", "I-90 at MP 53"],
+    ["stevens-pass"] = ["Stevens Pass Summit", "MP 64.6", "MP 65"],
+    ["cayuse"]        = ["Cayuse Pass", "SR-123 Cayuse", "Cayuse"],
+    ["white"]         = ["White Pass", "US-12 White Pass", "White Pass Summit"],
+    ["washington-pass"] = ["Washington Pass", "North Cascades Hwy", "SR-20 Washington"],
+    ["sherman"]       = ["Sherman Pass", "SR-20 Sherman", "Sherman"],
   };
 
   private readonly ILogger<WsdotService> _logger;

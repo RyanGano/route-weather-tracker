@@ -30,6 +30,61 @@ public static class PassRegistry
         },
         new PassInfo
         {
+            Id = "cayuse",
+            Name = "Cayuse Pass",
+            Highway = "WA-123",
+            ElevationFeet = 4694,
+            Latitude = 46.8706,
+            Longitude = -121.5445,
+            State = "WA",
+            OfficialUrl = "https://wsdot.com/travel/real-time/mountainpasses/cayuse"
+        },
+        new PassInfo
+        {
+            Id = "white",
+            Name = "White Pass",
+            Highway = "US-12",
+            ElevationFeet = 4500,
+            Latitude = 46.6388,
+            Longitude = -121.3988,
+            State = "WA",
+            OfficialUrl = "https://wsdot.com/travel/real-time/mountainpasses/white"
+        },
+        new PassInfo
+        {
+            Id = "washington-pass",
+            Name = "Washington Pass",
+            Highway = "WA-20",
+            ElevationFeet = 5477,
+            Latitude = 48.5195,
+            Longitude = -120.6653,
+            State = "WA",
+            OfficialUrl = "https://wsdot.com/travel/real-time/mountainpasses/washington"
+        },
+        new PassInfo
+        {
+            Id = "rainy-pass",
+            Name = "Rainy Pass",
+            Highway = "WA-20",
+            ElevationFeet = 4855,
+            Latitude = 48.5195,
+            Longitude = -120.7364,
+            State = "WA",
+            HasOfficialConditions = false
+        },
+        new PassInfo
+        {
+            Id = "sherman",
+            Name = "Sherman Pass",
+            Highway = "WA-20",
+            ElevationFeet = 5575,
+            Latitude = 48.6030,
+            Longitude = -118.4630,
+            State = "WA",
+            OfficialUrl = "https://wsdot.com/travel/real-time/mountainpasses/sherman"
+        },
+        new PassInfo
+        {
             Id = "fourth-of-july",
             Name = "Fourth of July Pass",
             Highway = "I-90",
