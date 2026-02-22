@@ -28,6 +28,8 @@ builder.Services.AddHttpClient<IWsdotService, WsdotService>()
 builder.Services.AddScoped<IIdahoTransportService, IdahoTransportService>();
 builder.Services.AddHttpClient<IOpenWeatherService, OpenWeatherService>()
     .AddHttpMessageHandler<SensitiveUrlRedactionHandler>();
+builder.Services.AddScoped<IPassDataSource, WsdotPassDataSource>();
+builder.Services.AddScoped<IPassDataSource, IdahoPassDataSource>();
 builder.Services.AddScoped<IPassAggregatorService, PassAggregatorService>();
 
 // ----- Controllers and OpenAPI -----

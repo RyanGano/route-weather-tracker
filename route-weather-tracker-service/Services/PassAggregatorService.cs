@@ -10,20 +10,17 @@ namespace route_weather_tracker_service.Services;
 /// </summary>
 public class PassAggregatorService : IPassAggregatorService
 {
-  private readonly IWsdotService _wsdot;
-  private readonly IIdahoTransportService _idaho;
+  private readonly IReadOnlyList<IPassDataSource> _dataSources;
   private readonly IOpenWeatherService _weather;
   private readonly IMemoryCache _cache;
   private static readonly TimeSpan CacheTtl = TimeSpan.FromMinutes(5);
 
   public PassAggregatorService(
-      IWsdotService wsdot,
-      IIdahoTransportService idaho,
+      IEnumerable<IPassDataSource> dataSources,
       IOpenWeatherService weather,
       IMemoryCache cache)
   {
-    _wsdot = wsdot;
-    _idaho = idaho;
+    _dataSources = [.. dataSources];
     _weather = weather;
     _cache = cache;
   }
@@ -46,15 +43,11 @@ public class PassAggregatorService : IPassAggregatorService
     var info = PassRegistry.GetById(passId);
     if (info is null) return null;
 
-    // Fetch from appropriate sources for each pass
-    var conditionTask = info.State == "WA"
-        ? _wsdot.GetPassConditionAsync(passId, ct)
-        : Task.FromResult<PassCondition?>(null);
+    var source = _dataSources.FirstOrDefault(s => s.SupportedPassIds.Contains(passId));
+    if (source is null) return null;
 
-    var camerasTask = info.State == "WA"
-        ? _wsdot.GetPassCamerasAsync(passId, ct)
-        : _idaho.GetPassCamerasAsync(passId, ct);
-
+    var conditionTask = source.GetConditionAsync(passId, ct);
+    var camerasTask = source.GetCamerasAsync(passId, ct);
     var weatherTask = _weather.GetForecastAsync(passId, info.Latitude, info.Longitude, ct);
 
     await Task.WhenAll(conditionTask, camerasTask, weatherTask);
