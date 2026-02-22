@@ -10,4 +10,11 @@ public class PassInfo
   public double Longitude { get; init; }
   public string State { get; init; } = string.Empty;
   public string OfficialUrl { get; init; } = string.Empty;
+
+  /// <summary>
+  /// True when a state DOT API provides real road condition data for this pass.
+  /// False means conditions are derived from OpenWeatherMap data only.
+  /// The frontend can use this to render a data-quality indicator.
+  /// </summary>
+  public bool HasOfficialConditions { get; init; } = true;
 }

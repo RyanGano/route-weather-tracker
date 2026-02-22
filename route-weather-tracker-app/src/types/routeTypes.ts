@@ -19,6 +19,26 @@ export interface SelectedRoute {
   highway: string;
 }
 
+/** GeoJSON LineString returned from OSRM — coordinates are [lon, lat] pairs. */
+export interface RouteGeometry {
+  type: 'LineString';
+  coordinates: [number, number][];
+}
+
+/**
+ * A city-to-city route computed by the OSRM routing engine.
+ * passIds can be passed to getAllPasses() to fetch full pass details.
+ */
+export interface ComputedRoute {
+  id: string;
+  name: string;
+  highwaysUsed: string[];
+  distanceMiles: number;
+  estimatedMinutes: number;
+  passIds: string[];
+  geometry: RouteGeometry | null;
+}
+
 /** Minimal pass info used on the frontend to preview which passes a route crosses. */
 export interface PassWaypoint {
   id: string;

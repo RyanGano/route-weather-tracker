@@ -58,10 +58,15 @@ public class PassAggregatorService : IPassAggregatorService
       if (info is null) return null;
 
       var source = _dataSources.FirstOrDefault(s => s.SupportedPassIds.Contains(passId));
-      if (source is null) return null;
+      // source may be null for passes with no registered data source (OpenWeather-only fallback).
+      // We still build a summary using derived conditions from weather data.
 
-      var conditionTask = source.GetConditionAsync(passId, ct);
-      var camerasTask = source.GetCamerasAsync(passId, ct);
+      var conditionTask = source is not null
+          ? source.GetConditionAsync(passId, ct)
+          : Task.FromResult<PassCondition?>(null);
+      var camerasTask = source is not null
+          ? source.GetCamerasAsync(passId, ct)
+          : Task.FromResult(new List<CameraImage>());
       var weatherTask = _weather.GetForecastAsync(passId, info.Latitude, info.Longitude, ct);
 
       await Task.WhenAll(conditionTask, camerasTask, weatherTask);

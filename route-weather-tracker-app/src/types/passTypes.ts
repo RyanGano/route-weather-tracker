@@ -16,6 +16,8 @@ export interface PassInfo {
   longitude: number;
   state: string;
   officialUrl: string;
+  /** True when a state DOT API provides real road conditions. False = OpenWeather derived. */
+  hasOfficialConditions: boolean;
 }
 
 export interface PassCondition {

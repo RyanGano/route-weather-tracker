@@ -1,6 +1,11 @@
 import axios from "axios";
 import type { PassSummary } from "../types/passTypes";
-import type { Route, RouteEndpoint, PassWaypoint } from "../types/routeTypes";
+import type {
+  ComputedRoute,
+  Route,
+  RouteEndpoint,
+  PassWaypoint,
+} from "../types/routeTypes";
 
 // Aspire injects VITE_API_URL at runtime with the backend's service-discovered URL.
 // Fallback to empty string so the Vite dev-server proxy can also be used.
@@ -43,4 +48,36 @@ export async function getAllPasses(
   if (highway) params.highway = highway;
   const response = await api.get<PassSummary[]>("/api/passes", { params });
   return response.data;
+}
+
+/**
+ * Computes up to three driving route options between two endpoint IDs using
+ * the OSRM routing engine. Each route includes the pass IDs matched along its
+ * geometry. Returns an empty array if OSRM is unreachable.
+ */
+export async function computeRoutes(
+  from: string,
+  to: string,
+): Promise<ComputedRoute[]> {
+  const response = await api.get<ComputedRoute[]>("/api/routes/compute", {
+    params: { from, to },
+  });
+  return response.data;
+}
+
+/**
+ * Fetches full PassSummary objects for a list of pass IDs returned by computeRoutes.
+ * Calls the existing /api/passes endpoint with each ID in parallel.
+ */
+export async function getPassesByIds(passIds: string[]): Promise<PassSummary[]> {
+  if (passIds.length === 0) return [];
+  const results = await Promise.all(
+    passIds.map((id) =>
+      api
+        .get<PassSummary>(`/api/passes/${id}`)
+        .then((r) => r.data)
+        .catch(() => null),
+    ),
+  );
+  return results.filter((p): p is PassSummary => p !== null);
 }

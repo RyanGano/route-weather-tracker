@@ -32,6 +32,10 @@ builder.Services.AddScoped<IPassDataSource, WsdotPassDataSource>();
 builder.Services.AddScoped<IPassDataSource, IdahoPassDataSource>();
 builder.Services.AddScoped<IPassAggregatorService, PassAggregatorService>();
 
+// ----- Routing services (OSRM + geometric pass matching) -----
+builder.Services.AddSingleton<IPassLocatorService, PassLocatorService>();
+builder.Services.AddHttpClient<IRoutingService, OsrmRoutingService>();
+
 // ----- Controllers and OpenAPI -----
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
