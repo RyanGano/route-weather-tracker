@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useId } from "react";
 import Form from "react-bootstrap/Form";
 import type { RouteEndpoint } from "../types/routeTypes";
+import { endpointLabel } from "../utils/formatters";
 
 interface Props {
   label: string;
@@ -11,10 +12,6 @@ interface Props {
   placeholder?: string;
   /** Endpoint id to exclude from the list (e.g. already-selected other end) */
   exclude?: string;
-}
-
-function endpointLabel(ep: RouteEndpoint) {
-  return `${ep.name}, ${ep.state}`;
 }
 
 export default function CityCombobox({

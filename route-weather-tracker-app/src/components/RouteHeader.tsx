@@ -6,6 +6,7 @@ import Button from "react-bootstrap/Button";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import type { Route, RouteEndpoint, SelectedRoute } from "../types/routeTypes";
 import { passesOnRoute } from "../types/routeTypes";
+import { endpointLabel } from "../utils/formatters";
 import CityCombobox from "./CityCombobox";
 
 interface Props {
@@ -13,10 +14,6 @@ interface Props {
   routes: Route[];
   selectedRoute: SelectedRoute | null;
   onRouteChange: (route: SelectedRoute) => void;
-}
-
-function endpointLabel(ep: RouteEndpoint) {
-  return `${ep.name}, ${ep.state}`;
 }
 
 export default function RouteHeader({
