@@ -63,10 +63,12 @@ jobs:
         # that persists in the Container Apps Environment.
         run: |
           RESOURCE_GROUP="rg-${AZURE_ENV_NAME}"
+          CAE_NAME=$(az containerapp env list --resource-group "$RESOURCE_GROUP" --query "[0].name" -o tsv)
           CERT_NAME="www.whentodrive.com-cae-xkbs-260222010052"
           az containerapp hostname bind \
             --name frontend \
             --resource-group "$RESOURCE_GROUP" \
+            --environment "$CAE_NAME" \
             --hostname www.whentodrive.com \
             --certificate "$CERT_NAME"
         shell: bash
