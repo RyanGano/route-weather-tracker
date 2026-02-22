@@ -66,7 +66,7 @@ public class PassAggregatorService : IPassAggregatorService
     {
       Info = info,
       Condition = condition,
-      Cameras = (await camerasTask).ToList(),
+      Cameras = camerasTask.Result,
       Weather = weather
     };
 
