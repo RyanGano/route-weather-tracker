@@ -22,9 +22,12 @@ builder.AddServiceDefaults();
 builder.Services.AddMemoryCache();
 
 // ----- HTTP clients for external APIs -----
-builder.Services.AddHttpClient<IWsdotService, WsdotService>();
+builder.Services.AddTransient<SensitiveUrlRedactionHandler>();
+builder.Services.AddHttpClient<IWsdotService, WsdotService>()
+    .AddHttpMessageHandler<SensitiveUrlRedactionHandler>();
 builder.Services.AddScoped<IIdahoTransportService, IdahoTransportService>();
-builder.Services.AddHttpClient<IOpenWeatherService, OpenWeatherService>();
+builder.Services.AddHttpClient<IOpenWeatherService, OpenWeatherService>()
+    .AddHttpMessageHandler<SensitiveUrlRedactionHandler>();
 builder.Services.AddScoped<IPassAggregatorService, PassAggregatorService>();
 
 // ----- Controllers and OpenAPI -----
