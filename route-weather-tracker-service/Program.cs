@@ -3,17 +3,17 @@ using route_weather_tracker_service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ----- Azure Key Vault (optional) -----
-// When KeyVaultUri is set (production / staging), secrets are pulled from Key Vault
-// via DefaultAzureCredential (Managed Identity on Container Apps, az login locally).
-// When it is absent or empty (local Aspire dev), secrets are expected via User Secrets
-// or environment variables instead — Key Vault registration is skipped entirely.
+// ----- Azure Key Vault -----
+// URI is read from config so it can be overridden per environment without
+// touching code. DefaultAzureCredential resolves via:
+//   - Local dev: `az login` or Visual Studio credentials + User Secrets/env var for the URI
+//   - Production: Managed Identity on the Container App + KeyVaultUri env var
 // The Managed Identity must hold the "Key Vault Secrets User" role on the vault.
 var keyVaultUri = builder.Configuration["KeyVaultUri"];
-if (!string.IsNullOrWhiteSpace(keyVaultUri))
-{
-    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
-}
+if (string.IsNullOrWhiteSpace(keyVaultUri))
+    throw new InvalidOperationException(
+        "KeyVaultUri is not configured. Set it via User Secrets (local) or as an environment variable (Azure).");
+builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
 
 // ----- Aspire service defaults (OpenTelemetry, health checks, service discovery) -----
 builder.AddServiceDefaults();
