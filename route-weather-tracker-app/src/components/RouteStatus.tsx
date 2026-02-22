@@ -6,6 +6,7 @@ import { formatRestriction } from "../utils/formatters";
 
 /** Days ahead to scan for drive-planning advice */
 const LOOK_AHEAD_DAYS = 7;
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 /**
  * Conditions at or above this threshold are considered "bad" for driving
@@ -102,7 +103,7 @@ export default function RouteStatus({ passes }: Props) {
       const date = new Date(day.date + "T00:00:00");
       date.setHours(0, 0, 0, 0);
       const offset = Math.round(
-        (date.getTime() - today.getTime()) / 86_400_000,
+        (date.getTime() - today.getTime()) / MS_PER_DAY,
       );
       if (offset < 0 || offset >= LOOK_AHEAD_DAYS) continue;
       const s = getSeverity(day.description, day.iconCode);
