@@ -150,6 +150,74 @@ public static class PassRegistry
             Longitude = -114.6978,
             State = "ID",
             HasOfficialConditions = false
+        },
+
+        // ── Montana — OpenWeather-only until MDT 511 integration ──────────────────────
+        new PassInfo
+        {
+            Id = "marias",
+            Name = "Marias Pass",
+            Highway = "US-2",
+            ElevationFeet = 5213,
+            Latitude = 48.3139,
+            Longitude = -112.9964,
+            State = "MT",
+            HasOfficialConditions = false
+        },
+        new PassInfo
+        {
+            Id = "logan-pass",
+            Name = "Logan Pass",
+            Highway = "US-89",
+            ElevationFeet = 6646,
+            Latitude = 48.6959,
+            Longitude = -113.7181,
+            State = "MT",
+            HasOfficialConditions = false
+        },
+        new PassInfo
+        {
+            Id = "macdonald",
+            Name = "MacDonald Pass",
+            Highway = "US-12",
+            ElevationFeet = 6325,
+            Latitude = 46.5950,
+            Longitude = -112.4440,
+            State = "MT",
+            HasOfficialConditions = false
+        },
+        new PassInfo
+        {
+            Id = "rogers-pass-mt",
+            Name = "Rogers Pass",
+            Highway = "MT-200",
+            ElevationFeet = 5610,
+            Latitude = 47.0392,
+            Longitude = -112.5256,
+            State = "MT",
+            HasOfficialConditions = false
+        },
+        new PassInfo
+        {
+            Id = "chief-joseph-mt",
+            Name = "Chief Joseph Pass",
+            Highway = "US-93",
+            ElevationFeet = 7241,
+            Latitude = 45.7269,
+            Longitude = -113.8699,
+            State = "MT/ID",
+            HasOfficialConditions = false
+        },
+        new PassInfo
+        {
+            Id = "homestake",
+            Name = "Homestake Pass",
+            Highway = "I-90",
+            ElevationFeet = 6375,
+            Latitude = 45.9099,
+            Longitude = -112.7756,
+            State = "MT",
+            HasOfficialConditions = false
         }
     ];
 

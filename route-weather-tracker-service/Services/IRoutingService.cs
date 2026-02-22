@@ -1,3 +1,6 @@
+// Alias avoids ambiguity with Microsoft.AspNetCore.Routing.RouteEndpoint (pulled
+// in via global usings for ASP.NET Core web apps).
+using RouteEndpoint = route_weather_tracker_service.Models.RouteEndpoint;
 using route_weather_tracker_service.Models;
 
 namespace route_weather_tracker_service.Services;

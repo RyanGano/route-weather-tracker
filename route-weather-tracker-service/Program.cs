@@ -30,6 +30,7 @@ builder.Services.AddHttpClient<IOpenWeatherService, OpenWeatherService>()
     .AddHttpMessageHandler<SensitiveUrlRedactionHandler>();
 builder.Services.AddScoped<IPassDataSource, WsdotPassDataSource>();
 builder.Services.AddScoped<IPassDataSource, IdahoPassDataSource>();
+builder.Services.AddScoped<IPassDataSource, MontanaPassDataSource>();
 builder.Services.AddScoped<IPassAggregatorService, PassAggregatorService>();
 
 // ----- Routing services (OSRM + geometric pass matching) -----

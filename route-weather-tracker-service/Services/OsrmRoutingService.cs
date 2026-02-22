@@ -1,5 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+// Alias avoids ambiguity with Microsoft.AspNetCore.Routing.RouteEndpoint.
+using RouteEndpoint = route_weather_tracker_service.Models.RouteEndpoint;
 using route_weather_tracker_service.Models;
 
 namespace route_weather_tracker_service.Services;
