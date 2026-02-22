@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Caching.Memory;
 using route_weather_tracker_service.Data;
 using route_weather_tracker_service.Models;
@@ -13,6 +14,7 @@ public class PassAggregatorService : IPassAggregatorService
   private readonly IReadOnlyList<IPassDataSource> _dataSources;
   private readonly IOpenWeatherService _weather;
   private readonly IMemoryCache _cache;
+  private readonly ConcurrentDictionary<string, SemaphoreSlim> _locks = new();
   private static readonly TimeSpan CacheTtl = TimeSpan.FromMinutes(5);
 
   public PassAggregatorService(
@@ -37,34 +39,51 @@ public class PassAggregatorService : IPassAggregatorService
   public async Task<PassSummary?> GetPassAsync(string passId, CancellationToken ct = default)
   {
     var cacheKey = $"pass:{passId}";
+
+    // Fast path: already cached
     if (_cache.TryGetValue(cacheKey, out PassSummary? cached))
       return cached;
 
-    var info = PassRegistry.GetById(passId);
-    if (info is null) return null;
-
-    var source = _dataSources.FirstOrDefault(s => s.SupportedPassIds.Contains(passId));
-    if (source is null) return null;
-
-    var conditionTask = source.GetConditionAsync(passId, ct);
-    var camerasTask = source.GetCamerasAsync(passId, ct);
-    var weatherTask = _weather.GetForecastAsync(passId, info.Latitude, info.Longitude, ct);
-
-    await Task.WhenAll(conditionTask, camerasTask, weatherTask);
-
-    var weather = await weatherTask;
-    var condition = await conditionTask ?? DeriveCondition(passId, weather);
-
-    var summary = new PassSummary
+    // Acquire a per-pass semaphore to prevent a thundering herd of concurrent
+    // requests all racing to populate the cache on a simultaneous miss.
+    var semaphore = _locks.GetOrAdd(cacheKey, _ => new SemaphoreSlim(1, 1));
+    await semaphore.WaitAsync(ct);
+    try
     {
-      Info = info,
-      Condition = condition,
-      Cameras = camerasTask.Result,
-      Weather = weather
-    };
+      // Double-check after acquiring: a concurrent caller may have filled the cache
+      if (_cache.TryGetValue(cacheKey, out cached))
+        return cached;
 
-    _cache.Set(cacheKey, summary, CacheTtl);
-    return summary;
+      var info = PassRegistry.GetById(passId);
+      if (info is null) return null;
+
+      var source = _dataSources.FirstOrDefault(s => s.SupportedPassIds.Contains(passId));
+      if (source is null) return null;
+
+      var conditionTask = source.GetConditionAsync(passId, ct);
+      var camerasTask = source.GetCamerasAsync(passId, ct);
+      var weatherTask = _weather.GetForecastAsync(passId, info.Latitude, info.Longitude, ct);
+
+      await Task.WhenAll(conditionTask, camerasTask, weatherTask);
+
+      var weather = await weatherTask;
+      var condition = await conditionTask ?? DeriveCondition(passId, weather);
+
+      var summary = new PassSummary
+      {
+        Info = info,
+        Condition = condition,
+        Cameras = camerasTask.Result,
+        Weather = weather
+      };
+
+      _cache.Set(cacheKey, summary, CacheTtl);
+      return summary;
+    }
+    finally
+    {
+      semaphore.Release();
+    }
   }
 
   /// <summary>
