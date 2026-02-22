@@ -4,7 +4,12 @@ import Navbar from "react-bootstrap/Navbar";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Offcanvas from "react-bootstrap/Offcanvas";
-import type { Route, RouteEndpoint, SelectedRoute, PassWaypoint } from "../types/routeTypes";
+import type {
+  Route,
+  RouteEndpoint,
+  SelectedRoute,
+  PassWaypoint,
+} from "../types/routeTypes";
 import { passesOnRoute } from "../types/routeTypes";
 import { endpointLabel } from "../utils/formatters";
 import CityCombobox from "./CityCombobox";
