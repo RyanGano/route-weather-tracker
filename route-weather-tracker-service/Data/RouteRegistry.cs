@@ -19,7 +19,4 @@ public static class RouteRegistry
             Highway = "US-2"
         }
     };
-
-  public static RouteInfo? GetById(string id) =>
-      Routes.FirstOrDefault(r => r.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
 }
