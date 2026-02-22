@@ -13,6 +13,7 @@
     "yarn install": true,
     "dotnet package": true,
     "npx tsc": true,
-    "git push": true
+    "git push": true,
+    "yarn build": true
   }
 }
