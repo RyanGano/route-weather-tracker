@@ -132,4 +132,65 @@ public class PassAggregatorServiceTests
     Assert.Single(summary.Cameras);
     Assert.NotNull(summary.Weather);
   }
+
+  // ---------------------------------------------------------------------------
+  // InferRoadCondition is private, so we test it via GetPassAsync with an Idaho
+  // pass that has no official condition source (GetConditionAsync returns null),
+  // which causes PassAggregatorService to call DeriveCondition / InferRoadCondition.
+  // ---------------------------------------------------------------------------
+  public static TheoryData<string, double, string> InferRoadConditionCases() => new()
+  {
+    // blizzard/heavy-snow branch
+    { "blizzard",    25, "Icy / Snow packed" }, // < 28 → Icy / Snow packed
+    { "heavy snow",  30, "Heavy snow"         }, // >= 28 → Heavy snow
+    // snow/sleet branch
+    { "light snow",  28, "Snow packed / Icy"  }, // < 30 → Snow packed / Icy
+    { "snow showers",32, "Snow covered"       }, // >= 30 → Snow covered
+    { "sleet",       20, "Snow packed / Icy"  },
+    // freezing/ice branch
+    { "freezing rain", 28, "Icy / Freezing"   },
+    { "ice storm",     20, "Icy / Freezing"   },
+    // rain/drizzle/shower branch
+    { "light rain",    35, "Bare and wet"     }, // >= 32 → Bare and wet
+    { "drizzle",       28, "Freezing rain"    }, // < 32 → Freezing rain
+    { "shower rain",   25, "Freezing rain"    },
+    // mist/fog branch
+    { "fog",           40, "Bare and wet"     },
+    { "mist",          38, "Bare and wet"     },
+    // default
+    { "clear sky",     55, "Bare and dry"     },
+  };
+
+  [Theory]
+  [MemberData(nameof(InferRoadConditionCases))]
+  public async Task InferRoadCondition_ProducesExpectedRoadCondition(
+      string weatherDescription, double tempF, string expectedRoadCondition)
+  {
+    // Use fourth-of-july: Idaho source returns null condition, triggering DeriveCondition
+    var idSource = new Mock<IPassDataSource>();
+    idSource.Setup(s => s.SupportedPassIds)
+            .Returns(new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "fourth-of-july", "lookout" });
+    idSource.Setup(s => s.GetConditionAsync("fourth-of-july", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((PassCondition?)null);
+    idSource.Setup(s => s.GetCamerasAsync("fourth-of-july", It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+    var weather = new Mock<IOpenWeatherService>();
+    weather.Setup(s => s.GetForecastAsync("fourth-of-july", It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
+           .ReturnsAsync(new PassWeatherForecast
+           {
+             CurrentTempFahrenheit = tempF,
+             CurrentDescription = weatherDescription,
+             CurrentIconCode = "01d",
+             DailyForecasts = []
+           });
+
+    var service = new PassAggregatorService([idSource.Object], weather.Object, BuildCache());
+
+    var summary = await service.GetPassAsync("fourth-of-july");
+
+    Assert.NotNull(summary);
+    Assert.NotNull(summary.Condition);
+    Assert.Equal(expectedRoadCondition, summary.Condition.RoadCondition);
+  }
 }
