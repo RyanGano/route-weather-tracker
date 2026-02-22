@@ -7,6 +7,7 @@ import Card from "react-bootstrap/Card";
 import RouteHeader from "./components/RouteHeader";
 import RouteStatus from "./components/RouteStatus";
 import PassCard from "./components/PassCard";
+import { RefreshProvider } from "./contexts/RefreshContext";
 import {
   getRouteEndpoints,
   getAllPasses,
@@ -104,7 +105,7 @@ export default function App() {
   }, [selectedRoute]);
 
   return (
-    <>
+    <RefreshProvider>
       <RouteHeader
         endpoints={endpoints}
         routes={routes}
@@ -147,6 +148,6 @@ export default function App() {
           </>
         )}
       </Container>
-    </>
+    </RefreshProvider>
   );
 }

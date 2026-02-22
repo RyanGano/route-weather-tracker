@@ -1,23 +1,12 @@
 import type { CameraImage } from "../types/passTypes";
-import { useEffect, useState } from "react";
+import { useRefresh } from "../contexts/RefreshContext";
 
 interface WebcamViewerProps {
   cameras: CameraImage[];
 }
 
-const REFRESH_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes
-
 export default function WebcamViewer({ cameras }: WebcamViewerProps) {
-  const [cacheBuster, setCacheBuster] = useState(() => Date.now());
-  const [lastUpdated, setLastUpdated] = useState(() => new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCacheBuster(Date.now());
-      setLastUpdated(new Date());
-    }, REFRESH_INTERVAL_MS);
-    return () => clearInterval(timer);
-  }, []);
+  const { cacheBuster, lastUpdated } = useRefresh();
 
   if (cameras.length === 0) {
     return (
