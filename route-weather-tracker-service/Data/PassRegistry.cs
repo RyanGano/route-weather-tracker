@@ -4,8 +4,8 @@ namespace route_weather_tracker_service.Data;
 
 public static class PassRegistry
 {
-    public static readonly IReadOnlyList<PassInfo> Passes = new List<PassInfo>
-    {
+    public static readonly IReadOnlyList<PassInfo> Passes =
+    [
         new PassInfo
         {
             Id = "snoqualmie",
@@ -50,7 +50,7 @@ public static class PassRegistry
             State = "MT/ID",
             OfficialUrl = "https://511.idaho.gov/List/Cameras?search=lookout"
         }
-    };
+    ];
 
     public static PassInfo? GetById(string id) =>
         Passes.FirstOrDefault(p => p.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
