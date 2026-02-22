@@ -44,8 +44,3 @@ export async function getAllPasses(
   const response = await api.get<PassSummary[]>("/api/passes", { params });
   return response.data;
 }
-
-export async function getPassById(id: string): Promise<PassSummary> {
-  const response = await api.get<PassSummary>(`/api/passes/${id}`);
-  return response.data;
-}
