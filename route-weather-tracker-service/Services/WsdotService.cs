@@ -116,7 +116,7 @@ public class WsdotService : IWsdotService
 
         cameras.Add(new CameraImage
         {
-          CameraId = cam.TryGetProperty("CameraID", out var cid) ? cid.ToString() : Guid.NewGuid().ToString(),
+          CameraId = cam.TryGetProperty("CameraID", out var cid) ? cid.ToString() : StableId(imageUrl),
           Description = description,
           ImageUrl = imageUrl,
           CapturedAt = DateTime.UtcNow
@@ -139,6 +139,14 @@ public class WsdotService : IWsdotService
       _logger.LogError(ex, "Unexpected error fetching WSDOT cameras for pass {PassId}", passId);
       throw;
     }
+  }
+
+  /// <summary>Returns a stable, deterministic ID derived from the image URL (first 8 bytes of SHA-256 as hex).</summary>
+  private static string StableId(string imageUrl)
+  {
+    var bytes = System.Security.Cryptography.SHA256.HashData(
+        System.Text.Encoding.UTF8.GetBytes(imageUrl));
+    return Convert.ToHexString(bytes[..8]).ToLowerInvariant();
   }
 
   private static (TravelRestriction Eastbound, TravelRestriction Westbound, string EastboundText, string WestboundText) ParseRestriction(
