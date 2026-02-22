@@ -3,6 +3,7 @@ import Badge from "react-bootstrap/Badge";
 import Alert from "react-bootstrap/Alert";
 import type { PassSummary } from "../types/passTypes";
 import { TravelRestriction } from "../types/passTypes";
+import { formatRestriction } from "../utils/formatters";
 import WebcamViewer from "./WebcamViewer";
 import WeatherDisplay from "./WeatherDisplay";
 
@@ -10,30 +11,8 @@ interface PassCardProps {
   pass: PassSummary;
 }
 
-/**
- * Returns a human-readable label for a travel restriction.
- * Prefers the raw source text (which includes "Advised" or "Required") over
- * the generic enum-derived fallback.
- */
-function restrictionLabel(
-  restriction: TravelRestriction,
-  text?: string,
-): string {
-  if (text) return text;
-  switch (restriction) {
-    case TravelRestriction.Closed:
-      return "Closed";
-    case TravelRestriction.ChainsRequired:
-      return "Chains Required";
-    case TravelRestriction.TiresOrTraction:
-      return "Traction Tires Required";
-    default:
-      return "No Restrictions";
-  }
-}
-
 function restrictionBadge(restriction: TravelRestriction, text?: string) {
-  const label = restrictionLabel(restriction, text);
+  const label = formatRestriction(restriction, text);
   switch (restriction) {
     case TravelRestriction.Closed:
       return <Badge bg="danger">{label}</Badge>;

@@ -2,6 +2,7 @@ import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
 import type { PassSummary } from "../types/passTypes";
 import { TravelRestriction } from "../types/passTypes";
+import { formatRestriction } from "../utils/formatters";
 
 /** Days ahead to scan for drive-planning advice */
 const LOOK_AHEAD_DAYS = 7;
@@ -186,19 +187,9 @@ export default function RouteStatus({ passes }: Props) {
       // Build a concise per-pass restriction description
       const sameRestriction = eb === wb && ebText === wbText;
 
-      const label = (restriction: TravelRestriction, text: string) => {
-        if (text) return text;
-        if (restriction === TravelRestriction.Closed) return "Closed";
-        if (restriction === TravelRestriction.ChainsRequired)
-          return "Chains Required";
-        if (restriction === TravelRestriction.TiresOrTraction)
-          return "Traction Tires Required";
-        return "";
-      };
-
       const detail = sameRestriction
-        ? label(eb, ebText)
-        : `EB: ${label(eb, ebText)} / WB: ${label(wb, wbText)}`;
+        ? formatRestriction(eb, ebText)
+        : `EB: ${formatRestriction(eb, ebText)} / WB: ${formatRestriction(wb, wbText)}`;
 
       return { name: p.info.name, detail };
     });
