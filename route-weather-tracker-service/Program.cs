@@ -49,8 +49,12 @@ builder.Services.AddCors(options =>
     {
         if (allowedOrigins.Length > 0)
             policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
-        else
+        else if (builder.Environment.IsDevelopment())
             policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        else
+            throw new InvalidOperationException(
+                "AllowedOrigins must be configured in non-development environments. " +
+                "Set the AllowedOrigins__0 environment variable to the frontend URL.");
     });
 });
 
