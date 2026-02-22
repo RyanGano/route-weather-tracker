@@ -52,8 +52,8 @@ public class PassAggregatorService : IPassAggregatorService
         : Task.FromResult<PassCondition?>(null);
 
     var camerasTask = info.State == "WA"
-        ? _wsdot.GetPassCamerasAsync(passId, ct).ContinueWith(t => (IEnumerable<CameraImage>)t.Result, ct)
-        : _idaho.GetPassCamerasAsync(passId, ct).ContinueWith(t => (IEnumerable<CameraImage>)t.Result, ct);
+        ? _wsdot.GetPassCamerasAsync(passId, ct)
+        : _idaho.GetPassCamerasAsync(passId, ct);
 
     var weatherTask = _weather.GetForecastAsync(passId, info.Latitude, info.Longitude, ct);
 
