@@ -49,7 +49,6 @@ export interface WeatherForecastDay {
 }
 
 export interface PassWeatherForecast {
-  passId: string;
   currentTempFahrenheit: number;
   currentDescription: string;
   currentIconCode: string;

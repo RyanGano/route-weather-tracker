@@ -84,7 +84,6 @@ public class OpenWeatherServiceTests
     var forecast = await service.GetForecastAsync("snoqualmie", 47.4245, -121.4116);
 
     Assert.NotNull(forecast);
-    Assert.Equal("snoqualmie", forecast.PassId);
     Assert.Equal(32.5, forecast.CurrentTempFahrenheit);
     Assert.Equal("light snow", forecast.CurrentDescription);
     Assert.Equal("13d", forecast.CurrentIconCode);

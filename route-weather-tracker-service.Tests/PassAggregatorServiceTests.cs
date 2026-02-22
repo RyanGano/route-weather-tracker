@@ -20,9 +20,8 @@ public class PassAggregatorServiceTests
     LastUpdated = DateTime.UtcNow
   };
 
-  private static PassWeatherForecast SampleForecast(string passId) => new()
+  private static PassWeatherForecast SampleForecast() => new()
   {
-    PassId = passId,
     CurrentTempFahrenheit = 30,
     CurrentDescription = "clear sky",
     CurrentIconCode = "01d",
@@ -43,7 +42,7 @@ public class PassAggregatorServiceTests
     idaho.Setup(s => s.GetPassCamerasAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
          .ReturnsAsync([]);
     weather.Setup(s => s.GetForecastAsync(It.IsAny<string>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
-           .ReturnsAsync((string id, double _, double __, CancellationToken ___) => SampleForecast(id));
+           .ReturnsAsync((string id, double _, double __, CancellationToken ___) => SampleForecast());
 
     var service = new PassAggregatorService(wsdot.Object, idaho.Object, weather.Object, BuildCache());
 
@@ -82,7 +81,7 @@ public class PassAggregatorServiceTests
     wsdot.Setup(s => s.GetPassCamerasAsync("snoqualmie", It.IsAny<CancellationToken>()))
          .ReturnsAsync([]);
     weather.Setup(s => s.GetForecastAsync("snoqualmie", It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
-           .ReturnsAsync(SampleForecast("snoqualmie"));
+           .ReturnsAsync(SampleForecast());
 
     var service = new PassAggregatorService(wsdot.Object, idaho.Object, weather.Object, BuildCache());
 
@@ -107,7 +106,7 @@ public class PassAggregatorServiceTests
     wsdot.Setup(s => s.GetPassCamerasAsync("snoqualmie", It.IsAny<CancellationToken>()))
          .ReturnsAsync([new CameraImage { CameraId = "c1", Description = "Summit", ImageUrl = "https://example.com/cam.jpg" }]);
     weather.Setup(s => s.GetForecastAsync("snoqualmie", It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
-           .ReturnsAsync(SampleForecast("snoqualmie"));
+           .ReturnsAsync(SampleForecast());
 
     var service = new PassAggregatorService(wsdot.Object, idaho.Object, weather.Object, BuildCache());
 

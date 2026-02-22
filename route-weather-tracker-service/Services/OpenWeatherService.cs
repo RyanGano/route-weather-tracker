@@ -83,7 +83,6 @@ public class OpenWeatherService : IOpenWeatherService
 
       return new PassWeatherForecast
       {
-        PassId = passId,
         CurrentTempFahrenheit = currentTemp,
         CurrentDescription = currentDesc,
         CurrentIconCode = currentIcon,

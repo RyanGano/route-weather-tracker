@@ -13,7 +13,6 @@ public class WeatherForecastDay
 
 public class PassWeatherForecast
 {
-  public string PassId { get; init; } = string.Empty;
   public double CurrentTempFahrenheit { get; init; }
   public string CurrentDescription { get; init; } = string.Empty;
   public string CurrentIconCode { get; init; } = string.Empty;
