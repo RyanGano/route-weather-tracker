@@ -11,8 +11,4 @@ builder.AddViteApp("frontend", "../route-weather-tracker-app")
        .WithExternalHttpEndpoints()
        .PublishAsDockerFile();
 
-// CORS: AllowedOrigins__0 is set by the post-deploy step in azure-dev.yml
-// after both Container Apps are running and the frontend FQDN is known.
-// Locally, AllowedOrigins is empty so the Development fallback applies.
-
 builder.Build().Run();

@@ -44,34 +44,9 @@ jobs:
             --tenant-id "$Env:AZURE_TENANT_ID"
         shell: pwsh
 
-      - name: Log in Azure CLI (for post-deploy az commands)
-        uses: azure/login@v2
-        with:
-          client-id: ${{ vars.AZURE_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-
-
       - name: Provision Infrastructure
         run: azd provision --no-prompt
 
       - name: Deploy Application
         run: azd deploy --no-prompt
-
-      - name: Configure CORS
-        shell: pwsh
-        run: |
-          # azd names the resource group rg-{AZURE_ENV_NAME}
-          $rg = "rg-$env:AZURE_ENV_NAME"
-
-          $fqdn = (az containerapp show `
-            --name frontend `
-            --resource-group $rg `
-            --query "properties.configuration.ingress.fqdn" `
-            --output tsv).Trim()
-
-          az containerapp update `
-            --name api `
-            --resource-group $rg `
-            --set-env-vars "AllowedOrigins__0=https://$fqdn"
 

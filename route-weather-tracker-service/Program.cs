@@ -37,10 +37,6 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 // ----- CORS -----
-// AllowedOrigins is populated at runtime:
-//   - Dev: empty → falls back to AllowAnyOrigin (Aspire vite proxy covers this)
-//   - Production: Aspire AppHost injects the frontend Container App FQDN via
-//     the AllowedOrigins__0 environment variable.
 var allowedOrigins = builder.Configuration
     .GetSection("AllowedOrigins")
     .Get<string[]>() ?? [];
@@ -51,12 +47,8 @@ builder.Services.AddCors(options =>
     {
         if (allowedOrigins.Length > 0)
             policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
-        else if (builder.Environment.IsDevelopment())
-            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
         else
-            throw new InvalidOperationException(
-                "AllowedOrigins must be configured in non-development environments. " +
-                "Set the AllowedOrigins__0 environment variable to the frontend URL.");
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
     });
 });
 
