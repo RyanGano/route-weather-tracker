@@ -90,7 +90,7 @@ public class PassAggregatorService : IPassAggregatorService
       PassId = passId,
       RoadCondition = roadCondition,
       WeatherCondition = weather.CurrentDescription,
-      TemperatureFahrenheit = (int)weather.CurrentTempFahrenheit,
+      TemperatureFahrenheit = (int)Math.Round(weather.CurrentTempFahrenheit),
       EastboundRestriction = TravelRestriction.None,
       WestboundRestriction = TravelRestriction.None,
       LastUpdated = DateTime.UtcNow
