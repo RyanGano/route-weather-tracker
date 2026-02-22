@@ -30,7 +30,7 @@ public class PassAggregatorServiceTests
   };
 
   [Fact]
-  public async Task GetAllPassesAsync_ReturnsAllThreePasses()
+  public async Task GetAllPassesAsync_ReturnsAllFourPasses()
   {
     var wsdot = new Mock<IWsdotService>();
     var idaho = new Mock<IIdahoTransportService>();
@@ -49,8 +49,9 @@ public class PassAggregatorServiceTests
 
     var passes = await service.GetAllPassesAsync();
 
-    Assert.Equal(3, passes.Count);
+    Assert.Equal(4, passes.Count);
     Assert.Contains(passes, p => p.Info.Id == "snoqualmie");
+    Assert.Contains(passes, p => p.Info.Id == "stevens-pass");
     Assert.Contains(passes, p => p.Info.Id == "fourth-of-july");
     Assert.Contains(passes, p => p.Info.Id == "lookout");
   }
