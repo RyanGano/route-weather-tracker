@@ -44,9 +44,30 @@ jobs:
             --tenant-id "$Env:AZURE_TENANT_ID"
         shell: pwsh
 
+      - name: Log in with Azure CLI (Federated Credentials)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
       - name: Provision Infrastructure
         run: azd provision --no-prompt
 
       - name: Deploy Application
         run: azd deploy --no-prompt
+
+      - name: Restore custom domain binding
+        # azd provision re-creates the Container App definition and wipes custom domains.
+        # Rebind www.whentodrive.com after every deploy using the managed certificate
+        # that persists in the Container Apps Environment.
+        run: |
+          RESOURCE_GROUP="rg-${AZURE_ENV_NAME}"
+          CERT_NAME="www.whentodrive.com-cae-xkbs-260222010052"
+          az containerapp hostname bind \
+            --name frontend \
+            --resource-group "$RESOURCE_GROUP" \
+            --hostname www.whentodrive.com \
+            --certificate "$CERT_NAME"
+        shell: bash
 
