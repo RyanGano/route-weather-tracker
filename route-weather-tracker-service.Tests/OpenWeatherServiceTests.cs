@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Moq.Protected;
 using route_weather_tracker_service.Services;
+using route_weather_tracker_service.Tests.Helpers;
 
 namespace route_weather_tracker_service.Tests;
 
@@ -116,6 +117,19 @@ public class OpenWeatherServiceTests
 
     var http = new HttpClient(handler.Object);
     var service = new OpenWeatherService(http, BuildConfig(), NullLogger<OpenWeatherService>.Instance);
+
+    var forecast = await service.GetForecastAsync("snoqualmie", 47.4245, -121.4116);
+
+    Assert.Null(forecast);
+  }
+
+  [Fact]
+  public async Task GetForecastAsync_ReturnsNull_OnNetworkError()
+  {
+    var service = new OpenWeatherService(
+        MockHttpFactory.CreateThrowingNetworkError(),
+        BuildConfig(),
+        NullLogger<OpenWeatherService>.Instance);
 
     var forecast = await service.GetForecastAsync("snoqualmie", 47.4245, -121.4116);
 

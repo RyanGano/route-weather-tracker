@@ -39,4 +39,21 @@ public static class MockHttpFactory
 
     return new HttpClient(handler.Object);
   }
+
+  /// <summary>
+  /// Creates an HttpClient whose handler throws <see cref="HttpRequestException"/>
+  /// from SendAsync, simulating a network-level failure (e.g. DNS error, connection refused).
+  /// </summary>
+  public static HttpClient CreateThrowingNetworkError()
+  {
+    var handler = new Mock<HttpMessageHandler>();
+    handler.Protected()
+        .Setup<Task<HttpResponseMessage>>(
+            "SendAsync",
+            ItExpr.IsAny<HttpRequestMessage>(),
+            ItExpr.IsAny<CancellationToken>())
+        .ThrowsAsync(new HttpRequestException("Simulated network failure"));
+
+    return new HttpClient(handler.Object);
+  }
 }

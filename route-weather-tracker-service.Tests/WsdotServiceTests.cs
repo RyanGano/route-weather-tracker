@@ -115,6 +115,26 @@ public class WsdotServiceTests
     Assert.Empty(cameras);
   }
 
+  [Fact]
+  public async Task GetPassConditionAsync_ReturnsNull_OnNetworkError()
+  {
+    var service = new WsdotService(MockHttpFactory.CreateThrowingNetworkError(), BuildConfig(), NullLogger<WsdotService>.Instance);
+
+    var condition = await service.GetPassConditionAsync("snoqualmie");
+
+    Assert.Null(condition);
+  }
+
+  [Fact]
+  public async Task GetPassCamerasAsync_ReturnsEmpty_OnNetworkError()
+  {
+    var service = new WsdotService(MockHttpFactory.CreateThrowingNetworkError(), BuildConfig(), NullLogger<WsdotService>.Instance);
+
+    var cameras = await service.GetPassCamerasAsync("snoqualmie");
+
+    Assert.Empty(cameras);
+  }
+
   // ---------------------------------------------------------------------------
   // Restriction parsing tests — exercised via GetPassConditionAsync responses
   // ---------------------------------------------------------------------------
