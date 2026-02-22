@@ -193,4 +193,41 @@ public class PassAggregatorServiceTests
     Assert.NotNull(summary.Condition);
     Assert.Equal(expectedRoadCondition, summary.Condition.RoadCondition);
   }
+
+  [Fact]
+  public async Task GetPassAsync_CacheIsIsolatedPerPass()
+  {
+    // Arrange: WA source for snoqualmie, Idaho source for fourth-of-july
+    var waSource = new Mock<IPassDataSource>();
+    waSource.Setup(s => s.SupportedPassIds).Returns(WaPassIds);
+    waSource.Setup(s => s.GetConditionAsync("snoqualmie", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(SampleCondition("snoqualmie"));
+    waSource.Setup(s => s.GetCamerasAsync("snoqualmie", It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+    var idSource = new Mock<IPassDataSource>();
+    idSource.Setup(s => s.SupportedPassIds).Returns(IdahoPassIds);
+    idSource.Setup(s => s.GetConditionAsync("fourth-of-july", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((PassCondition?)null);
+    idSource.Setup(s => s.GetCamerasAsync("fourth-of-july", It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+    var weather = new Mock<IOpenWeatherService>();
+    weather.Setup(s => s.GetForecastAsync(It.IsAny<string>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
+           .ReturnsAsync((string _, double __, double ___, CancellationToken ____) => SampleForecast());
+
+    var service = new PassAggregatorService([waSource.Object, idSource.Object], weather.Object, BuildCache());
+
+    // Act: fetch snoqualmie twice and fourth-of-july once
+    await service.GetPassAsync("snoqualmie");
+    await service.GetPassAsync("fourth-of-july");
+    await service.GetPassAsync("snoqualmie");
+
+    // Assert: each source is called exactly once (second snoqualmie served from cache,
+    // fourth-of-july is NOT served from snoqualmie cache)
+    waSource.Verify(s => s.GetConditionAsync("snoqualmie", It.IsAny<CancellationToken>()), Times.Once);
+    waSource.Verify(s => s.GetCamerasAsync("snoqualmie", It.IsAny<CancellationToken>()), Times.Once);
+    idSource.Verify(s => s.GetCamerasAsync("fourth-of-july", It.IsAny<CancellationToken>()), Times.Once);
+    waSource.Verify(s => s.GetCamerasAsync("fourth-of-july", It.IsAny<CancellationToken>()), Times.Never);
+  }
 }
