@@ -7,7 +7,11 @@ each completed state should be committed as its own git commit before moving on.
 
 ---
 
-## Architecture Overview
+## Architecture Overview ✅
+
+> **Implemented** (`4331bc4`): `IRoutingService` / `OsrmRoutingService`, `IPassLocatorService` / `PassLocatorService`,
+> `ComputedRoute` model, `/api/routes/compute` endpoint, `PassAggregatorService` null-source fix,
+> `PassInfo.HasOfficialConditions`, frontend `computeRoutes()` + `getPassesByIds()` helpers.
 
 ### How a city-to-city route is resolved
 
@@ -98,7 +102,7 @@ For each state:
 
 1. **Oregon** — well-documented ODOT/TripCheck API, major I-5 and US-20 corridors
 2. **Colorado** — best-documented state API (COtrip), most passes of any state
-3. **Montana** — extends existing I-90 and US-2 corridors already in the app
+3. ~~**Montana**~~ ✅ scaffold committed — MDT 511 integration still pending
 4. **California** — Donner Pass (I-80) is highest-traffic winter pass in the US
 5. **Wyoming** — Teton Pass, iconic gateway corridor
 6. **Utah** — I-80 and I-15 western arterials
@@ -119,22 +123,17 @@ For each state:
 **Data:** Road conditions (surface, traction, restrictions), webcam images, travel advisories
 **Official site:** https://wsdot.com/travel/real-time/mountainpasses
 
-#### Passes in PassRegistry
+#### Passes in PassRegistry (all ✅ committed)
 
-| Pass            | Highway | Elevation (ft) | Lat     | Lon       |
-| --------------- | ------- | -------------- | ------- | --------- |
-| Snoqualmie Pass | I-90    | 3,022          | 47.4245 | -121.4116 |
-| Stevens Pass    | US-2    | 4,061          | 47.7447 | -121.0891 |
-
-#### Passes to add in a future WA iteration
-
-| Pass            | Highway | Elevation (ft) | Lat     | Lon       | WSDOT Pass ID  |
-| --------------- | ------- | -------------- | ------- | --------- | -------------- |
-| White Pass      | US-12   | 4,500          | 46.6381 | -121.3957 | WhitePass      |
-| Cayuse Pass     | WA-123  | 4,694          | 46.8738 | -121.5367 | CayusePass     |
-| Sherman Pass    | WA-20   | 5,575          | 48.6066 | -118.4635 | ShermanPass    |
-| Rainy Pass      | US-20   | 4,855          | 48.5148 | -120.7348 | RainyPass      |
-| Washington Pass | US-20   | 5,477          | 48.5221 | -120.6625 | WashingtonPass |
+| Pass            | Highway | Elevation (ft) | Lat     | Lon       | WSDOT ID |
+| --------------- | ------- | -------------- | ------- | --------- | -------- |
+| Snoqualmie Pass | I-90    | 3,022          | 47.4245 | -121.4116 | 11       |
+| Stevens Pass    | US-2    | 4,061          | 47.7447 | -121.0891 | 2        |
+| Cayuse Pass     | WA-123  | 4,694          | 46.8706 | -121.5445 | 1        |
+| White Pass      | US-12   | 4,500          | 46.6388 | -121.3988 | 3        |
+| Washington Pass | WA-20   | 5,477          | 48.5195 | -120.6653 | 4        |
+| Rainy Pass      | WA-20   | 4,855          | 48.5195 | -120.7364 | n/a (OpenWeather-only) |
+| Sherman Pass    | WA-20   | 5,575          | 48.6030 | -118.4630 | 5        |
 
 ---
 
@@ -146,22 +145,16 @@ For each state:
 **Data:** Camera images only (no official road conditions from Idaho DOT via API)
 **Official site:** https://511.idaho.gov
 
-#### Passes in PassRegistry
+#### Passes in PassRegistry (all ✅ committed)
 
-| Pass                | Highway | Elevation (ft) | Lat     | Lon       |
-| ------------------- | ------- | -------------- | ------- | --------- |
-| Fourth of July Pass | I-90    | 3,081          | 47.5333 | -116.3667 |
-| Lookout Pass        | I-90    | 4,738          | 47.4576 | -115.6990 |
-
-#### Passes to add in a future ID iteration
-
-| Pass            | Highway | Elevation (ft) | Lat     | Lon       |
-| --------------- | ------- | -------------- | ------- | --------- |
-| Lost Trail Pass | US-93   | 7,014          | 45.6956 | -113.9546 |
-| Lolo Pass       | US-12   | 5,233          | 46.6367 | -115.4960 |
-| Banner Summit   | ID-21   | 7,057          | 44.1955 | -114.9688 |
-| Galena Summit   | ID-75   | 8,701          | 43.8857 | -114.7043 |
-| Pine Creek Pass | ID-34   | 6,837          | 42.8752 | -111.3015 |
+| Pass                | Highway | Elevation (ft) | Lat     | Lon       | Source         |
+| ------------------- | ------- | -------------- | ------- | --------- | -------------- |
+| Fourth of July Pass | I-90    | 3,081          | 47.5333 | -116.3667 | Idaho 511 cams |
+| Lookout Pass        | I-90    | 4,738          | 47.4576 | -115.6990 | Idaho 511 cams |
+| Lolo Pass           | US-12   | 5,233          | 46.6494 | -114.5983 | OpenWeather-only |
+| Lost Trail Pass     | US-93   | 6,995          | 45.6800 | -113.9500 | OpenWeather-only |
+| Banner Summit       | ID-21   | 6,989          | 44.2608 | -114.9731 | OpenWeather-only |
+| Galena Summit       | ID-75   | 8,701          | 43.8742 | -114.6978 | OpenWeather-only |
 
 ---
 
@@ -338,7 +331,13 @@ feat(co): add Colorado passes and CDOT COtrip data source
 
 ---
 
-## Montana (MT) ⬜
+## Montana (MT) ✅ (scaffold — OpenWeather-only; MDT integration pending)
+
+> **Implemented** (`b47cc1d`): `MontanaPassDataSource` registered in DI. All 6 passes are in
+> `PassRegistry` with `HasOfficialConditions = false`. Conditions come from OpenWeatherMap;
+> cameras will be added when MDT 511 camera IDs are confirmed.
+> To enable official conditions: implement `IMtdService` / `MtdService` (XML feed parser),
+> inject into `MontanaPassDataSource`, and set `HasOfficialConditions = true`.
 
 ### Data Source
 
@@ -374,7 +373,7 @@ Create `MtdService.cs` / `IMtdService.cs` and `MontanaPassDataSource.cs`.
 Parse the XML condition feed, match road names (e.g., "US-2", "US-12", "I-90") to the
 known pass segments. Conditions are reported by road segment mile-post range.
 
-### Passes to Add
+### Passes in PassRegistry ✅
 
 | Pass ID           | Name              | Highway                | Elevation (ft) | Lat     | Lon       | Notes                              |
 | ----------------- | ----------------- | ---------------------- | -------------- | ------- | --------- | ---------------------------------- |
@@ -385,7 +384,7 @@ known pass segments. Conditions are reported by road segment mile-post range.
 | `rogers-pass-mt`  | Rogers Pass       | US-12/MT-200           | 5,610          | 47.0392 | -112.5256 | Lincoln to Augusta                 |
 | `homestake`       | Homestake Pass    | I-90                   | 6,375          | 45.9099 | -112.7756 | Butte bypass                       |
 
-### Cities to Add to RouteEndpointRegistry
+### Cities in RouteEndpointRegistry ✅
 
 | Id            | Name        | State | Lat     | Lon       |
 | ------------- | ----------- | ----- | ------- | --------- |
@@ -401,6 +400,7 @@ known pass segments. Conditions are reported by road segment mile-post range.
 ```
 feat(mt): add Montana passes and MDT data source
 ```
+> ✅ Committed as `feat(mt): add Montana passes and MontanaPassDataSource scaffold; fix RouteEndpoint ambiguity` (`b47cc1d`)
 
 ---
 
