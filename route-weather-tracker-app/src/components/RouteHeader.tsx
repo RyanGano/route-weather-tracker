@@ -42,6 +42,7 @@ export default function RouteHeader({
   onRouteChange,
 }: Props) {
   const [showDrawer, setShowDrawer] = useState(false);
+  const [showInfoDrawer, setShowInfoDrawer] = useState(false);
   const [draftFromId, setDraftFromId] = useState("");
   const [draftToId, setDraftToId] = useState("");
   const [fetchedRoutes, setFetchedRoutes] = useState<ComputedRoute[]>([]);
@@ -133,6 +134,15 @@ export default function RouteHeader({
             <Button
               variant="outline-light"
               size="sm"
+              onClick={() => setShowInfoDrawer(true)}
+              aria-label="About this site"
+            >
+              <span aria-hidden>&#8505;&#65039;</span>
+            </Button>
+
+            <Button
+              variant="outline-light"
+              size="sm"
               onClick={() => setShowDrawer(true)}
               aria-label="Choose route"
             >
@@ -142,6 +152,42 @@ export default function RouteHeader({
           </div>
         </Container>
       </Navbar>
+
+      <Offcanvas
+        show={showInfoDrawer}
+        onHide={() => setShowInfoDrawer(false)}
+        placement="start"
+      >
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>
+            <span aria-hidden className="me-2">&#127956;</span>
+            About When to Drive
+          </Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <p>
+            <strong>When to Drive</strong> helps you plan mountain pass crossings
+            by showing current road conditions, weather forecasts, and active
+            restrictions for every pass along your route.
+          </p>
+          <p>
+            Select a starting city and a destination using the{" "}
+            <strong>Route</strong> button, and the app will identify which passes
+            you'll cross and surface the best window of time to make the drive.
+          </p>
+          <p>
+            Pass condition data is sourced from state DOT agencies and weather
+            forecasts are provided by OpenWeather. Information is refreshed
+            automatically so you always see the latest available data.
+          </p>
+          <hr />
+          <p className="text-muted" style={{ fontSize: "0.8rem" }}>
+            This site is for informational purposes only. Always use your best
+            judgment — and check official agency sources — when deciding when
+            and whether to travel.
+          </p>
+        </Offcanvas.Body>
+      </Offcanvas>
 
       <Offcanvas
         show={showDrawer}
