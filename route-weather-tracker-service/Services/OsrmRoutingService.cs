@@ -118,11 +118,14 @@ public class OsrmRoutingService : IRoutingService
   /// </summary>
   /// <param name="routeEl">A single OSRM route object.</param>
   /// <param name="minFraction">
-  /// Fraction of total route distance a highway must cover to be included.
-  /// Default 0.05 (5%) — keeps any highway used for at least ~14 miles on a
-  /// typical 280-mile Pacific-Northwest interstate run.
+  /// Fraction of total route distance a highway must cover to be included in the
+  /// label. Default 0.02 (2%) — eliminates genuine junction noise (a concurrent
+  /// segment of &lt;0.1% of route length) while retaining connector highways that
+  /// define a meaningful alternate path (e.g. US-12 over White Pass = ~6% of a
+  /// Yakima→Portland trip). Pass detection is unaffected by this value — passes
+  /// are located geometrically, not by highway ref.
   /// </param>
-  private static IReadOnlyList<string> ExtractHighways(JsonElement routeEl, double minFraction = 0.05)
+  private static IReadOnlyList<string> ExtractHighways(JsonElement routeEl, double minFraction = 0.02)
   {
     if (!routeEl.TryGetProperty("legs", out var legs)) return [];
 
