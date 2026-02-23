@@ -199,7 +199,7 @@ export default function RouteStatus({ passes }: Props) {
     <>
       <Alert
         variant={variant}
-        className="py-2 d-flex align-items-center gap-2 mb-2"
+        className="py-2 d-flex align-items-center gap-2 mb-1"
       >
         <span role="img" aria-label="status" style={{ fontSize: "1.25rem" }}>
           {icon}
@@ -208,6 +208,11 @@ export default function RouteStatus({ passes }: Props) {
           <strong>Best time to drive:</strong> {message}
         </div>
       </Alert>
+
+      <p className="text-muted mb-3" style={{ fontSize: "0.72rem" }}>
+        This site is for informational purposes only. Always use your best
+        judgment when deciding when to travel.
+      </p>
 
       {restrictedPasses.length > 0 && (
         <Alert variant="warning" className="py-2 mb-4">
