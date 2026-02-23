@@ -156,7 +156,7 @@ export default function RouteHeader({
       <Offcanvas
         show={showInfoDrawer}
         onHide={() => setShowInfoDrawer(false)}
-        placement="start"
+        placement="end"
       >
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>
