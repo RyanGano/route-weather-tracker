@@ -86,6 +86,20 @@ public class OsrmRoutingService : IRoutingService
         idx++;
       }
 
+      // Deduplicate: OSRM sometimes returns two alternates with the same highway
+      // signature (e.g. two near-identical I-90 paths through Spokane). Keep only
+      // the fastest route for each unique highway set — the user would see no
+      // meaningful difference between them.
+      var seen = new HashSet<string>();
+      routes = routes
+          .Where(r =>
+          {
+            var key = string.Join(",", r.HighwaysUsed.OrderBy(h => h, StringComparer.OrdinalIgnoreCase));
+            if (key == string.Empty) key = r.Name; // fallback for unnamed routes
+            return seen.Add(key);
+          })
+          .ToList();
+
       // Tag each alternate with how many miles longer it is than the primary.
       // The frontend uses this to split routes into "reasonable" vs "longer options"
       // sections rather than silently dropping the longer ones.

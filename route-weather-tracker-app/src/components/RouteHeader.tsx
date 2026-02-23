@@ -88,10 +88,10 @@ export default function RouteHeader({
   // only ~3% longer and stays in the primary section).
   const primaryDist = fetchedRoutes[0]?.distanceMiles ?? 0;
   const primaryRoutes = fetchedRoutes.filter(
-    (r) => !r.extraDistanceMiles || r.extraDistanceMiles <= primaryDist * 0.2,
+    (r) => r.extraDistanceMiles == null || r.extraDistanceMiles <= primaryDist * 0.2,
   );
   const longerRoutes = fetchedRoutes.filter(
-    (r) => r.extraDistanceMiles && r.extraDistanceMiles > primaryDist * 0.2,
+    (r) => r.extraDistanceMiles != null && r.extraDistanceMiles > primaryDist * 0.2,
   );
 
   function handleSelectRoute(route: ComputedRoute) {
