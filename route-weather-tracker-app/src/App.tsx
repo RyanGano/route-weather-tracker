@@ -8,19 +8,9 @@ import RouteHeader from "./components/RouteHeader";
 import RouteStatus from "./components/RouteStatus";
 import PassCard from "./components/PassCard";
 import { RefreshProvider } from "./contexts/RefreshContext";
-import {
-  getRouteEndpoints,
-  getAllPasses,
-  getRoutes,
-  getPassWaypoints,
-} from "./services/passService";
+import { getRouteEndpoints, getPassesByIds } from "./services/passService";
 import type { PassSummary } from "./types/passTypes";
-import type {
-  Route,
-  RouteEndpoint,
-  SelectedRoute,
-  PassWaypoint,
-} from "./types/routeTypes";
+import type { ComputedRoute, RouteEndpoint } from "./types/routeTypes";
 import "./App.css";
 
 function PassCardSkeleton() {
@@ -44,28 +34,19 @@ function PassCardSkeleton() {
 
 export default function App() {
   const [endpoints, setEndpoints] = useState<RouteEndpoint[]>([]);
-  const [routes, setRoutes] = useState<Route[]>([]);
-  const [waypoints, setWaypoints] = useState<PassWaypoint[]>([]);
-  const [selectedRoute, setSelectedRoute] = useState<SelectedRoute | null>(
-    null,
-  );
+  const [selectedFrom, setSelectedFrom] = useState<RouteEndpoint | null>(null);
+  const [selectedTo, setSelectedTo] = useState<RouteEndpoint | null>(null);
+  const [selectedRoute, setSelectedRoute] = useState<ComputedRoute | null>(null);
   const [passes, setPasses] = useState<PassSummary[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load endpoints and routes once on mount; default to Stanwood → Kalispell via I-90
+  // Load endpoints once on mount
   useEffect(() => {
-    Promise.all([getRouteEndpoints(), getRoutes(), getPassWaypoints()])
-      .then(([eps, rts, wps]) => {
-        setEndpoints(eps);
-        setRoutes(rts);
-        setWaypoints(wps);
-        const from = eps.find((e) => e.id === "stanwood");
-        const to = eps.find((e) => e.id === "kalispell");
-        if (from && to) setSelectedRoute({ from, to, highway: "I-90" });
-      })
+    getRouteEndpoints()
+      .then(setEndpoints)
       .catch(() => {
-        // Non-fatal — the pass fetch will show the real error
+        // Non-fatal — UI will show empty comboboxes
       });
   }, []);
 
@@ -79,11 +60,7 @@ export default function App() {
       try {
         setLoading(true);
         setError(null);
-        const data = await getAllPasses(
-          selectedRoute!.from.id,
-          selectedRoute!.to.id,
-          selectedRoute!.highway,
-        );
+        const data = await getPassesByIds(selectedRoute!.passIds);
         if (!cancelled) setPasses(data);
       } catch (err) {
         if (!cancelled) {
@@ -104,16 +81,33 @@ export default function App() {
     };
   }, [selectedRoute]);
 
+  function handleRouteChange(
+    from: RouteEndpoint,
+    to: RouteEndpoint,
+    route: ComputedRoute,
+  ) {
+    setSelectedFrom(from);
+    setSelectedTo(to);
+    setSelectedRoute(route);
+    setPasses([]);
+  }
+
   return (
     <RefreshProvider>
       <RouteHeader
         endpoints={endpoints}
-        routes={routes}
-        waypoints={waypoints}
+        selectedFrom={selectedFrom}
+        selectedTo={selectedTo}
         selectedRoute={selectedRoute}
-        onRouteChange={setSelectedRoute}
+        onRouteChange={handleRouteChange}
       />
       <Container>
+        {!selectedRoute && !loading && (
+          <Alert variant="info" className="mt-2">
+            Use the <strong>Route</strong> button above to choose your start and
+            end city.
+          </Alert>
+        )}
         {loading && (
           <>
             <div className="d-flex align-items-center gap-2 mb-3 text-muted">
@@ -133,7 +127,7 @@ export default function App() {
           </Alert>
         )}
 
-        {!loading && !error && passes.length === 0 && (
+        {!loading && !error && selectedRoute && passes.length === 0 && (
           <Alert variant="warning">
             No pass data returned from the service.
           </Alert>

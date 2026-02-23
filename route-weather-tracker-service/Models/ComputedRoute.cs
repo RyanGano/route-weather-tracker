@@ -4,7 +4,7 @@ namespace route_weather_tracker_service.Models;
 /// A city-to-city route computed by the OSRM routing engine, with mountain passes
 /// matched geometrically along the route polyline.
 /// </summary>
-public class ComputedRoute
+public record ComputedRoute
 {
   /// <summary>Stable identifier for this route option (e.g. "route-0", "route-1" for alternates).</summary>
   public string Id { get; init; } = string.Empty;
@@ -32,6 +32,19 @@ public class ComputedRoute
   /// did not include geometry (should not happen with overview=full).
   /// </summary>
   public RouteGeometry? Geometry { get; init; }
+
+  /// <summary>
+  /// How many miles longer this route is compared to the primary (fastest) option.
+  /// Null for the primary route itself. Used by the frontend to group alternates
+  /// into "reasonable" vs "longer options" sections.
+  /// </summary>
+  public double? ExtraDistanceMiles { get; init; }
+
+  /// <summary>
+  /// Human-readable names of the passes found on this route, in trip order.
+  /// Derived from PassRegistry; mirrors the PassIds list.
+  /// </summary>
+  public IReadOnlyList<string> PassNames { get; init; } = [];
 }
 
 /// <summary>GeoJSON LineString geometry returned by OSRM.</summary>

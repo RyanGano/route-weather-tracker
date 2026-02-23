@@ -4,60 +4,99 @@ import Navbar from "react-bootstrap/Navbar";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Offcanvas from "react-bootstrap/Offcanvas";
-import type {
-  Route,
-  RouteEndpoint,
-  SelectedRoute,
-  PassWaypoint,
-} from "../types/routeTypes";
-import { passesOnRoute } from "../types/routeTypes";
+import Spinner from "react-bootstrap/Spinner";
+import type { ComputedRoute, RouteEndpoint } from "../types/routeTypes";
 import { endpointLabel } from "../utils/formatters";
+import { computeRoutes } from "../services/passService";
 import CityCombobox from "./CityCombobox";
 
 interface Props {
   endpoints: RouteEndpoint[];
-  routes: Route[];
-  waypoints: PassWaypoint[];
-  selectedRoute: SelectedRoute | null;
-  onRouteChange: (route: SelectedRoute) => void;
+  selectedFrom: RouteEndpoint | null;
+  selectedTo: RouteEndpoint | null;
+  selectedRoute: ComputedRoute | null;
+  onRouteChange: (
+    from: RouteEndpoint,
+    to: RouteEndpoint,
+    route: ComputedRoute,
+  ) => void;
+}
+
+/** "I-90" → "Interstate 90", "US-2" → "US Highway 2", others pass through. */
+function formatRouteName(name: string): string {
+  return name
+    .split(" / ")
+    .map((h) => {
+      if (h.startsWith("I-")) return `Interstate ${h.slice(2)}`;
+      if (h.startsWith("US-")) return `US Highway ${h.slice(3)}`;
+      return h;
+    })
+    .join(" / ");
 }
 
 export default function RouteHeader({
   endpoints,
-  routes,
-  waypoints,
+  selectedFrom,
+  selectedTo,
   selectedRoute,
   onRouteChange,
 }: Props) {
   const [showDrawer, setShowDrawer] = useState(false);
-  const [draftFromId, setDraftFromId] = useState<string>("");
-  const [draftToId, setDraftToId] = useState<string>("");
+  const [draftFromId, setDraftFromId] = useState("");
+  const [draftToId, setDraftToId] = useState("");
+  const [fetchedRoutes, setFetchedRoutes] = useState<ComputedRoute[]>([]);
+  const [computing, setComputing] = useState(false);
 
   // Sync drafts when the drawer opens
   useEffect(() => {
-    if (showDrawer && selectedRoute) {
-      setDraftFromId(selectedRoute.from.id);
-      setDraftToId(selectedRoute.to.id);
+    if (showDrawer) {
+      setDraftFromId(selectedFrom?.id ?? "");
+      setDraftToId(selectedTo?.id ?? "");
     }
-  }, [showDrawer, selectedRoute]);
+  }, [showDrawer, selectedFrom, selectedTo]);
+
+  // Re-compute routes whenever the city pair changes
+  useEffect(() => {
+    if (!draftFromId || !draftToId || draftFromId === draftToId) {
+      setFetchedRoutes([]);
+      return;
+    }
+    let cancelled = false;
+    setComputing(true);
+    computeRoutes(draftFromId, draftToId)
+      .then((routes) => {
+        if (!cancelled) setFetchedRoutes(routes);
+      })
+      .catch(() => {
+        if (!cancelled) setFetchedRoutes([]);
+      })
+      .finally(() => {
+        if (!cancelled) setComputing(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [draftFromId, draftToId]);
 
   const draftFrom = endpoints.find((e) => e.id === draftFromId) ?? null;
   const draftTo = endpoints.find((e) => e.id === draftToId) ?? null;
 
-  // Routes that have ≥1 pass between the chosen endpoints — used to render the option buttons.
-  const routeOptions =
-    draftFrom && draftTo && draftFrom.id !== draftTo.id
-      ? routes
-          .map((r) => ({
-            route: r,
-            passes: passesOnRoute(draftFrom, draftTo, r.highway, waypoints),
-          }))
-          .filter(({ passes }) => passes.length > 0)
-      : [];
+  // Routes ≤20% longer than the fastest are "reasonable" primary options.
+  // Anything beyond that is grouped under a separate "Longer options" section
+  // so they're visible but clearly distinguished (e.g. Spokane→Tacoma via US-2
+  // adds ~60 miles and goes to the longer section; Spokane→Everett via US-2 is
+  // only ~3% longer and stays in the primary section).
+  const primaryDist = fetchedRoutes[0]?.distanceMiles ?? 0;
+  const primaryRoutes = fetchedRoutes.filter(
+    (r) => !r.extraDistanceMiles || r.extraDistanceMiles <= primaryDist * 0.2,
+  );
+  const longerRoutes = fetchedRoutes.filter(
+    (r) => r.extraDistanceMiles && r.extraDistanceMiles > primaryDist * 0.2,
+  );
 
-  function handleSelectRoute(r: Route) {
+  function handleSelectRoute(route: ComputedRoute) {
     if (!draftFrom || !draftTo) return;
-    onRouteChange({ from: draftFrom, to: draftTo, highway: r.highway });
+    onRouteChange(draftFrom, draftTo, route);
     setShowDrawer(false);
   }
 
@@ -76,17 +115,18 @@ export default function RouteHeader({
           </Navbar.Brand>
 
           <div className="d-flex align-items-center gap-2 ms-auto">
-            {/* Inline route summary — visible on md+ */}
-            {selectedRoute && (
+            {selectedFrom && selectedTo && (
               <span className="d-none d-md-flex align-items-center gap-2 text-white-50 small me-1">
                 <span className="text-white fw-semibold">
-                  {endpointLabel(selectedRoute.from)}
+                  {endpointLabel(selectedFrom)}
                 </span>
                 <span>&#8594;</span>
                 <span className="text-white fw-semibold">
-                  {endpointLabel(selectedRoute.to)}
+                  {endpointLabel(selectedTo)}
                 </span>
-                <Badge bg="info">{selectedRoute.highway}</Badge>
+                {selectedRoute && (
+                  <Badge bg="info">{selectedRoute.name}</Badge>
+                )}
               </span>
             )}
 
@@ -131,30 +171,96 @@ export default function RouteHeader({
             exclude={draftFromId}
           />
 
-          {/* Route option buttons — shown once a valid pair is selected */}
           {draftFrom && draftTo && draftFrom.id !== draftTo.id && (
-            <div className="d-grid gap-2">
-              {routeOptions.length === 0 ? (
+            <div className="mt-3">
+              {computing ? (
+                <div className="d-flex align-items-center gap-2 text-muted py-2">
+                  <Spinner animation="border" size="sm" />
+                  <span className="small">Finding routes…</span>
+                </div>
+              ) : fetchedRoutes.length === 0 ? (
                 <p className="text-muted small mb-0">
-                  No tracked passes found on any route between these cities.
+                  No routes found between these cities.
                 </p>
               ) : (
-                routeOptions.map(({ route, passes }) => (
-                  <Button
-                    key={route.id}
-                    variant="outline-primary"
-                    className="text-start py-2 px-3"
-                    onClick={() => handleSelectRoute(route)}
-                  >
-                    <div className="d-flex align-items-center gap-2">
-                      <span className="fw-semibold">{route.name}</span>
-                      <Badge bg="info">{route.highway}</Badge>
+                <>
+                  <div className="d-grid gap-2">
+                    {primaryRoutes.map((route) => (
+                      <Button
+                        key={route.id}
+                        variant="outline-primary"
+                        className="text-start py-2 px-3"
+                        onClick={() => handleSelectRoute(route)}
+                      >
+                        <div className="d-flex align-items-center gap-2">
+                          <span className="fw-semibold">
+                            {formatRouteName(route.name)}
+                          </span>
+                          {route.highwaysUsed.map((h) => (
+                            <Badge key={h} bg="info">
+                              {h}
+                            </Badge>
+                          ))}
+                        </div>
+                        <div className="text-muted small mt-1">
+                          {route.passNames.length > 0
+                            ? route.passNames.join(" • ")
+                            : "No tracked passes"}
+                          <span className="text-body-tertiary ms-2">
+                            {Math.round(route.distanceMiles)} mi
+                          </span>
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+
+                  {longerRoutes.length > 0 && (
+                    <div className="mt-3">
+                      <p
+                        className="text-muted mb-2 fw-semibold text-uppercase"
+                        style={{ fontSize: "0.7rem", letterSpacing: "0.05em" }}
+                      >
+                        Longer options
+                      </p>
+                      <div className="d-grid gap-2">
+                        {longerRoutes.map((route) => (
+                          <Button
+                            key={route.id}
+                            variant="outline-secondary"
+                            className="text-start py-2 px-3"
+                            onClick={() => handleSelectRoute(route)}
+                          >
+                            <div className="d-flex align-items-center gap-2">
+                              <span className="fw-semibold">
+                                {formatRouteName(route.name)}
+                              </span>
+                              {route.highwaysUsed.map((h) => (
+                                <Badge key={h} bg="secondary">
+                                  {h}
+                                </Badge>
+                              ))}
+                              <Badge
+                                bg="warning"
+                                text="dark"
+                                className="ms-auto"
+                              >
+                                +{Math.round(route.extraDistanceMiles!)} mi
+                              </Badge>
+                            </div>
+                            <div className="text-muted small mt-1">
+                              {route.passNames.length > 0
+                                ? route.passNames.join(" • ")
+                                : "No tracked passes"}
+                              <span className="text-body-tertiary ms-2">
+                                {Math.round(route.distanceMiles)} mi total
+                              </span>
+                            </div>
+                          </Button>
+                        ))}
+                      </div>
                     </div>
-                    <div className="text-muted small mt-1">
-                      {passes.map((p) => p.name).join(" • ")}
-                    </div>
-                  </Button>
-                ))
+                  )}
+                </>
               )}
             </div>
           )}

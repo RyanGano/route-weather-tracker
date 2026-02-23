@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 // Alias avoids ambiguity with Microsoft.AspNetCore.Routing.RouteEndpoint.
 using RouteEndpoint = route_weather_tracker_service.Models.RouteEndpoint;
+using route_weather_tracker_service.Data;
 using route_weather_tracker_service.Models;
 
 namespace route_weather_tracker_service.Services;
@@ -79,9 +80,23 @@ public class OsrmRoutingService : IRoutingService
           DistanceMiles = distMetres / 1609.344,
           EstimatedMinutes = durSec / 60.0,
           PassIds = passIds,
+          PassNames = passIds.Select(id => PassRegistry.GetById(id)?.Name ?? id).ToList(),
           Geometry = geometry
         });
         idx++;
+      }
+
+      // Tag each alternate with how many miles longer it is than the primary.
+      // The frontend uses this to split routes into "reasonable" vs "longer options"
+      // sections rather than silently dropping the longer ones.
+      if (routes.Count > 1)
+      {
+        var primaryDist = routes[0].DistanceMiles;
+        for (var i = 1; i < routes.Count; i++)
+          routes[i] = routes[i] with
+          {
+            ExtraDistanceMiles = Math.Round(routes[i].DistanceMiles - primaryDist, 1)
+          };
       }
 
       _logger.LogInformation(

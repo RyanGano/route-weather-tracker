@@ -36,7 +36,14 @@ export interface ComputedRoute {
   distanceMiles: number;
   estimatedMinutes: number;
   passIds: string[];
+  /** Human-readable pass names in trip order — mirrors passIds. */
+  passNames: string[];
   geometry: RouteGeometry | null;
+  /**
+   * How many miles longer this route is than the primary (fastest) option.
+   * Null/undefined for the primary route itself.
+   */
+  extraDistanceMiles?: number | null;
 }
 
 /** Minimal pass info used on the frontend to preview which passes a route crosses. */
