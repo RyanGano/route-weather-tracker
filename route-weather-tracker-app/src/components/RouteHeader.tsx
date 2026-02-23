@@ -89,10 +89,12 @@ export default function RouteHeader({
   // only ~3% longer and stays in the primary section).
   const primaryDist = fetchedRoutes[0]?.distanceMiles ?? 0;
   const primaryRoutes = fetchedRoutes.filter(
-    (r) => r.extraDistanceMiles == null || r.extraDistanceMiles <= primaryDist * 0.2,
+    (r) =>
+      r.extraDistanceMiles == null || r.extraDistanceMiles <= primaryDist * 0.2,
   );
   const longerRoutes = fetchedRoutes.filter(
-    (r) => r.extraDistanceMiles != null && r.extraDistanceMiles > primaryDist * 0.2,
+    (r) =>
+      r.extraDistanceMiles != null && r.extraDistanceMiles > primaryDist * 0.2,
   );
 
   function handleSelectRoute(route: ComputedRoute) {
@@ -125,9 +127,7 @@ export default function RouteHeader({
                 <span className="text-white fw-semibold">
                   {endpointLabel(selectedTo)}
                 </span>
-                {selectedRoute && (
-                  <Badge bg="info">{selectedRoute.name}</Badge>
-                )}
+                {selectedRoute && <Badge bg="info">{selectedRoute.name}</Badge>}
               </span>
             )}
 
@@ -160,20 +160,23 @@ export default function RouteHeader({
       >
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>
-            <span aria-hidden className="me-2">&#127956;</span>
+            <span aria-hidden className="me-2">
+              &#127956;
+            </span>
             About When to Drive
           </Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
           <p>
-            <strong>When to Drive</strong> helps you plan mountain pass crossings
-            by showing current road conditions, weather forecasts, and active
-            restrictions for every pass along your route.
+            <strong>When to Drive</strong> helps you plan mountain pass
+            crossings by showing current road conditions, weather forecasts, and
+            active restrictions for every pass along your route.
           </p>
           <p>
             Select a starting city and a destination using the{" "}
-            <strong>Route</strong> button, and the app will identify which passes
-            you'll cross and surface the best window of time to make the drive.
+            <strong>Route</strong> button, and the app will identify which
+            passes you'll cross and surface the best window of time to make the
+            drive.
           </p>
           <p>
             Pass condition data is sourced from state DOT agencies and weather
