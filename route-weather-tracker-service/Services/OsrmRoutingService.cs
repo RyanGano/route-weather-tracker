@@ -167,6 +167,7 @@ public class OsrmRoutingService : IRoutingService
         var parts = refs
             .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Where(IsMajorHighway)
+            .Select(NormalizeHighway)
             .ToList();
 
         if (parts.Count == 0) continue;
@@ -191,8 +192,23 @@ public class OsrmRoutingService : IRoutingService
 
   private static bool IsMajorHighway(string r) =>
       r.StartsWith("I-", StringComparison.OrdinalIgnoreCase) ||
+      r.StartsWith("I ",  StringComparison.OrdinalIgnoreCase) ||   // OSM uses "I 90" not "I-90"
       r.StartsWith("US-", StringComparison.OrdinalIgnoreCase) ||
       r.StartsWith("US ", StringComparison.OrdinalIgnoreCase);
+
+  /// <summary>
+  /// Normalises OSM ref variants to a canonical hyphenated form so that
+  /// "I 90" and "I-90" accumulate into the same bucket.
+  /// </summary>
+  private static string NormalizeHighway(string r)
+  {
+    // "I 90" → "I-90",  "US 2" → "US-2",  already-hyphenated pass through.
+    if (r.Length > 2 && r[1] == ' ')
+      return string.Concat(r.AsSpan(0, 1), "-", r.AsSpan(2));
+    if (r.StartsWith("US ", StringComparison.OrdinalIgnoreCase) && r.Length > 3)
+      return string.Concat("US-", r.AsSpan(3));
+    return r;
+  }
 
   private static RouteGeometry? ExtractGeometry(JsonElement routeEl)
   {
