@@ -111,7 +111,7 @@ export default function RouteHeader({
         <Container>
           <Navbar.Brand className="d-flex align-items-center gap-2 fw-bold">
             <span aria-hidden>&#127956;</span>
-            Route Weather Tracker
+            When to Drive
           </Navbar.Brand>
 
           <div className="d-flex align-items-center gap-2 ms-auto">
