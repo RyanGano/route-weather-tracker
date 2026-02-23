@@ -106,35 +106,66 @@ public class OsrmRoutingService : IRoutingService
   // ── Private helpers ──────────────────────────────────────────────────────
 
   /// <summary>
-  /// Collects unique highway reference tags (e.g. "I-90", "US-2") from all
-  /// route steps. Minor state highways and unclassified refs are filtered out
-  /// to keep the name readable.
+  /// Returns the major highway designations (e.g. "I-90", "US-12") that account
+  /// for a significant portion of the route.
+  ///
+  /// Each OSRM step carries a <c>distance</c> in metres and an optional <c>ref</c>
+  /// tag (semicolon-delimited when multiple designations share a segment, e.g.
+  /// "I-90;US-2" near Spokane where the two highways are briefly concurrent).
+  /// Accumulating distance per highway and requiring it to reach a minimum share
+  /// of the total route length eliminates brief interchange noise while correctly
+  /// retaining genuine multi-highway routes like "I-90 / US-20".
   /// </summary>
-  private static IReadOnlyList<string> ExtractHighways(JsonElement routeEl)
+  /// <param name="routeEl">A single OSRM route object.</param>
+  /// <param name="minFraction">
+  /// Fraction of total route distance a highway must cover to be included.
+  /// Default 0.05 (5%) — keeps any highway used for at least ~14 miles on a
+  /// typical 280-mile Pacific-Northwest interstate run.
+  /// </param>
+  private static IReadOnlyList<string> ExtractHighways(JsonElement routeEl, double minFraction = 0.05)
   {
-    var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
     if (!routeEl.TryGetProperty("legs", out var legs)) return [];
+
+    // Accumulate metres per highway designation.
+    var distanceByHighway = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+    double totalMetres = 0;
 
     foreach (var leg in legs.EnumerateArray())
     {
       if (!leg.TryGetProperty("steps", out var steps)) continue;
       foreach (var step in steps.EnumerateArray())
       {
+        var stepMetres = step.TryGetProperty("distance", out var distEl) ? distEl.GetDouble() : 0.0;
+        totalMetres += stepMetres;
+
         if (!step.TryGetProperty("ref", out var refEl)) continue;
         var refs = refEl.GetString();
         if (string.IsNullOrWhiteSpace(refs)) continue;
 
-        // OSRM may return semicolon-delimited values: "I-90;US-20"
-        foreach (var r in refs.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-        {
-          if (IsMajorHighway(r)) seen.Add(r);
-        }
+        // OSRM may return semicolon-delimited values: "I-90;US-2" on concurrent
+        // segments. Split the step distance equally among all designations —
+        // if a step is only 200 m of "I-90;US-2" each gets 100 m credit,
+        // which is still negligible compared to hundreds of miles of sole I-90.
+        var parts = refs
+            .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(IsMajorHighway)
+            .ToList();
+
+        if (parts.Count == 0) continue;
+        var share = stepMetres / parts.Count;
+        foreach (var r in parts)
+          distanceByHighway[r] = distanceByHighway.GetValueOrDefault(r) + share;
       }
     }
 
-    // Sort: interstates first, then US routes, alphabetically within each group
-    return seen
+    if (totalMetres <= 0) return [];
+
+    var threshold = totalMetres * minFraction;
+
+    // Sort: interstates first, then US routes; alphabetically within each group.
+    return distanceByHighway
+        .Where(kv => kv.Value >= threshold)
+        .Select(kv => kv.Key)
         .OrderBy(h => h.StartsWith("I-", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
         .ThenBy(h => h)
         .ToList();
