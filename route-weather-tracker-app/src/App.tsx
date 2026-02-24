@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
@@ -8,9 +9,10 @@ import RouteHeader from "./components/RouteHeader";
 import RouteStatus from "./components/RouteStatus";
 import PassCard from "./components/PassCard";
 import { RefreshProvider } from "./contexts/RefreshContext";
-import { getRouteEndpoints, getPassesByIds } from "./services/passService";
+import { getRouteEndpoints, getPassesByIds, computeRoutes } from "./services/passService";
 import type { PassSummary } from "./types/passTypes";
 import type { ComputedRoute, RouteEndpoint } from "./types/routeTypes";
+import { routeToSlug, routeMatchesSlug } from "./utils/formatters";
 import "./App.css";
 
 function PassCardSkeleton() {
@@ -33,6 +35,13 @@ function PassCardSkeleton() {
 }
 
 export default function App() {
+  const { fromId, toId, routeSlug } = useParams<{
+    fromId: string;
+    toId: string;
+    routeSlug: string;
+  }>();
+  const navigate = useNavigate();
+
   const [endpoints, setEndpoints] = useState<RouteEndpoint[]>([]);
   const [selectedFrom, setSelectedFrom] = useState<RouteEndpoint | null>(null);
   const [selectedTo, setSelectedTo] = useState<RouteEndpoint | null>(null);
@@ -40,6 +49,10 @@ export default function App() {
   const [passes, setPasses] = useState<PassSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Track whether we've already resolved the URL-encoded route so we don't
+  // re-run the deep-link effect after the user manually picks a new route.
+  const urlResolved = useRef(false);
 
   // Load endpoints once on mount
   useEffect(() => {
@@ -49,6 +62,35 @@ export default function App() {
         // Non-fatal — UI will show empty comboboxes
       });
   }, []);
+
+  // When navigating directly to a permalink, auto-compute and select the route
+  // once endpoints are available.
+  useEffect(() => {
+    if (urlResolved.current) return;
+    if (!fromId || !toId || !routeSlug) return;
+    if (endpoints.length === 0) return;
+
+    const from = endpoints.find((e) => e.id === fromId);
+    const to = endpoints.find((e) => e.id === toId);
+    if (!from || !to) return;
+
+    urlResolved.current = true;
+
+    computeRoutes(fromId, toId)
+      .then((routes) => {
+        const match =
+          routes.find((r) => routeMatchesSlug(r, routeSlug)) ?? routes[0];
+        if (match) {
+          setSelectedFrom(from);
+          setSelectedTo(to);
+          setSelectedRoute(match);
+          setPasses([]);
+        }
+      })
+      .catch(() => {
+        // Non-fatal — user can still pick a route manually
+      });
+  }, [endpoints, fromId, toId, routeSlug]);
 
   // Fetch pass data whenever the selected route changes
   useEffect(() => {
@@ -90,6 +132,8 @@ export default function App() {
     setSelectedTo(to);
     setSelectedRoute(route);
     setPasses([]);
+    urlResolved.current = true;
+    navigate(`/${from.id}/${to.id}/${routeToSlug(route)}`, { replace: false });
   }
 
   return (
