@@ -35,10 +35,79 @@ public class OsrmRoutingService : IRoutingService
       RouteEndpoint destination,
       CancellationToken ct = default)
   {
-    // OSRM coordinates are lon,lat (not lat,lon)
-    var url = $"{OsrmBase}/route/v1/driving/" +
-              $"{origin.Longitude},{origin.Latitude};" +
-              $"{destination.Longitude},{destination.Latitude}" +
+    // Build all waypoint sequences to query:
+    //   1. Always query the direct origin → destination route (OSRM's natural choice).
+    //   2. For each routing hub declared by the destination, also query
+    //      origin → hub → destination. This surfaces corridor alternatives that
+    //      OSRM omits because a shorter path exists — e.g. for Kalispell, OSRM
+    //      picks US-2/Sandpoint (~60 mi shorter) but the I-90 → US-93 route via
+    //      Missoula is the common road and crosses Fourth of July and Lookout passes.
+    var waypointSets = new List<IReadOnlyList<RouteEndpoint>>();
+    waypointSets.Add([origin, destination]);
+    foreach (var hubId in destination.RoutingHubs)
+    {
+      var hub = RouteEndpointRegistry.GetById(hubId);
+      if (hub is not null && hub.Id != origin.Id && hub.Id != destination.Id)
+        waypointSets.Add([origin, hub, destination]);
+    }
+
+    // Fetch all waypoint sequences in parallel.
+    var fetchTasks = waypointSets
+        .Select(wps => FetchFromOsrmAsync(wps, origin, destination, ct));
+    var allRouteLists = await Task.WhenAll(fetchTasks);
+    var allRoutes = allRouteLists.SelectMany(r => r).ToList();
+
+    if (allRoutes.Count == 0) return [];
+
+    // Deduplicate: two routes are considered identical when they cover the same
+    // major highways AND the same passes. This collapses near-identical OSRM
+    // geometries for the same corridor while keeping genuinely distinct options
+    // (e.g. "I-90/US-93 with Idaho passes" vs "US-2/US-95 via Sandpoint").
+    var seen = new HashSet<string>();
+    var unique = allRoutes
+        .Where(r =>
+        {
+          var hwKey = string.Join(",", r.HighwaysUsed.OrderBy(h => h, StringComparer.OrdinalIgnoreCase));
+          var passKey = string.Join(",", r.PassIds.OrderBy(p => p));
+          var key = $"{hwKey}|{passKey}";
+          if (key == "|") key = r.Name; // fallback for unnamed, pass-less routes
+          return seen.Add(key);
+        })
+        .OrderBy(r => r.DistanceMiles)
+        .ToList();
+
+    // Re-assign stable IDs and tag extra-distance relative to the fastest option.
+    var primaryDist = unique[0].DistanceMiles;
+    unique = unique
+        .Select((r, i) => r with
+        {
+          Id = $"route-{i}",
+          ExtraDistanceMiles = i == 0 ? null : Math.Round(r.DistanceMiles - primaryDist, 1)
+        })
+        .ToList();
+
+    _logger.LogInformation(
+        "OSRM: {Count} route(s) found {Origin} → {Dest}; passes total: {Passes}",
+        unique.Count, origin.Name, destination.Name,
+        unique.Sum(r => r.PassIds.Count));
+
+    return unique;
+  }
+
+  /// <summary>
+  /// Issues a single OSRM request for the given ordered waypoints and parses
+  /// the response into <see cref="ComputedRoute"/> objects. Routes are returned
+  /// with temporary IDs — the caller re-indexes after merging all results.
+  /// </summary>
+  private async Task<List<ComputedRoute>> FetchFromOsrmAsync(
+      IReadOnlyList<RouteEndpoint> waypoints,
+      RouteEndpoint origin,
+      RouteEndpoint destination,
+      CancellationToken ct)
+  {
+    var coordinateString = string.Join(";",
+        waypoints.Select(w => $"{w.Longitude},{w.Latitude}"));
+    var url = $"{OsrmBase}/route/v1/driving/{coordinateString}" +
               "?alternatives=true&steps=true&geometries=geojson&overview=full&annotations=false";
 
     try
@@ -74,7 +143,7 @@ public class OsrmRoutingService : IRoutingService
 
         routes.Add(new ComputedRoute
         {
-          Id = $"route-{idx}",
+          Id = $"route-tmp-{idx}", // re-assigned after merge
           Name = BuildName(highways, idx),
           HighwaysUsed = highways,
           DistanceMiles = distMetres / 1609.344,
@@ -85,38 +154,6 @@ public class OsrmRoutingService : IRoutingService
         });
         idx++;
       }
-
-      // Deduplicate: OSRM sometimes returns two alternates with the same highway
-      // signature (e.g. two near-identical I-90 paths through Spokane). Keep only
-      // the fastest route for each unique highway set — the user would see no
-      // meaningful difference between them.
-      var seen = new HashSet<string>();
-      routes = routes
-          .Where(r =>
-          {
-            var key = string.Join(",", r.HighwaysUsed.OrderBy(h => h, StringComparer.OrdinalIgnoreCase));
-            if (key == string.Empty) key = r.Name; // fallback for unnamed routes
-            return seen.Add(key);
-          })
-          .ToList();
-
-      // Tag each alternate with how many miles longer it is than the primary.
-      // The frontend uses this to split routes into "reasonable" vs "longer options"
-      // sections rather than silently dropping the longer ones.
-      if (routes.Count > 1)
-      {
-        var primaryDist = routes[0].DistanceMiles;
-        for (var i = 1; i < routes.Count; i++)
-          routes[i] = routes[i] with
-          {
-            ExtraDistanceMiles = Math.Round(routes[i].DistanceMiles - primaryDist, 1)
-          };
-      }
-
-      _logger.LogInformation(
-          "OSRM: {Count} route(s) found {Origin} → {Dest}; passes total: {Passes}",
-          routes.Count, origin.Name, destination.Name,
-          routes.Sum(r => r.PassIds.Count));
 
       return routes;
     }
@@ -206,7 +243,7 @@ public class OsrmRoutingService : IRoutingService
 
   private static bool IsMajorHighway(string r) =>
       r.StartsWith("I-", StringComparison.OrdinalIgnoreCase) ||
-      r.StartsWith("I ",  StringComparison.OrdinalIgnoreCase) ||   // OSM uses "I 90" not "I-90"
+      r.StartsWith("I ", StringComparison.OrdinalIgnoreCase) ||   // OSM uses "I 90" not "I-90"
       r.StartsWith("US-", StringComparison.OrdinalIgnoreCase) ||
       r.StartsWith("US ", StringComparison.OrdinalIgnoreCase);
 

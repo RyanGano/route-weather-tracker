@@ -39,9 +39,15 @@ public static class RouteEndpointRegistry
         new() { Id = "idaho-falls",   Name = "Idaho Falls",   State = "ID", Latitude = 43.492, Longitude = -112.034 },
 
         // ── Montana ──────────────────────────────────────────────────────────────
-        new() { Id = "whitefish",     Name = "Whitefish",     State = "MT", Latitude = 48.412, Longitude = -114.336 },
-        new() { Id = "kalispell",     Name = "Kalispell",     State = "MT", Latitude = 48.196, Longitude = -114.313 },
-        new() { Id = "missoula",      Name = "Missoula",      State = "MT", Latitude = 46.872, Longitude = -113.994 },
+        // Whitefish and Kalispell are reached faster from the west via US-2/Sandpoint,
+        // but the common road is I-90 east through the Idaho passes then north on
+        // US-93 from St. Regis, MT. Declaring St. Regis as a routing hub causes the
+        // service to offer both options so the user sees the Idaho-pass corridor with
+        // an accurate distance.
+        new() { Id = "whitefish",  Name = "Whitefish",  State = "MT", Latitude = 48.412, Longitude = -114.336, RoutingHubs = ["st-regis"] },
+        new() { Id = "kalispell",  Name = "Kalispell",  State = "MT", Latitude = 48.196, Longitude = -114.313, RoutingHubs = ["st-regis"] },
+        new() { Id = "missoula",   Name = "Missoula",   State = "MT", Latitude = 46.872, Longitude = -113.994 },
+        new() { Id = "st-regis",   Name = "St. Regis",  State = "MT", Latitude = 47.297, Longitude = -115.101 },
         new() { Id = "great-falls",   Name = "Great Falls",   State = "MT", Latitude = 47.500, Longitude = -111.300 },
         new() { Id = "helena",        Name = "Helena",        State = "MT", Latitude = 46.596, Longitude = -112.027 },
         new() { Id = "butte",         Name = "Butte",         State = "MT", Latitude = 46.003, Longitude = -112.534 },
