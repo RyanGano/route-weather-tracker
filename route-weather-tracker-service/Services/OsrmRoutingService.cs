@@ -41,10 +41,19 @@ public class OsrmRoutingService : IRoutingService
     //      origin → hub → destination. This surfaces corridor alternatives that
     //      OSRM omits because a shorter path exists — e.g. for Kalispell, OSRM
     //      picks US-2/Sandpoint (~60 mi shorter) but the I-90 → US-93 route via
-    //      Missoula is the common road and crosses Fourth of July and Lookout passes.
+    //      St. Regis is the common road and crosses Fourth of July and Lookout passes.
+    //   3. Symmetrically, for each routing hub declared by the origin, also query
+    //      origin → hub → destination so the same corridor is surfaced when the
+    //      hub-declared city is the starting point (westbound trips).
     var waypointSets = new List<IReadOnlyList<RouteEndpoint>>();
     waypointSets.Add([origin, destination]);
     foreach (var hubId in destination.RoutingHubs)
+    {
+      var hub = RouteEndpointRegistry.GetById(hubId);
+      if (hub is not null && hub.Id != origin.Id && hub.Id != destination.Id)
+        waypointSets.Add([origin, hub, destination]);
+    }
+    foreach (var hubId in origin.RoutingHubs)
     {
       var hub = RouteEndpointRegistry.GetById(hubId);
       if (hub is not null && hub.Id != origin.Id && hub.Id != destination.Id)
