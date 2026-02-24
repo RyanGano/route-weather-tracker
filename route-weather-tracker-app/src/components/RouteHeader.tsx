@@ -239,23 +239,21 @@ export default function RouteHeader({
                         key={route.id}
                         variant="outline-primary"
                         className="text-start py-2 px-3"
+                        style={{ whiteSpace: "normal" }}
                         onClick={() => handleSelectRoute(route)}
                       >
-                        <div className="d-flex align-items-center gap-2">
-                          <span className="fw-semibold">
-                            {formatRouteName(route.name)}
-                          </span>
-                          {route.highwaysUsed.map((h) => (
-                            <Badge key={h} bg="info">
-                              {h}
-                            </Badge>
-                          ))}
-                        </div>
-                        <div className="text-muted small mt-1">
+                        <div className="fw-semibold" style={{ color: "#5b9bd5" }}>
                           {route.passNames.length > 0
                             ? route.passNames.join(" • ")
                             : "No tracked passes"}
-                          <span className="text-body-tertiary ms-2">
+                        </div>
+                        <div className="d-flex flex-wrap align-items-center gap-2 mt-1">
+                          {route.highwaysUsed.map((h) => (
+                            <Badge key={h} bg="" style={{ backgroundColor: "#1a3a6e" }}>
+                              {formatRouteName(h)}
+                            </Badge>
+                          ))}
+                          <span className="text-body-tertiary small ms-auto">
                             {Math.round(route.distanceMiles)} mi
                           </span>
                         </div>
@@ -277,15 +275,18 @@ export default function RouteHeader({
                             key={route.id}
                             variant="outline-secondary"
                             className="text-start py-2 px-3"
+                            style={{ whiteSpace: "normal" }}
                             onClick={() => handleSelectRoute(route)}
                           >
-                            <div className="d-flex align-items-center gap-2">
-                              <span className="fw-semibold">
-                                {formatRouteName(route.name)}
-                              </span>
+                            <div className="fw-semibold" style={{ color: "#8aabb8" }}>
+                              {route.passNames.length > 0
+                                ? route.passNames.join(" • ")
+                                : "No tracked passes"}
+                            </div>
+                            <div className="d-flex flex-wrap align-items-center gap-2 mt-1">
                               {route.highwaysUsed.map((h) => (
                                 <Badge key={h} bg="secondary">
-                                  {h}
+                                  {formatRouteName(h)}
                                 </Badge>
                               ))}
                               <Badge
@@ -295,12 +296,7 @@ export default function RouteHeader({
                               >
                                 +{Math.round(route.extraDistanceMiles!)} mi
                               </Badge>
-                            </div>
-                            <div className="text-muted small mt-1">
-                              {route.passNames.length > 0
-                                ? route.passNames.join(" • ")
-                                : "No tracked passes"}
-                              <span className="text-body-tertiary ms-2">
+                              <span className="text-body-tertiary small">
                                 {Math.round(route.distanceMiles)} mi total
                               </span>
                             </div>
