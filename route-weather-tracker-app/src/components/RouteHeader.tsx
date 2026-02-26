@@ -241,10 +241,10 @@ export default function RouteHeader({
                   strokeLinejoin="round"
                   aria-hidden="true"
                 >
-                  <path d="M21 7v6h-6" />
-                  <path d="M3 17v-6h6" />
-                  <path d="M7.5 6.5a8 8 0 0111 1.5L21 9" />
-                  <path d="M16.5 17.5a8 8 0 01-11-1.5L3 15" />
+                  <path d="M21 12a9 9 0 1 1-3.5-6.5" />
+                  <polyline points="21 3 21 9 15 9" />
+                  <path d="M3 12a9 9 0 1 0 3.5 6.5" />
+                  <polyline points="3 21 3 15 9 15" />
                 </svg>
               </Button>
             </div>
