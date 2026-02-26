@@ -217,14 +217,15 @@ export default function RouteHeader({
           <div className="d-flex align-items-center gap-2">
             <div style={{ flex: 1 }}>
               <CityCombobox
-            label="From"
-            endpoints={endpoints}
-            value={draftFromId}
-            onChange={setDraftFromId}
-            disabled={endpoints.length === 0}
-            placeholder="Type a city or state…"
-            exclude={draftToId}
-            userPos={userPos}
+                label="From"
+                endpoints={endpoints}
+                value={draftFromId}
+                onChange={setDraftFromId}
+                disabled={endpoints.length === 0}
+                placeholder="Type a city or state…"
+                exclude={draftToId}
+                userPos={userPos}
+              />
             </div>
             <div className="d-flex align-items-center justify-content-center" style={{ width: 48 }}>
               <Button
