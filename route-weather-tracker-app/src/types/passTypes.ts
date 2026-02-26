@@ -62,4 +62,6 @@ export interface PassSummary {
   condition: PassCondition | null;
   cameras: CameraImage[];
   weather: PassWeatherForecast | null;
+  weatherSource?: string;
+  weatherForecastUrl?: string;
 }

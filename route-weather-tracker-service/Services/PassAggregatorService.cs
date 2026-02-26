@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Caching.Memory;
 using route_weather_tracker_service.Data;
+using System.Globalization;
 using route_weather_tracker_service.Models;
 
 namespace route_weather_tracker_service.Services;
@@ -12,18 +13,18 @@ namespace route_weather_tracker_service.Services;
 public class PassAggregatorService : IPassAggregatorService
 {
   private readonly IReadOnlyList<IPassDataSource> _dataSources;
-  private readonly IOpenWeatherService _weather;
+  private readonly INwsService _nws;
   private readonly IMemoryCache _cache;
   private readonly ConcurrentDictionary<string, SemaphoreSlim> _locks = new();
   private static readonly TimeSpan CacheTtl = TimeSpan.FromMinutes(5);
 
   public PassAggregatorService(
       IEnumerable<IPassDataSource> dataSources,
-      IOpenWeatherService weather,
+      INwsService nws,
       IMemoryCache cache)
   {
     _dataSources = [.. dataSources];
-    _weather = weather;
+    _nws = nws;
     _cache = cache;
   }
 
@@ -67,11 +68,15 @@ public class PassAggregatorService : IPassAggregatorService
       var camerasTask = source is not null
           ? source.GetCamerasAsync(passId, ct)
           : Task.FromResult(new List<CameraImage>());
-      var weatherTask = _weather.GetForecastAsync(passId, info.Latitude, info.Longitude, ct);
+      // Only use NWS as the source of weather data.
+      var nwsTask = _nws.GetForecastAsync(passId, info.Latitude, info.Longitude, ct);
 
-      await Task.WhenAll(conditionTask, camerasTask, weatherTask);
+      await Task.WhenAll(conditionTask, camerasTask, nwsTask);
 
-      var weather = await weatherTask;
+      var nwsResult = await nwsTask;
+      var weather = nwsResult;
+      var weatherSource = nwsResult != null ? "nws" : null;
+
       var condition = await conditionTask ?? DeriveCondition(passId, weather);
 
       var summary = new PassSummary
@@ -79,8 +84,19 @@ public class PassAggregatorService : IPassAggregatorService
         Info = info,
         Condition = condition,
         Cameras = camerasTask.Result,
-        Weather = weather
+        Weather = weather,
+        WeatherSource = weatherSource
       };
+      // Expose a canonical forecast URL. For NWS-sourced results prefer the
+      // human-friendly MapClick page; otherwise use the provider's SourceUrl.
+      if (weatherSource == "nws")
+      {
+        summary.WeatherForecastUrl = $"https://forecast.weather.gov/MapClick.php?lat={info.Latitude.ToString(CultureInfo.InvariantCulture)}&lon={info.Longitude.ToString(CultureInfo.InvariantCulture)}";
+      }
+      else
+      {
+        summary.WeatherForecastUrl = weather?.SourceUrl;
+      }
 
       _cache.Set(cacheKey, summary, CacheTtl);
       return summary;

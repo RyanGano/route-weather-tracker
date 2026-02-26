@@ -6,6 +6,7 @@ import { TravelRestriction } from "../types/passTypes";
 import { formatRestriction } from "../utils/formatters";
 import WebcamViewer from "./WebcamViewer";
 import WeatherDisplay from "./WeatherDisplay";
+// NWS links are provided by the backend via `pass.weatherForecastUrl`.
 
 interface PassCardProps {
   pass: PassSummary;
@@ -82,6 +83,18 @@ export default function PassCard({ pass }: PassCardProps) {
               title="Official pass conditions page"
             >
               Official &#8599;
+            </a>
+          )}
+
+          {pass.weatherSource === "nws" && pass.weatherForecastUrl && (
+            <a
+              href={pass.weatherForecastUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`badge bg-info text-decoration-none ${info.officialUrl ? "ms-2" : ""}`}
+              title="NWS forecast"
+            >
+              Weather &#8599;
             </a>
           )}
         </div>

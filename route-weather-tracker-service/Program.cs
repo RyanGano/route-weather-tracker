@@ -26,7 +26,15 @@ builder.Services.AddTransient<SensitiveUrlRedactionHandler>();
 builder.Services.AddHttpClient<IWsdotService, WsdotService>()
     .AddHttpMessageHandler<SensitiveUrlRedactionHandler>();
 builder.Services.AddScoped<IIdahoTransportService, IdahoTransportService>();
-builder.Services.AddHttpClient<IOpenWeatherService, OpenWeatherService>()
+// OpenWeather removed as a fallback; NWS is used as the sole weather source.
+builder.Services.AddHttpClient<INwsService, NwsService>(client =>
+{
+    // NWS API requires a descriptive User-Agent and a contact From header.
+    var contact = builder.Configuration["NwsContact"] ?? "dev@local";
+    client.DefaultRequestHeaders.UserAgent.ParseAdd($"RouteWeatherTracker/0.1 (+{contact})");
+    if (!client.DefaultRequestHeaders.Contains("From"))
+        client.DefaultRequestHeaders.Add("From", contact);
+})
     .AddHttpMessageHandler<SensitiveUrlRedactionHandler>();
 builder.Services.AddScoped<IPassDataSource, WsdotPassDataSource>();
 builder.Services.AddScoped<IPassDataSource, IdahoPassDataSource>();

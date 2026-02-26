@@ -8,6 +8,13 @@ function owmIconUrl(icon: string) {
   return `https://openweathermap.org/img/wn/${icon}@2x.png`;
 }
 
+function iconUrl(icon: string) {
+  if (!icon) return "";
+  // If the icon looks like a full URL (NWS returns full icon URLs), use it directly.
+  if (icon.startsWith("http://") || icon.startsWith("https://")) return icon;
+  return owmIconUrl(icon);
+}
+
 function formatTemp(f: number) {
   return `${Math.round(f)}°F`;
 }
@@ -27,7 +34,7 @@ export default function WeatherDisplay({ weather }: WeatherDisplayProps) {
       <div className="d-flex align-items-center gap-2 mb-2">
         {weather.currentIconCode && (
           <img
-            src={owmIconUrl(weather.currentIconCode)}
+            src={iconUrl(weather.currentIconCode)}
             alt={weather.currentDescription}
             width={40}
             height={40}
@@ -62,7 +69,7 @@ export default function WeatherDisplay({ weather }: WeatherDisplayProps) {
                 <div className="fw-semibold text-muted">{label}</div>
                 {day.iconCode && (
                   <img
-                    src={owmIconUrl(day.iconCode)}
+                    src={iconUrl(day.iconCode)}
                     alt={day.description}
                     width={32}
                     height={32}

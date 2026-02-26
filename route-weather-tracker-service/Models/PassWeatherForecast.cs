@@ -17,4 +17,6 @@ public class PassWeatherForecast
   public string CurrentDescription { get; init; } = string.Empty;
   public string CurrentIconCode { get; init; } = string.Empty;
   public List<WeatherForecastDay> DailyForecasts { get; init; } = new();
+  // Optional canonical URL for the forecast used to generate this data
+  public string? SourceUrl { get; set; }
 }

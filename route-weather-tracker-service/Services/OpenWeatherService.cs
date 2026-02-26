@@ -89,13 +89,17 @@ public class OpenWeatherService : IOpenWeatherService
         };
       }).ToList();
 
-      return new PassWeatherForecast
+      var result = new PassWeatherForecast
       {
         CurrentTempFahrenheit = currentTemp,
         CurrentDescription = currentDesc,
         CurrentIconCode = currentIcon,
         DailyForecasts = dailyForecasts
       };
+
+      // Provide a fallback canonical link to the OpenWeather map view centered on the pass
+      result.SourceUrl = $"https://openweathermap.org/weathermap?basemap=map&cities=false&layer=precipitation&lat={latitude}&lon={longitude}&zoom=12";
+      return result;
     }
     catch (HttpRequestException ex)
     {
