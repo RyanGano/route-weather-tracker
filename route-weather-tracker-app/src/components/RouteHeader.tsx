@@ -20,7 +20,6 @@ interface Props {
     to: RouteEndpoint,
     route: ComputedRoute,
   ) => void;
-  onSwap?: () => void;
   userPos?: { lat: number; lon: number } | null;
 }
 
@@ -42,7 +41,6 @@ export default function RouteHeader({
   selectedTo,
   selectedRoute,
   onRouteChange,
-  onSwap,
   userPos,
 }: Props) {
   const [showDrawer, setShowDrawer] = useState(false);
