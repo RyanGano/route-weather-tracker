@@ -20,6 +20,7 @@ interface Props {
     to: RouteEndpoint,
     route: ComputedRoute,
   ) => void;
+  userPos?: { lat: number; lon: number } | null;
 }
 
 /** "I-90" → "Interstate 90", "US-2" → "US Highway 2", others pass through. */
@@ -40,6 +41,7 @@ export default function RouteHeader({
   selectedTo,
   selectedRoute,
   onRouteChange,
+  userPos,
 }: Props) {
   const [showDrawer, setShowDrawer] = useState(false);
   const [showInfoDrawer, setShowInfoDrawer] = useState(false);
@@ -209,6 +211,7 @@ export default function RouteHeader({
             disabled={endpoints.length === 0}
             placeholder="Type a city or state…"
             exclude={draftToId}
+            userPos={userPos}
           />
           <CityCombobox
             label="To"
@@ -218,6 +221,7 @@ export default function RouteHeader({
             disabled={endpoints.length === 0}
             placeholder="Type a city or state…"
             exclude={draftFromId}
+            userPos={userPos}
           />
 
           {draftFrom && draftTo && draftFrom.id !== draftTo.id && (

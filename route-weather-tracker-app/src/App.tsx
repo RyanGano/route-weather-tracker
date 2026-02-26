@@ -52,6 +52,9 @@ export default function App() {
   const [selectedRoute, setSelectedRoute] = useState<ComputedRoute | null>(
     null,
   );
+  const [userPos, setUserPos] = useState<{ lat: number; lon: number } | null>(
+    null,
+  );
   const [passes, setPasses] = useState<PassSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,6 +70,25 @@ export default function App() {
       .catch(() => {
         // Non-fatal — UI will show empty comboboxes
       });
+  }, []);
+
+  // Request geolocation once when the app first loads so comboboxes can sort
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    let cancelled = false;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (cancelled) return;
+        setUserPos({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+      },
+      () => {
+        /* ignore errors silently; comboboxes will fallback to alpha order */
+      },
+      { maximumAge: 60_000, timeout: 7000 },
+    );
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // When navigating directly to a permalink, auto-compute and select the route
@@ -149,6 +171,7 @@ export default function App() {
         selectedFrom={selectedFrom}
         selectedTo={selectedTo}
         selectedRoute={selectedRoute}
+        userPos={userPos}
         onRouteChange={handleRouteChange}
       />
       <Container>

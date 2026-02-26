@@ -12,6 +12,7 @@ interface Props {
   placeholder?: string;
   /** Endpoint id to exclude from the list (e.g. already-selected other end) */
   exclude?: string;
+  userPos?: { lat: number; lon: number } | null;
 }
 
 export default function CityCombobox({
@@ -22,6 +23,7 @@ export default function CityCombobox({
   disabled = false,
   placeholder = "Type to search…",
   exclude,
+  userPos = null,
 }: Props) {
   const inputId = useId();
   const listId = useId();
@@ -43,7 +45,33 @@ export default function CityCombobox({
       if (exclude && ep.id === exclude) return false;
       return endpointLabel(ep).toLowerCase().includes(inputText.toLowerCase());
     })
-    .sort((a, b) => endpointLabel(a).localeCompare(endpointLabel(b)));
+    .map((ep) => ({ ep }))
+    .map((x) => ({ ...x, dist: userPos ? distanceMeters(x.ep.latitude, x.ep.longitude, userPos.lat, userPos.lon) : undefined }))
+    .sort((a, b) => {
+      // If we have user position, sort by distance ascending.
+      if (a.dist != null && b.dist != null) return a.dist - b.dist;
+      if (a.dist != null) return -1;
+      if (b.dist != null) return 1;
+      // Fallback to alphabetical
+      return endpointLabel(a.ep).localeCompare(endpointLabel(b.ep));
+    })
+    .map((x) => x.ep);
+
+  // Note: `userPos` may be provided by a parent; no local geolocation here.
+
+  // Haversine distance in meters
+  function distanceMeters(lat1: number, lon1: number, lat2: number, lon2: number) {
+    const toRad = (deg: number) => (deg * Math.PI) / 180;
+    const R = 6371000; // earth radius meters
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
 
   function handleInputChange(text: string) {
     setInputText(text);
