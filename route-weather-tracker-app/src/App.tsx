@@ -9,7 +9,11 @@ import RouteHeader from "./components/RouteHeader";
 import RouteStatus from "./components/RouteStatus";
 import PassCard from "./components/PassCard";
 import { RefreshProvider } from "./contexts/RefreshContext";
-import { getRouteEndpoints, getPassesByIds, computeRoutes } from "./services/passService";
+import {
+  getRouteEndpoints,
+  getPassesByIds,
+  computeRoutes,
+} from "./services/passService";
 import type { PassSummary } from "./types/passTypes";
 import type { ComputedRoute, RouteEndpoint } from "./types/routeTypes";
 import { routeToSlug, routeMatchesSlug } from "./utils/formatters";
@@ -45,7 +49,9 @@ export default function App() {
   const [endpoints, setEndpoints] = useState<RouteEndpoint[]>([]);
   const [selectedFrom, setSelectedFrom] = useState<RouteEndpoint | null>(null);
   const [selectedTo, setSelectedTo] = useState<RouteEndpoint | null>(null);
-  const [selectedRoute, setSelectedRoute] = useState<ComputedRoute | null>(null);
+  const [selectedRoute, setSelectedRoute] = useState<ComputedRoute | null>(
+    null,
+  );
   const [passes, setPasses] = useState<PassSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -146,12 +152,27 @@ export default function App() {
         onRouteChange={handleRouteChange}
       />
       <Container>
-        {!selectedRoute && !loading && (
+        {!selectedRoute && !loading && !(fromId && toId && routeSlug) && (
           <Alert variant="info" className="mt-2">
             Use the <strong>Route</strong> button above to choose your start and
             end city.
           </Alert>
         )}
+        {fromId &&
+          toId &&
+          routeSlug &&
+          !selectedRoute &&
+          !loading &&
+          endpoints.length > 0 && (
+            <>
+              <div className="d-flex align-items-center gap-2 mb-3 text-muted">
+                <Spinner animation="border" size="sm" />
+                <span>Loading route and pass conditions…</span>
+              </div>
+              <PassCardSkeleton />
+            </>
+          )}
+
         {loading && (
           <>
             <div className="d-flex align-items-center gap-2 mb-3 text-muted">
