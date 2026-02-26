@@ -164,7 +164,6 @@ export default function App() {
     navigate(`/${from.id}/${to.id}/${routeToSlug(route)}`, { replace: false });
   }
 
-
   return (
     <RefreshProvider>
       <RouteHeader
