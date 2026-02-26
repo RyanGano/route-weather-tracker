@@ -48,14 +48,22 @@ public class OpenWeatherService : IOpenWeatherService
       var currentDesc = currentRoot.GetProperty("weather")[0].GetProperty("description").GetString() ?? string.Empty;
       var currentIcon = currentRoot.GetProperty("weather")[0].GetProperty("icon").GetString() ?? string.Empty;
 
-      // Aggregate 3-hour slots into daily forecasts (group by day)
+      // Aggregate 3-hour slots into daily forecasts (group by local day)
+      // OpenWeather returns epoch seconds (UTC) and provides a city.timezone offset (seconds)
+      var timezoneOffsetSeconds = forecastDoc.RootElement.TryGetProperty("city", out var cityElem) &&
+                                  cityElem.TryGetProperty("timezone", out var tzElem)
+          ? tzElem.GetInt32()
+          : 0;
+      var tzOffset = TimeSpan.FromSeconds(timezoneOffsetSeconds);
+
       var dailyGroups = forecastDoc.RootElement
           .GetProperty("list")
           .EnumerateArray()
           .GroupBy(slot =>
           {
-            var dt = DateTimeOffset.FromUnixTimeSeconds(slot.GetProperty("dt").GetInt64()).Date;
-            return dt;
+            var unix = slot.GetProperty("dt").GetInt64();
+            var localDate = DateTimeOffset.FromUnixTimeSeconds(unix).ToOffset(tzOffset).Date;
+            return localDate;
           })
           .Take(5);
 

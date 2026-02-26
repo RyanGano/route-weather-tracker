@@ -79,9 +79,11 @@ public class WsdotService : IWsdotService
         WestboundRestriction = restriction.Westbound,
         EastboundRestrictionText = restriction.EastboundText,
         WestboundRestrictionText = restriction.WestboundText,
-        LastUpdated = root.TryGetProperty("DateUpdated", out var dt)
-              ? DateTime.TryParse(dt.GetString(), out var parsed) ? parsed : DateTime.UtcNow
-              : DateTime.UtcNow
+          LastUpdated = root.TryGetProperty("DateUpdated", out var dt)
+            ? (DateTimeOffset.TryParse(dt.GetString(), out var parsedOffset)
+            ? parsedOffset.UtcDateTime
+            : DateTime.UtcNow)
+            : DateTime.UtcNow
       };
     }
     catch (HttpRequestException ex)
