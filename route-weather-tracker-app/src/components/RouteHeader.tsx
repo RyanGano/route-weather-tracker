@@ -242,14 +242,21 @@ export default function RouteHeader({
                         style={{ whiteSpace: "normal" }}
                         onClick={() => handleSelectRoute(route)}
                       >
-                        <div className="fw-semibold" style={{ color: "#5b9bd5" }}>
+                        <div
+                          className="fw-semibold"
+                          style={{ color: "#5b9bd5" }}
+                        >
                           {route.passNames.length > 0
                             ? route.passNames.join(" • ")
                             : "No tracked passes"}
                         </div>
                         <div className="d-flex flex-wrap align-items-center gap-2 mt-1">
                           {route.highwaysUsed.map((h) => (
-                            <Badge key={h} bg="" style={{ backgroundColor: "#1a3a6e" }}>
+                            <Badge
+                              key={h}
+                              bg=""
+                              style={{ backgroundColor: "#1a3a6e" }}
+                            >
                               {formatRouteName(h)}
                             </Badge>
                           ))}
@@ -278,7 +285,10 @@ export default function RouteHeader({
                             style={{ whiteSpace: "normal" }}
                             onClick={() => handleSelectRoute(route)}
                           >
-                            <div className="fw-semibold" style={{ color: "#8aabb8" }}>
+                            <div
+                              className="fw-semibold"
+                              style={{ color: "#8aabb8" }}
+                            >
                               {route.passNames.length > 0
                                 ? route.passNames.join(" • ")
                                 : "No tracked passes"}

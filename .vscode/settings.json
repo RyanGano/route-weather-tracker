@@ -14,6 +14,7 @@
     "dotnet package": true,
     "npx tsc": true,
     "git push": true,
-    "yarn build": true
+    "yarn build": true,
+    "git rev-parse": true
   }
 }
