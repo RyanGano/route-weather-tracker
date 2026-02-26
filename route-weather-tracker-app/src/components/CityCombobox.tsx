@@ -38,10 +38,12 @@ export default function CityCombobox({
     setInputText(ep ? endpointLabel(ep) : "");
   }, [value, endpoints]);
 
-  const candidates = endpoints.filter((ep) => {
-    if (exclude && ep.id === exclude) return false;
-    return endpointLabel(ep).toLowerCase().includes(inputText.toLowerCase());
-  });
+  const candidates = endpoints
+    .filter((ep) => {
+      if (exclude && ep.id === exclude) return false;
+      return endpointLabel(ep).toLowerCase().includes(inputText.toLowerCase());
+    })
+    .sort((a, b) => endpointLabel(a).localeCompare(endpointLabel(b)));
 
   function handleInputChange(text: string) {
     setInputText(text);
