@@ -238,7 +238,7 @@ export default function RouteHeader({
                       <Button
                         key={route.id}
                         variant="outline-primary"
-                        className="text-start py-2 px-3"
+                        className="route-option text-start py-2 px-3"
                         style={{ whiteSpace: "normal" }}
                         onClick={() => handleSelectRoute(route)}
                       >
@@ -281,7 +281,7 @@ export default function RouteHeader({
                           <Button
                             key={route.id}
                             variant="outline-secondary"
-                            className="text-start py-2 px-3"
+                            className="route-option text-start py-2 px-3"
                             style={{ whiteSpace: "normal" }}
                             onClick={() => handleSelectRoute(route)}
                           >
