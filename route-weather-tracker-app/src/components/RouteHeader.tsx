@@ -231,18 +231,15 @@ export default function RouteHeader({
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
                   height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                  fill="currentColor"
+                  className="bi bi-arrow-repeat"
+                  viewBox="0 0 16 16"
                   aria-hidden="true"
                 >
-                  <path d="M21 12a9 9 0 1 1-3.5-6.5" />
-                  <polyline points="21 3 21 9 15 9" />
-                  <path d="M3 12a9 9 0 1 0 3.5 6.5" />
-                  <polyline points="3 21 3 15 9 15" />
+                  <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41" />
+                  <path d="M.342 8.59 2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9" />
+                  <path fillRule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3z" />
+                  <path fillRule="evenodd" d="M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z" />
                 </svg>
               </Button>
             </div>
