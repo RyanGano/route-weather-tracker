@@ -20,6 +20,7 @@ interface Props {
     to: RouteEndpoint,
     route: ComputedRoute,
   ) => void;
+  onSwap?: () => void;
   userPos?: { lat: number; lon: number } | null;
 }
 
@@ -41,6 +42,7 @@ export default function RouteHeader({
   selectedTo,
   selectedRoute,
   onRouteChange,
+  onSwap,
   userPos,
 }: Props) {
   const [showDrawer, setShowDrawer] = useState(false);
@@ -130,6 +132,15 @@ export default function RouteHeader({
                   {endpointLabel(selectedTo)}
                 </span>
                 {selectedRoute && <Badge bg="info">{selectedRoute.name}</Badge>}
+                <Button
+                  variant="outline-light"
+                  size="sm"
+                  className="ms-2"
+                  onClick={() => onSwap && onSwap()}
+                  aria-label="Swap origin and destination"
+                >
+                  ↔
+                </Button>
               </span>
             )}
 
@@ -203,7 +214,9 @@ export default function RouteHeader({
           <Offcanvas.Title>Choose Route</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-          <CityCombobox
+          <div className="d-flex align-items-center gap-2">
+            <div style={{ flex: 1 }}>
+              <CityCombobox
             label="From"
             endpoints={endpoints}
             value={draftFromId}
@@ -212,17 +225,35 @@ export default function RouteHeader({
             placeholder="Type a city or state…"
             exclude={draftToId}
             userPos={userPos}
-          />
-          <CityCombobox
-            label="To"
-            endpoints={endpoints}
-            value={draftToId}
-            onChange={setDraftToId}
-            disabled={endpoints.length === 0}
-            placeholder="Type a city or state…"
-            exclude={draftFromId}
-            userPos={userPos}
-          />
+            </div>
+            <div className="d-flex align-items-center justify-content-center" style={{ width: 48 }}>
+              <Button
+                variant="outline-secondary"
+                onClick={() => {
+                  const a = draftFromId;
+                  const b = draftToId;
+                  setDraftFromId(b);
+                  setDraftToId(a);
+                }}
+                aria-label="Swap draft origin and destination"
+                title="Swap"
+              >
+                ↔
+              </Button>
+            </div>
+            <div style={{ flex: 1 }}>
+              <CityCombobox
+                label="To"
+                endpoints={endpoints}
+                value={draftToId}
+                onChange={setDraftToId}
+                disabled={endpoints.length === 0}
+                placeholder="Type a city or state…"
+                exclude={draftFromId}
+                userPos={userPos}
+              />
+            </div>
+          </div>
 
           {draftFrom && draftTo && draftFrom.id !== draftTo.id && (
             <div className="mt-3">

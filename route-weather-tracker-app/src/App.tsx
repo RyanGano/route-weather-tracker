@@ -164,6 +164,33 @@ export default function App() {
     navigate(`/${from.id}/${to.id}/${routeToSlug(route)}`, { replace: false });
   }
 
+  // Swap the currently selected from/to and lookup the best matching route
+  function handleSwapCurrent() {
+    if (!selectedFrom || !selectedTo) return;
+    let cancelled = false;
+    // Compute routes in the reversed direction and prefer a route with the same name
+    computeRoutes(selectedTo.id, selectedFrom.id)
+      .then((routes) => {
+        if (cancelled || routes.length === 0) return;
+        const match =
+          routes.find((r) => r.name === selectedRoute?.name) ?? routes[0];
+        setSelectedFrom(selectedTo);
+        setSelectedTo(selectedFrom);
+        setSelectedRoute(match);
+        setPasses([]);
+        urlResolved.current = true;
+        navigate(`/${selectedTo.id}/${selectedFrom.id}/${routeToSlug(match)}`, {
+          replace: false,
+        });
+      })
+      .catch(() => {
+        /* ignore — keep current selection */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }
+
   return (
     <RefreshProvider>
       <RouteHeader
@@ -173,6 +200,7 @@ export default function App() {
         selectedRoute={selectedRoute}
         userPos={userPos}
         onRouteChange={handleRouteChange}
+        onSwap={handleSwapCurrent}
       />
       <Container>
         {!selectedRoute && !loading && !(fromId && toId && routeSlug) && (
