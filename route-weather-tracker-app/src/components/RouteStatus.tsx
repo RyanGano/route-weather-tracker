@@ -168,7 +168,7 @@ export default function RouteStatus({ passes }: Props) {
     const severity =
       entries.length === 0
         ? 0
-        : (entries.reduce((m, e) => Math.max(m, e.severity), 0) as Severity);
+        : (entries.reduce<number>((m, e) => Math.max(m, e.severity), 0) as Severity);
     const worstDescription =
       entries.length === 0
         ? "clear skies"
