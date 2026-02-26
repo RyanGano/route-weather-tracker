@@ -132,15 +132,6 @@ export default function RouteHeader({
                   {endpointLabel(selectedTo)}
                 </span>
                 {selectedRoute && <Badge bg="info">{selectedRoute.name}</Badge>}
-                <Button
-                  variant="outline-light"
-                  size="sm"
-                  className="ms-2"
-                  onClick={() => onSwap && onSwap()}
-                  aria-label="Swap origin and destination"
-                >
-                  ↔
-                </Button>
               </span>
             )}
 
@@ -214,20 +205,19 @@ export default function RouteHeader({
           <Offcanvas.Title>Choose Route</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-          <div className="d-flex align-items-center gap-2">
-            <div style={{ flex: 1 }}>
-              <CityCombobox
-                label="From"
-                endpoints={endpoints}
-                value={draftFromId}
-                onChange={setDraftFromId}
-                disabled={endpoints.length === 0}
-                placeholder="Type a city or state…"
-                exclude={draftToId}
-                userPos={userPos}
-              />
-            </div>
-            <div className="d-flex align-items-center justify-content-center" style={{ width: 48 }}>
+          <div className="d-flex flex-column gap-2">
+            <CityCombobox
+              label="From"
+              endpoints={endpoints}
+              value={draftFromId}
+              onChange={setDraftFromId}
+              disabled={endpoints.length === 0}
+              placeholder="Type a city or state…"
+              exclude={draftToId}
+              userPos={userPos}
+            />
+
+            <div className="d-flex align-items-center justify-content-center">
               <Button
                 variant="outline-secondary"
                 onClick={() => {
@@ -239,21 +229,20 @@ export default function RouteHeader({
                 aria-label="Swap draft origin and destination"
                 title="Swap"
               >
-                ↔
+                ⟳
               </Button>
             </div>
-            <div style={{ flex: 1 }}>
-              <CityCombobox
-                label="To"
-                endpoints={endpoints}
-                value={draftToId}
-                onChange={setDraftToId}
-                disabled={endpoints.length === 0}
-                placeholder="Type a city or state…"
-                exclude={draftFromId}
-                userPos={userPos}
-              />
-            </div>
+
+            <CityCombobox
+              label="To"
+              endpoints={endpoints}
+              value={draftToId}
+              onChange={setDraftToId}
+              disabled={endpoints.length === 0}
+              placeholder="Type a city or state…"
+              exclude={draftFromId}
+              userPos={userPos}
+            />
           </div>
 
           {draftFrom && draftTo && draftFrom.id !== draftTo.id && (
