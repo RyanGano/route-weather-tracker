@@ -227,23 +227,28 @@ export default function RouteHeader({
                 aria-label="Swap draft origin and destination"
                 title="Swap"
                 className="d-flex align-items-center justify-content-center"
-                style={{ lineHeight: 0, padding: "0.5rem" }}
+                style={{ lineHeight: 0, padding: "0.18rem" }}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  fill="currentColor"
-                  className="bi bi-arrow-clockwise"
-                  viewBox="0 0 16 16"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
                   aria-hidden="true"
                   style={{ display: "block" }}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.8}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"
-                  />
-                  <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
+                  {/* Left: taller up arrow with a tail/shaft */}
+                  <path d="M7.5 19 V5" />
+                  <path d="M4.5 8.5 L7.5 5.5 L10.5 8.5" />
+
+                  {/* Right: taller down arrow with a tail/shaft */}
+                  <path d="M16.5 5 V19" />
+                  <path d="M13.5 15.5 L16.5 18.5 L19.5 15.5" />
                 </svg>
               </Button>
             </div>
