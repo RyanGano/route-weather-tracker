@@ -1,4 +1,5 @@
 using Azure.Identity;
+using Microsoft.AspNetCore.HttpOverrides;
 using route_weather_tracker_service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -83,6 +84,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+// App Service reverse-proxies to the app over HTTP internally and sets X-Forwarded-Proto.
+// Without this, UseHttpsRedirection() sees HTTP and issues an infinite redirect loop.
+app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedProto });
 app.UseHttpsRedirection();
 app.UseCors("FrontendPolicy");
 app.UseAuthorization();

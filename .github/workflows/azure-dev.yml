@@ -1,75 +1,72 @@
-# Run when commits are pushed to main
+name: Deploy Route Weather Tracker
+
 on:
   workflow_dispatch:
   push:
-    # Run when commits are pushed to mainline branch (main or master)
-    # Set this to the mainline branch you are using
     branches:
       - main
 
-# Set up permissions for deploying with secretless Azure federated credentials
-# https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
+# Federated credentials (OIDC) — no long-lived secrets needed for Azure auth
 permissions:
   id-token: write
   contents: read
 
-
 jobs:
-  build:
+  deploy-backend:
     runs-on: ubuntu-latest
-    env:
-      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-      AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
-      AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install azd
-        uses: Azure/setup-azd@v2
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: | 
-            8.x
-            9.x
-            10.x
+          dotnet-version: '10.x'
 
-      - name: Log in with Azure (Federated Credentials)
-        run: |
-          azd auth login `
-            --client-id "$Env:AZURE_CLIENT_ID" `
-            --federated-credential-provider "github" `
-            --tenant-id "$Env:AZURE_TENANT_ID"
-        shell: pwsh
+      - name: Publish
+        run: dotnet publish route-weather-tracker-service/route-weather-tracker-service.csproj -c Release -o ./publish
 
-      - name: Log in with Azure CLI (Federated Credentials)
+      - name: Login to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Provision Infrastructure
-        run: azd provision --no-prompt
+      - name: Deploy to App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_APP_SERVICE_NAME }}
+          package: ./publish
 
-      - name: Deploy Application
-        run: azd deploy --no-prompt
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Restore custom domain binding
-        # azd provision re-creates the Container App definition and wipes custom domains.
-        # Rebind www.whentodrive.com after every deploy using the managed certificate
-        # that persists in the Container Apps Environment.
-        run: |
-          RESOURCE_GROUP="rg-${AZURE_ENV_NAME}"
-          CAE_NAME=$(az containerapp env list --resource-group "$RESOURCE_GROUP" --query "[0].name" -o tsv)
-          CERT_NAME="www.whentodrive.com-cae-xkbs-260222010052"
-          az containerapp hostname bind \
-            --name frontend \
-            --resource-group "$RESOURCE_GROUP" \
-            --environment "$CAE_NAME" \
-            --hostname www.whentodrive.com \
-            --certificate "$CERT_NAME"
-        shell: bash
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        working-directory: route-weather-tracker-app
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        working-directory: route-weather-tracker-app
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+        run: yarn build
+
+      - name: Deploy to Static Web App
+        uses: azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: route-weather-tracker-app
+          output_location: dist
+          skip_app_build: true
 
