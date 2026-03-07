@@ -560,6 +560,266 @@ public static class PassRegistry
             State = "CA",
             HasOfficialConditions = false,
             OfficialUrl = "https://roads.dot.ca.gov/"
+        },
+
+        // ── Wyoming — NWS weather; WYDOT ArcGIS integration pending ──────────────
+        new PassInfo
+        {
+            Id = "teton-pass",
+            Name = "Teton Pass",
+            Highway = "WY-22",
+            ElevationFeet = 8431,
+            Latitude = 43.4952,
+            Longitude = -110.9455,
+            State = "WY",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://wyoroad.info"
+        },
+        new PassInfo
+        {
+            Id = "togwotee",
+            Name = "Togwotee Pass",
+            Highway = "US-287",
+            ElevationFeet = 9658,
+            Latitude = 43.7601,
+            Longitude = -110.0824,
+            State = "WY",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://wyoroad.info"
+        },
+        new PassInfo
+        {
+            Id = "snowy-range",
+            Name = "Snowy Range Pass",
+            Highway = "WY-130",
+            ElevationFeet = 10847,
+            Latitude = 41.3681,
+            Longitude = -106.1989,
+            State = "WY",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://wyoroad.info"
+        },
+        new PassInfo
+        {
+            Id = "south-pass",
+            Name = "South Pass",
+            Highway = "WY-28",
+            ElevationFeet = 7412,
+            Latitude = 42.3647,
+            Longitude = -108.5905,
+            State = "WY",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://wyoroad.info"
+        },
+        new PassInfo
+        {
+            Id = "powder-river",
+            Name = "Powder River Pass",
+            Highway = "US-16",
+            ElevationFeet = 9666,
+            Latitude = 44.2002,
+            Longitude = -107.0838,
+            State = "WY",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://wyoroad.info"
+        },
+        new PassInfo
+        {
+            Id = "beartooth",
+            Name = "Beartooth Pass",
+            Highway = "US-212",
+            ElevationFeet = 10947,
+            Latitude = 45.0030,
+            Longitude = -109.4561,
+            State = "WY/MT",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://wyoroad.info"
+        },
+
+        // ── Utah — NWS weather; UDOT ArcGIS integration pending ───────────────────
+        new PassInfo
+        {
+            Id = "parleys",
+            Name = "Parleys Canyon Summit",
+            Highway = "I-80",
+            ElevationFeet = 6755,
+            Latitude = 40.6897,
+            Longitude = -111.7437,
+            State = "UT",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://udottraffic.utah.gov"
+        },
+        new PassInfo
+        {
+            Id = "soldier-summit",
+            Name = "Soldier Summit",
+            Highway = "US-6",
+            ElevationFeet = 7477,
+            Latitude = 39.8358,
+            Longitude = -110.9294,
+            State = "UT",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://udottraffic.utah.gov"
+        },
+        new PassInfo
+        {
+            Id = "sardine",
+            Name = "Sardine Canyon",
+            Highway = "US-91",
+            ElevationFeet = 5540,
+            Latitude = 41.6347,
+            Longitude = -111.8491,
+            State = "UT",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://udottraffic.utah.gov"
+        },
+        new PassInfo
+        {
+            Id = "cedar-mountain",
+            Name = "Cedar Canyon",
+            Highway = "UT-14",
+            ElevationFeet = 9240,
+            Latitude = 37.6315,
+            Longitude = -112.9621,
+            State = "UT",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://udottraffic.utah.gov"
+        },
+        new PassInfo
+        {
+            Id = "beaver-canyon",
+            Name = "UT-153 Summit",
+            Highway = "UT-153",
+            ElevationFeet = 9400,
+            Latitude = 38.3980,
+            Longitude = -112.4614,
+            State = "UT",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://udottraffic.utah.gov"
+        },
+        new PassInfo
+        {
+            Id = "pine-valley",
+            Name = "Veyo / Black Ridge",
+            Highway = "I-15",
+            ElevationFeet = 5545,
+            Latitude = 37.2650,
+            Longitude = -113.6968,
+            State = "UT",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://udottraffic.utah.gov"
+        },
+
+        // ── Nevada — NWS weather; NDOT ArcGIS integration pending ─────────────────
+        new PassInfo
+        {
+            Id = "spooner",
+            Name = "Spooner Summit",
+            Highway = "US-50",
+            ElevationFeet = 7146,
+            Latitude = 39.1013,
+            Longitude = -119.9124,
+            State = "NV",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://nvroads.com"
+        },
+        new PassInfo
+        {
+            Id = "mount-rose",
+            Name = "Mt. Rose Summit",
+            Highway = "NV-431",
+            ElevationFeet = 8911,
+            Latitude = 39.3235,
+            Longitude = -119.9140,
+            State = "NV",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://nvroads.com"
+        },
+        new PassInfo
+        {
+            Id = "golconda",
+            Name = "Golconda Summit",
+            Highway = "I-80",
+            ElevationFeet = 5145,
+            Latitude = 40.9396,
+            Longitude = -117.5048,
+            State = "NV",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://nvroads.com"
+        },
+        new PassInfo
+        {
+            Id = "palisade",
+            Name = "Palisade Canyon",
+            Highway = "I-80",
+            ElevationFeet = 4540,
+            Latitude = 40.5280,
+            Longitude = -116.2037,
+            State = "NV",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://nvroads.com"
+        },
+
+        // ── New Mexico — NWS weather; NMDOT ArcGIS integration pending ────────────
+        new PassInfo
+        {
+            Id = "glorieta",
+            Name = "Glorieta Pass",
+            Highway = "I-25",
+            ElevationFeet = 7432,
+            Latitude = 35.5218,
+            Longitude = -105.7700,
+            State = "NM",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://nmroads.com"
+        },
+        new PassInfo
+        {
+            Id = "tijeras",
+            Name = "Tijeras Canyon",
+            Highway = "I-40",
+            ElevationFeet = 6534,
+            Latitude = 35.0698,
+            Longitude = -106.3855,
+            State = "NM",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://nmroads.com"
+        },
+        new PassInfo
+        {
+            Id = "raton",
+            Name = "Raton Pass",
+            Highway = "I-25",
+            ElevationFeet = 7834,
+            Latitude = 36.9977,
+            Longitude = -104.5076,
+            State = "NM",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://nmroads.com"
+        },
+        new PassInfo
+        {
+            Id = "apache-summit",
+            Name = "Apache Summit",
+            Highway = "US-60",
+            ElevationFeet = 7600,
+            Latitude = 34.1350,
+            Longitude = -109.8490,
+            State = "NM",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://nmroads.com"
+        },
+        new PassInfo
+        {
+            Id = "emory",
+            Name = "Emory Pass",
+            Highway = "NM-152",
+            ElevationFeet = 8228,
+            Latitude = 32.9019,
+            Longitude = -107.6856,
+            State = "NM",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://nmroads.com"
         }
     ];
 
