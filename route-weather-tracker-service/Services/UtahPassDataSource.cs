@@ -12,22 +12,22 @@ namespace route_weather_tracker_service.Services;
 /// </summary>
 public class UtahPassDataSource : IPassDataSource
 {
-    private static readonly IReadOnlySet<string> UtPassIds =
-        new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
+  private static readonly IReadOnlySet<string> UtPassIds =
+      new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+      {
             "parleys",
             "soldier-summit",
             "sardine",
             "cedar-mountain",
             "beaver-canyon",
             "pine-valley",
-        };
+      };
 
-    public IReadOnlySet<string> SupportedPassIds => UtPassIds;
+  public IReadOnlySet<string> SupportedPassIds => UtPassIds;
 
-    public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
-        Task.FromResult<PassCondition?>(null);
+  public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
+      Task.FromResult<PassCondition?>(null);
 
-    public Task<List<CameraImage>> GetCamerasAsync(string passId, CancellationToken ct = default) =>
-        Task.FromResult(new List<CameraImage>());
+  public Task<List<CameraImage>> GetCamerasAsync(string passId, CancellationToken ct = default) =>
+      Task.FromResult(new List<CameraImage>());
 }

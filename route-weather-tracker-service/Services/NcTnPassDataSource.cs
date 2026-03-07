@@ -14,21 +14,21 @@ namespace route_weather_tracker_service.Services;
 /// </summary>
 public class NcTnPassDataSource : IPassDataSource
 {
-    private static readonly IReadOnlySet<string> NcTnPassIds =
-        new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
+  private static readonly IReadOnlySet<string> NcTnPassIds =
+      new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+      {
             "newfound-gap",
             "cherokee",
             "clinch-mountain",
             "santeelah",
             "clingmans-dome",
-        };
+      };
 
-    public IReadOnlySet<string> SupportedPassIds => NcTnPassIds;
+  public IReadOnlySet<string> SupportedPassIds => NcTnPassIds;
 
-    public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
-        Task.FromResult<PassCondition?>(null);
+  public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
+      Task.FromResult<PassCondition?>(null);
 
-    public Task<List<CameraImage>> GetCamerasAsync(string passId, CancellationToken ct = default) =>
-        Task.FromResult(new List<CameraImage>());
+  public Task<List<CameraImage>> GetCamerasAsync(string passId, CancellationToken ct = default) =>
+      Task.FromResult(new List<CameraImage>());
 }

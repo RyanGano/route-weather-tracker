@@ -14,9 +14,9 @@ namespace route_weather_tracker_service.Services;
 /// </summary>
 public class CaliforniaPassDataSource : IPassDataSource
 {
-    private static readonly IReadOnlySet<string> CaPassIds =
-        new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
+  private static readonly IReadOnlySet<string> CaPassIds =
+      new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+      {
             "donner",
             "echo-summit",
             "cajon",
@@ -25,13 +25,13 @@ public class CaliforniaPassDataSource : IPassDataSource
             "tioga",
             "sonora",
             "mt-shasta",
-        };
+      };
 
-    public IReadOnlySet<string> SupportedPassIds => CaPassIds;
+  public IReadOnlySet<string> SupportedPassIds => CaPassIds;
 
-    public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
-        Task.FromResult<PassCondition?>(null);
+  public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
+      Task.FromResult<PassCondition?>(null);
 
-    public Task<List<CameraImage>> GetCamerasAsync(string passId, CancellationToken ct = default) =>
-        Task.FromResult(new List<CameraImage>());
+  public Task<List<CameraImage>> GetCamerasAsync(string passId, CancellationToken ct = default) =>
+      Task.FromResult(new List<CameraImage>());
 }

@@ -12,21 +12,21 @@ namespace route_weather_tracker_service.Services;
 /// </summary>
 public class NewMexicoPassDataSource : IPassDataSource
 {
-    private static readonly IReadOnlySet<string> NmPassIds =
-        new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
+  private static readonly IReadOnlySet<string> NmPassIds =
+      new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+      {
             "glorieta",
             "tijeras",
             "raton",
             "apache-summit",
             "emory",
-        };
+      };
 
-    public IReadOnlySet<string> SupportedPassIds => NmPassIds;
+  public IReadOnlySet<string> SupportedPassIds => NmPassIds;
 
-    public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
-        Task.FromResult<PassCondition?>(null);
+  public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
+      Task.FromResult<PassCondition?>(null);
 
-    public Task<List<CameraImage>> GetCamerasAsync(string passId, CancellationToken ct = default) =>
-        Task.FromResult(new List<CameraImage>());
+  public Task<List<CameraImage>> GetCamerasAsync(string passId, CancellationToken ct = default) =>
+      Task.FromResult(new List<CameraImage>());
 }

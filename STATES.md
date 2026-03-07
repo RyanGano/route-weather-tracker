@@ -125,15 +125,15 @@ For each state:
 
 #### Passes in PassRegistry (all ✅ committed)
 
-| Pass            | Highway | Elevation (ft) | Lat     | Lon       | WSDOT ID |
-| --------------- | ------- | -------------- | ------- | --------- | -------- |
-| Snoqualmie Pass | I-90    | 3,022          | 47.4245 | -121.4116 | 11       |
-| Stevens Pass    | US-2    | 4,061          | 47.7447 | -121.0891 | 2        |
-| Cayuse Pass     | WA-123  | 4,694          | 46.8706 | -121.5445 | 1        |
-| White Pass      | US-12   | 4,500          | 46.6388 | -121.3988 | 3        |
-| Washington Pass | WA-20   | 5,477          | 48.5195 | -120.6653 | 4        |
+| Pass            | Highway | Elevation (ft) | Lat     | Lon       | WSDOT ID               |
+| --------------- | ------- | -------------- | ------- | --------- | ---------------------- |
+| Snoqualmie Pass | I-90    | 3,022          | 47.4245 | -121.4116 | 11                     |
+| Stevens Pass    | US-2    | 4,061          | 47.7447 | -121.0891 | 2                      |
+| Cayuse Pass     | WA-123  | 4,694          | 46.8706 | -121.5445 | 1                      |
+| White Pass      | US-12   | 4,500          | 46.6388 | -121.3988 | 3                      |
+| Washington Pass | WA-20   | 5,477          | 48.5195 | -120.6653 | 4                      |
 | Rainy Pass      | WA-20   | 4,855          | 48.5195 | -120.7364 | n/a (OpenWeather-only) |
-| Sherman Pass    | WA-20   | 5,575          | 48.6030 | -118.4630 | 5        |
+| Sherman Pass    | WA-20   | 5,575          | 48.6030 | -118.4630 | 5                      |
 
 ---
 
@@ -147,10 +147,10 @@ For each state:
 
 #### Passes in PassRegistry (all ✅ committed)
 
-| Pass                | Highway | Elevation (ft) | Lat     | Lon       | Source         |
-| ------------------- | ------- | -------------- | ------- | --------- | -------------- |
-| Fourth of July Pass | I-90    | 3,081          | 47.5333 | -116.3667 | Idaho 511 cams |
-| Lookout Pass        | I-90    | 4,738          | 47.4576 | -115.6990 | Idaho 511 cams |
+| Pass                | Highway | Elevation (ft) | Lat     | Lon       | Source           |
+| ------------------- | ------- | -------------- | ------- | --------- | ---------------- |
+| Fourth of July Pass | I-90    | 3,081          | 47.5333 | -116.3667 | Idaho 511 cams   |
+| Lookout Pass        | I-90    | 4,738          | 47.4576 | -115.6990 | Idaho 511 cams   |
 | Lolo Pass           | US-12   | 5,233          | 46.6494 | -114.5983 | OpenWeather-only |
 | Lost Trail Pass     | US-93   | 6,995          | 45.6800 | -113.9500 | OpenWeather-only |
 | Banner Summit       | ID-21   | 6,989          | 44.2608 | -114.9731 | OpenWeather-only |
@@ -400,6 +400,7 @@ known pass segments. Conditions are reported by road segment mile-post range.
 ```
 feat(mt): add Montana passes and MDT data source
 ```
+
 > ✅ Committed as `feat(mt): add Montana passes and MontanaPassDataSource scaffold; fix RouteEndpoint ambiguity` (`b47cc1d`)
 
 ---

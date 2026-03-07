@@ -13,22 +13,22 @@ namespace route_weather_tracker_service.Services;
 /// </summary>
 public class WyomingPassDataSource : IPassDataSource
 {
-    private static readonly IReadOnlySet<string> WyPassIds =
-        new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
+  private static readonly IReadOnlySet<string> WyPassIds =
+      new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+      {
             "teton-pass",
             "togwotee",
             "snowy-range",
             "south-pass",
             "powder-river",
             "beartooth",
-        };
+      };
 
-    public IReadOnlySet<string> SupportedPassIds => WyPassIds;
+  public IReadOnlySet<string> SupportedPassIds => WyPassIds;
 
-    public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
-        Task.FromResult<PassCondition?>(null);
+  public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
+      Task.FromResult<PassCondition?>(null);
 
-    public Task<List<CameraImage>> GetCamerasAsync(string passId, CancellationToken ct = default) =>
-        Task.FromResult(new List<CameraImage>());
+  public Task<List<CameraImage>> GetCamerasAsync(string passId, CancellationToken ct = default) =>
+      Task.FromResult(new List<CameraImage>());
 }

@@ -14,20 +14,20 @@ namespace route_weather_tracker_service.Services;
 /// </summary>
 public class VirginiaPassDataSource : IPassDataSource
 {
-    private static readonly IReadOnlySet<string> VaPassIds =
-        new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
+  private static readonly IReadOnlySet<string> VaPassIds =
+      new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+      {
             "afton-mountain",
             "rockfish-gap",
             "fancy-gap",
             "shenandoah-gap",
-        };
+      };
 
-    public IReadOnlySet<string> SupportedPassIds => VaPassIds;
+  public IReadOnlySet<string> SupportedPassIds => VaPassIds;
 
-    public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
-        Task.FromResult<PassCondition?>(null);
+  public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
+      Task.FromResult<PassCondition?>(null);
 
-    public Task<List<CameraImage>> GetCamerasAsync(string passId, CancellationToken ct = default) =>
-        Task.FromResult(new List<CameraImage>());
+  public Task<List<CameraImage>> GetCamerasAsync(string passId, CancellationToken ct = default) =>
+      Task.FromResult(new List<CameraImage>());
 }

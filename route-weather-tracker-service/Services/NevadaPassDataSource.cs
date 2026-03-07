@@ -12,20 +12,20 @@ namespace route_weather_tracker_service.Services;
 /// </summary>
 public class NevadaPassDataSource : IPassDataSource
 {
-    private static readonly IReadOnlySet<string> NvPassIds =
-        new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
+  private static readonly IReadOnlySet<string> NvPassIds =
+      new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+      {
             "spooner",
             "mount-rose",
             "golconda",
             "palisade",
-        };
+      };
 
-    public IReadOnlySet<string> SupportedPassIds => NvPassIds;
+  public IReadOnlySet<string> SupportedPassIds => NvPassIds;
 
-    public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
-        Task.FromResult<PassCondition?>(null);
+  public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
+      Task.FromResult<PassCondition?>(null);
 
-    public Task<List<CameraImage>> GetCamerasAsync(string passId, CancellationToken ct = default) =>
-        Task.FromResult(new List<CameraImage>());
+  public Task<List<CameraImage>> GetCamerasAsync(string passId, CancellationToken ct = default) =>
+      Task.FromResult(new List<CameraImage>());
 }
