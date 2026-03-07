@@ -820,6 +820,118 @@ public static class PassRegistry
             State = "NM",
             HasOfficialConditions = false,
             OfficialUrl = "https://nmroads.com"
+        },
+
+        // ── Virginia — NWS weather; VDOT 511 integration pending (needs VDOT-ApiKey)
+        new PassInfo
+        {
+            Id = "afton-mountain",
+            Name = "Afton Mountain",
+            Highway = "I-64",
+            ElevationFeet = 1929,
+            Latitude = 37.9990,
+            Longitude = -78.8980,
+            State = "VA",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://511virginia.org"
+        },
+        new PassInfo
+        {
+            Id = "rockfish-gap",
+            Name = "Rockfish Gap",
+            Highway = "US-250",
+            ElevationFeet = 1909,
+            Latitude = 38.0343,
+            Longitude = -78.8682,
+            State = "VA",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://511virginia.org"
+        },
+        new PassInfo
+        {
+            Id = "fancy-gap",
+            Name = "Fancy Gap",
+            Highway = "I-77",
+            ElevationFeet = 2895,
+            Latitude = 36.6623,
+            Longitude = -80.6460,
+            State = "VA",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://511virginia.org"
+        },
+        new PassInfo
+        {
+            Id = "shenandoah-gap",
+            Name = "Front Royal (Skyline Dr)",
+            Highway = "US-340",
+            ElevationFeet = 1460,
+            Latitude = 38.9201,
+            Longitude = -78.1944,
+            State = "VA",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://511virginia.org"
+        },
+
+        // ── North Carolina / Tennessee — NWS weather; TDOT key pending ────────────
+        new PassInfo
+        {
+            Id = "newfound-gap",
+            Name = "Newfound Gap",
+            Highway = "US-441",
+            ElevationFeet = 5046,
+            Latitude = 35.6112,
+            Longitude = -83.4265,
+            State = "NC/TN",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://www.nps.gov/grsm/planyourvisit/parkreads.htm"
+        },
+        new PassInfo
+        {
+            Id = "cherokee",
+            Name = "Big Witch Gap",
+            Highway = "US-19",
+            ElevationFeet = 3200,
+            Latitude = 35.4450,
+            Longitude = -83.2680,
+            State = "NC",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://drivenc.gov"
+        },
+        new PassInfo
+        {
+            Id = "clinch-mountain",
+            Name = "Clinch Mountain",
+            Highway = "US-11W",
+            ElevationFeet = 3074,
+            Latitude = 36.5000,
+            Longitude = -82.8000,
+            State = "TN",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://www.tn511.com"
+        },
+        new PassInfo
+        {
+            Id = "santeelah",
+            Name = "Wayah Bald",
+            Highway = "US-64",
+            ElevationFeet = 4180,
+            Latitude = 35.1700,
+            Longitude = -83.6400,
+            State = "NC",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://drivenc.gov"
+        },
+        new PassInfo
+        {
+            Id = "clingmans-dome",
+            Name = "Clingmans Dome Rd",
+            Highway = "Spur",
+            ElevationFeet = 6643,
+            Latitude = 35.5629,
+            Longitude = -83.4985,
+            State = "NC/TN",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://www.nps.gov/grsm/planyourvisit/parkreads.htm"
         }
     ];
 

@@ -46,6 +46,8 @@ builder.Services.AddScoped<IPassDataSource, WyomingPassDataSource>();
 builder.Services.AddScoped<IPassDataSource, UtahPassDataSource>();
 builder.Services.AddScoped<IPassDataSource, NevadaPassDataSource>();
 builder.Services.AddScoped<IPassDataSource, NewMexicoPassDataSource>();
+builder.Services.AddScoped<IPassDataSource, VirginiaPassDataSource>();
+builder.Services.AddScoped<IPassDataSource, NcTnPassDataSource>();
 builder.Services.AddScoped<IPassAggregatorService, PassAggregatorService>();
 
 // ----- Routing services (OSRM + geometric pass matching) -----
