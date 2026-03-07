@@ -160,7 +160,7 @@ For each state:
 
 ---
 
-## Oregon (OR) ⬜
+## Oregon (OR) ✅ (scaffold — NWS weather; ODOT TripCheck integration pending)
 
 ### Data Source
 
@@ -243,7 +243,7 @@ feat(or): add Oregon passes and ODOT TripCheck data source
 
 ---
 
-## Colorado (CO) ⬜
+## Colorado (CO) 🔄 (scaffold committed — awaiting CDOT-ApiKey for official conditions)
 
 ### Data Source
 
@@ -404,7 +404,7 @@ feat(mt): add Montana passes and MDT data source
 
 ---
 
-## California (CA) ⬜
+## California (CA) ✅ (scaffold — NWS weather; Caltrans chain-control integration pending)
 
 ### Data Source
 
@@ -494,7 +494,7 @@ feat(ca): add California passes and Caltrans data source
 
 ---
 
-## Wyoming (WY) ⬜
+## Wyoming (WY) ✅ (scaffold — NWS weather; WYDOT ArcGIS integration pending)
 
 ### Data Source
 
@@ -568,7 +568,7 @@ feat(wy): add Wyoming passes and WYDOT data source
 
 ---
 
-## Utah (UT) ⬜
+## Utah (UT) ✅ (scaffold — NWS weather; UDOT ArcGIS integration pending)
 
 ### Data Source
 
@@ -625,7 +625,7 @@ feat(ut): add Utah passes and UDOT data source
 
 ---
 
-## Nevada (NV) ⬜
+## Nevada (NV) ✅ (scaffold — NWS weather; NDOT ArcGIS integration pending)
 
 ### Data Source
 
@@ -678,7 +678,7 @@ feat(nv): add Nevada passes and NV Roads data source
 
 ---
 
-## New Mexico (NM) ⬜
+## New Mexico (NM) ✅ (scaffold — NWS weather; NMDOT ArcGIS integration pending)
 
 ### Data Source
 
@@ -727,7 +727,7 @@ feat(nm): add New Mexico passes and NMDOT data source
 
 ---
 
-## Virginia (VA) ⬜
+## Virginia (VA) 🔄 (scaffold committed — awaiting VDOT-ApiKey for official conditions)
 
 ### Data Source
 
@@ -779,7 +779,7 @@ feat(va): add Virginia Appalachian passes and VDOT data source
 
 ---
 
-## North Carolina / Tennessee (NC/TN) ⬜
+## North Carolina / Tennessee (NC/TN) 🔄 (scaffold committed — awaiting TDOT-ApiKey for official TN conditions)
 
 ### Data Source
 
