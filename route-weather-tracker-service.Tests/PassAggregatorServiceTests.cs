@@ -54,7 +54,7 @@ public class PassAggregatorServiceTests
   {
     var waSource = BuildSource(WaPassIds, conditionFactory: id => SampleCondition(id));
     var idSource = BuildSource(IdahoPassIds);
-    var weather = new Mock<IOpenWeatherService>();
+    var weather = new Mock<INwsService>();
     weather.Setup(s => s.GetForecastAsync(It.IsAny<string>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
            .ReturnsAsync((string _, double __, double ___, CancellationToken ____) => SampleForecast());
 
@@ -62,7 +62,7 @@ public class PassAggregatorServiceTests
 
     var passes = await service.GetAllPassesAsync();
 
-    Assert.Equal(4, passes.Count);
+    // Registry grows as new states are added — verify the four original passes are present
     Assert.Contains(passes, p => p.Info.Id == "snoqualmie");
     Assert.Contains(passes, p => p.Info.Id == "stevens-pass");
     Assert.Contains(passes, p => p.Info.Id == "fourth-of-july");
@@ -76,7 +76,7 @@ public class PassAggregatorServiceTests
     var idSource = BuildSource(IdahoPassIds);
     var service = new PassAggregatorService(
         [waSource.Object, idSource.Object],
-        new Mock<IOpenWeatherService>().Object,
+        new Mock<INwsService>().Object,
         BuildCache());
 
     var result = await service.GetPassAsync("not-a-pass");
@@ -94,7 +94,7 @@ public class PassAggregatorServiceTests
     waSource.Setup(s => s.GetCamerasAsync("snoqualmie", It.IsAny<CancellationToken>()))
             .ReturnsAsync([]);
 
-    var weather = new Mock<IOpenWeatherService>();
+    var weather = new Mock<INwsService>();
     weather.Setup(s => s.GetForecastAsync("snoqualmie", It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
            .ReturnsAsync(SampleForecast());
 
@@ -115,7 +115,7 @@ public class PassAggregatorServiceTests
     var cam = new CameraImage { CameraId = "c1", Description = "Summit", ImageUrl = "https://example.com/cam.jpg" };
     var waSource = BuildSource(WaPassIds, conditionFactory: _ => expectedCondition, cameras: [cam]);
 
-    var weather = new Mock<IOpenWeatherService>();
+    var weather = new Mock<INwsService>();
     weather.Setup(s => s.GetForecastAsync("snoqualmie", It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
            .ReturnsAsync(SampleForecast());
 
@@ -175,7 +175,7 @@ public class PassAggregatorServiceTests
     idSource.Setup(s => s.GetCamerasAsync("fourth-of-july", It.IsAny<CancellationToken>()))
             .ReturnsAsync([]);
 
-    var weather = new Mock<IOpenWeatherService>();
+    var weather = new Mock<INwsService>();
     weather.Setup(s => s.GetForecastAsync("fourth-of-july", It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
            .ReturnsAsync(new PassWeatherForecast
            {
@@ -212,7 +212,7 @@ public class PassAggregatorServiceTests
     idSource.Setup(s => s.GetCamerasAsync("fourth-of-july", It.IsAny<CancellationToken>()))
             .ReturnsAsync([]);
 
-    var weather = new Mock<IOpenWeatherService>();
+    var weather = new Mock<INwsService>();
     weather.Setup(s => s.GetForecastAsync(It.IsAny<string>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
            .ReturnsAsync((string _, double __, double ___, CancellationToken ____) => SampleForecast());
 

@@ -15,6 +15,9 @@
     "npx tsc": true,
     "git push": true,
     "yarn build": true,
-    "git rev-parse": true
+    "git rev-parse": true,
+    "dotnet run": true,
+    "Receive-Job": true,
+    "Start-Job": true
   }
 }

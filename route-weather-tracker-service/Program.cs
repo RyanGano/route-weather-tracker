@@ -39,6 +39,7 @@ builder.Services.AddHttpClient<INwsService, NwsService>(client =>
 builder.Services.AddScoped<IPassDataSource, WsdotPassDataSource>();
 builder.Services.AddScoped<IPassDataSource, IdahoPassDataSource>();
 builder.Services.AddScoped<IPassDataSource, MontanaPassDataSource>();
+builder.Services.AddScoped<IPassDataSource, OregonPassDataSource>();
 builder.Services.AddScoped<IPassAggregatorService, PassAggregatorService>();
 
 // ----- Routing services (OSRM + geometric pass matching) -----

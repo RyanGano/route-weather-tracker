@@ -218,6 +218,80 @@ public static class PassRegistry
             Longitude = -112.7756,
             State = "MT",
             HasOfficialConditions = false
+        },
+
+        // ── Oregon — NWS weather; full ODOT TripCheck integration pending ────────
+        new PassInfo
+        {
+            Id = "santiam",
+            Name = "Santiam Pass",
+            Highway = "US-20",
+            ElevationFeet = 4817,
+            Latitude = 44.4194,
+            Longitude = -121.9946,
+            State = "OR",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://tripcheck.com/Pages/RoadConditions"
+        },
+        new PassInfo
+        {
+            Id = "willamette",
+            Name = "Willamette Pass",
+            Highway = "US-58",
+            ElevationFeet = 5128,
+            Latitude = 43.5953,
+            Longitude = -122.0540,
+            State = "OR",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://tripcheck.com/Pages/RoadConditions"
+        },
+        new PassInfo
+        {
+            Id = "siskiyou",
+            Name = "Siskiyou Summit",
+            Highway = "I-5",
+            ElevationFeet = 4310,
+            Latitude = 42.0591,
+            Longitude = -122.5353,
+            State = "OR",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://tripcheck.com/Pages/RoadConditions"
+        },
+        new PassInfo
+        {
+            Id = "deadman",
+            Name = "Deadman Pass",
+            Highway = "I-84",
+            ElevationFeet = 4193,
+            Latitude = 45.6952,
+            Longitude = -118.6489,
+            State = "OR",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://tripcheck.com/Pages/RoadConditions"
+        },
+        new PassInfo
+        {
+            Id = "mckenzie",
+            Name = "McKenzie Pass",
+            Highway = "OR-242",
+            ElevationFeet = 5325,
+            Latitude = 44.2600,
+            Longitude = -121.8697,
+            State = "OR",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://tripcheck.com/Pages/RoadConditions"
+        },
+        new PassInfo
+        {
+            Id = "government-camp",
+            Name = "Mt. Hood Corridor",
+            Highway = "US-26",
+            ElevationFeet = 3670,
+            Latitude = 45.2939,
+            Longitude = -121.7467,
+            State = "OR",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://tripcheck.com/Pages/RoadConditions"
         }
     ];
 
