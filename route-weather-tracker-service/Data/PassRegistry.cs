@@ -292,6 +292,176 @@ public static class PassRegistry
             State = "OR",
             HasOfficialConditions = false,
             OfficialUrl = "https://tripcheck.com/Pages/RoadConditions"
+        },
+
+        // ── Colorado — NWS weather; CDOT COtrip integration pending (needs CDOT-ApiKey) ──
+        new PassInfo
+        {
+            Id = "vail-pass",
+            Name = "Vail Pass",
+            Highway = "I-70",
+            ElevationFeet = 10662,
+            Latitude = 39.5449,
+            Longitude = -106.2085,
+            State = "CO",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://cotrip.org"
+        },
+        new PassInfo
+        {
+            Id = "eisenhower-tunnel",
+            Name = "Eisenhower/Johnson Tunnel",
+            Highway = "I-70",
+            ElevationFeet = 11013,
+            Latitude = 39.6846,
+            Longitude = -105.9066,
+            State = "CO",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://cotrip.org"
+        },
+        new PassInfo
+        {
+            Id = "loveland-pass",
+            Name = "Loveland Pass",
+            Highway = "US-6",
+            ElevationFeet = 11990,
+            Latitude = 39.6707,
+            Longitude = -105.8893,
+            State = "CO",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://cotrip.org"
+        },
+        new PassInfo
+        {
+            Id = "berthoud-pass",
+            Name = "Berthoud Pass",
+            Highway = "US-40",
+            ElevationFeet = 11307,
+            Latitude = 39.7988,
+            Longitude = -105.7754,
+            State = "CO",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://cotrip.org"
+        },
+        new PassInfo
+        {
+            Id = "rabbit-ears",
+            Name = "Rabbit Ears Pass",
+            Highway = "US-40",
+            ElevationFeet = 9426,
+            Latitude = 40.3818,
+            Longitude = -106.5839,
+            State = "CO",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://cotrip.org"
+        },
+        new PassInfo
+        {
+            Id = "monarch-pass",
+            Name = "Monarch Pass",
+            Highway = "US-50",
+            ElevationFeet = 11312,
+            Latitude = 38.4940,
+            Longitude = -106.3297,
+            State = "CO",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://cotrip.org"
+        },
+        new PassInfo
+        {
+            Id = "wolf-creek",
+            Name = "Wolf Creek Pass",
+            Highway = "US-160",
+            ElevationFeet = 10857,
+            Latitude = 37.4774,
+            Longitude = -106.7980,
+            State = "CO",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://cotrip.org"
+        },
+        new PassInfo
+        {
+            Id = "red-mountain",
+            Name = "Red Mountain Pass",
+            Highway = "US-550",
+            ElevationFeet = 11018,
+            Latitude = 37.9057,
+            Longitude = -107.7214,
+            State = "CO",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://cotrip.org"
+        },
+        new PassInfo
+        {
+            Id = "la-veta",
+            Name = "La Veta Pass",
+            Highway = "US-160",
+            ElevationFeet = 9413,
+            Latitude = 37.4946,
+            Longitude = -105.0055,
+            State = "CO",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://cotrip.org"
+        },
+        new PassInfo
+        {
+            Id = "cameron-pass",
+            Name = "Cameron Pass",
+            Highway = "CO-14",
+            ElevationFeet = 10276,
+            Latitude = 40.5569,
+            Longitude = -105.8884,
+            State = "CO",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://cotrip.org"
+        },
+        new PassInfo
+        {
+            Id = "hoosier-pass",
+            Name = "Hoosier Pass",
+            Highway = "CO-9",
+            ElevationFeet = 11541,
+            Latitude = 39.3580,
+            Longitude = -106.0559,
+            State = "CO",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://cotrip.org"
+        },
+        new PassInfo
+        {
+            Id = "kenosha-pass",
+            Name = "Kenosha Pass",
+            Highway = "US-285",
+            ElevationFeet = 9999,
+            Latitude = 39.4198,
+            Longitude = -105.7665,
+            State = "CO",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://cotrip.org"
+        },
+        new PassInfo
+        {
+            Id = "fremont-pass",
+            Name = "Fremont Pass",
+            Highway = "CO-91",
+            ElevationFeet = 11318,
+            Latitude = 39.3780,
+            Longitude = -106.2075,
+            State = "CO",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://cotrip.org"
+        },
+        new PassInfo
+        {
+            Id = "poncha-pass",
+            Name = "Poncha Pass",
+            Highway = "US-285",
+            ElevationFeet = 9010,
+            Latitude = 38.3536,
+            Longitude = -106.0897,
+            State = "CO",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://cotrip.org"
         }
     ];
 
