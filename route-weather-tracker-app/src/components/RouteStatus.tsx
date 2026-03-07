@@ -142,13 +142,18 @@ export default function RouteStatus({ passes }: Props) {
   for (const pass of passes) {
     // Build a per-pass map of forecast entries so we only ever add one entry
     // per pass per offset (and can merge in current pass conditions for today).
-    const perPass = new Map<number, { severity: Severity; high?: number; description: string }>();
+    const perPass = new Map<
+      number,
+      { severity: Severity; high?: number; description: string }
+    >();
 
     if (pass.weather) {
       for (const day of pass.weather.dailyForecasts) {
         const date = new Date(day.date + "T00:00:00");
         date.setHours(0, 0, 0, 0);
-        const offset = Math.floor((date.getTime() - today.getTime()) / MS_PER_DAY);
+        const offset = Math.floor(
+          (date.getTime() - today.getTime()) / MS_PER_DAY,
+        );
         if (offset < 0 || offset >= LOOK_AHEAD_DAYS) continue;
         const s = getSeverity(day.description, day.iconCode);
         perPass.set(offset, {
@@ -162,24 +167,45 @@ export default function RouteStatus({ passes }: Props) {
     // If we have current DOT/pass conditions, fold them into today's severity.
     if (pass.condition) {
       const { eastboundRestriction, westboundRestriction } = pass.condition;
-      const worstRestriction = Math.max(eastboundRestriction, westboundRestriction);
+      const worstRestriction = Math.max(
+        eastboundRestriction,
+        westboundRestriction,
+      );
       let condSeverity: Severity | null = null;
-      if (worstRestriction === 3) condSeverity = 5; // Closed
-      else if (worstRestriction === 2 || worstRestriction === 1) condSeverity = 4; // Chains/traction
+      if (worstRestriction === 3)
+        condSeverity = 5; // Closed
+      else if (worstRestriction === 2 || worstRestriction === 1)
+        condSeverity = 4; // Chains/traction
 
       if (condSeverity != null) {
-        const condText = formatRestriction(worstRestriction as TravelRestriction,
-          eastboundRestriction === westboundRestriction ? pass.condition.eastboundRestrictionText : `${formatRestriction(eastboundRestriction, pass.condition.eastboundRestrictionText)} / ${formatRestriction(westboundRestriction, pass.condition.westboundRestrictionText)}`
+        const condText = formatRestriction(
+          worstRestriction as TravelRestriction,
+          eastboundRestriction === westboundRestriction
+            ? pass.condition.eastboundRestrictionText
+            : `${formatRestriction(eastboundRestriction, pass.condition.eastboundRestrictionText)} / ${formatRestriction(westboundRestriction, pass.condition.westboundRestrictionText)}`,
         );
         const existing = perPass.get(0);
         if (existing) {
           // Merge: take the worse of forecast and current condition
-          const mergedSeverity = Math.max(existing.severity, condSeverity) as Severity;
-          const mergedDescription = existing.description && existing.description !== condText ? `${existing.description}; ${condText}` : condText;
-          perPass.set(0, { severity: mergedSeverity, high: existing.high, description: mergedDescription });
+          const mergedSeverity = Math.max(
+            existing.severity,
+            condSeverity,
+          ) as Severity;
+          const mergedDescription =
+            existing.description && existing.description !== condText
+              ? `${existing.description}; ${condText}`
+              : condText;
+          perPass.set(0, {
+            severity: mergedSeverity,
+            high: existing.high,
+            description: mergedDescription,
+          });
         } else {
           // No forecast for today for this pass — add condition-derived entry
-          perPass.set(0, { severity: condSeverity as Severity, description: condText });
+          perPass.set(0, {
+            severity: condSeverity as Severity,
+            description: condText,
+          });
         }
       }
     }
@@ -203,7 +229,10 @@ export default function RouteStatus({ passes }: Props) {
     const severity =
       entries.length === 0
         ? 0
-        : (entries.reduce<number>((m, e) => Math.max(m, e.severity), 0) as Severity);
+        : (entries.reduce<number>(
+            (m, e) => Math.max(m, e.severity),
+            0,
+          ) as Severity);
     const worstDescription =
       entries.length === 0
         ? "clear skies"
