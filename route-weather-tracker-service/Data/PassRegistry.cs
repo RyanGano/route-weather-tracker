@@ -462,6 +462,104 @@ public static class PassRegistry
             State = "CO",
             HasOfficialConditions = false,
             OfficialUrl = "https://cotrip.org"
+        },
+
+        // ── California — NWS weather; Caltrans chain-control integration pending ─
+        new PassInfo
+        {
+            Id = "donner",
+            Name = "Donner Pass",
+            Highway = "I-80",
+            ElevationFeet = 7227,
+            Latitude = 39.3224,
+            Longitude = -120.3287,
+            State = "CA",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://roads.dot.ca.gov/"
+        },
+        new PassInfo
+        {
+            Id = "echo-summit",
+            Name = "Echo Summit",
+            Highway = "US-50",
+            ElevationFeet = 7382,
+            Latitude = 38.8108,
+            Longitude = -120.0348,
+            State = "CA",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://roads.dot.ca.gov/"
+        },
+        new PassInfo
+        {
+            Id = "cajon",
+            Name = "Cajon Pass",
+            Highway = "I-15",
+            ElevationFeet = 4190,
+            Latitude = 34.3166,
+            Longitude = -117.4629,
+            State = "CA",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://roads.dot.ca.gov/"
+        },
+        new PassInfo
+        {
+            Id = "tehachapi",
+            Name = "Tehachapi Pass",
+            Highway = "CA-58",
+            ElevationFeet = 3793,
+            Latitude = 35.1308,
+            Longitude = -118.4383,
+            State = "CA",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://roads.dot.ca.gov/"
+        },
+        new PassInfo
+        {
+            Id = "monitor",
+            Name = "Monitor Pass",
+            Highway = "CA-89",
+            ElevationFeet = 8314,
+            Latitude = 38.6783,
+            Longitude = -119.5985,
+            State = "CA",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://roads.dot.ca.gov/"
+        },
+        new PassInfo
+        {
+            Id = "tioga",
+            Name = "Tioga Pass",
+            Highway = "CA-120",
+            ElevationFeet = 9943,
+            Latitude = 37.9099,
+            Longitude = -119.2552,
+            State = "CA",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://roads.dot.ca.gov/"
+        },
+        new PassInfo
+        {
+            Id = "sonora",
+            Name = "Sonora Pass",
+            Highway = "CA-108",
+            ElevationFeet = 9624,
+            Latitude = 38.3294,
+            Longitude = -119.6264,
+            State = "CA",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://roads.dot.ca.gov/"
+        },
+        new PassInfo
+        {
+            Id = "mt-shasta",
+            Name = "Mt. Shasta Summit",
+            Highway = "I-5",
+            ElevationFeet = 3540,
+            Latitude = 41.4028,
+            Longitude = -122.3455,
+            State = "CA",
+            HasOfficialConditions = false,
+            OfficialUrl = "https://roads.dot.ca.gov/"
         }
     ];
 
