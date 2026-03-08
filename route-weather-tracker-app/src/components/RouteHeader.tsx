@@ -24,44 +24,9 @@ interface Props {
   userPos?: { lat: number; lon: number } | null;
 }
 
-function AutoOpenInfo({
-  enabled,
-  onOpen,
-  userInteractedRef,
-}: {
-  enabled: boolean;
-  onOpen: () => void;
-  userInteractedRef: { current: boolean };
-}) {
-  useEffect(() => {
-    if (!enabled) return;
-    const delay = 3000; // ms
-    let timer: number | undefined = undefined;
-
-    function markInteracted() {
-      userInteractedRef.current = true;
-      if (timer) {
-        window.clearTimeout(timer);
-        timer = undefined;
-      }
-    }
-
-    window.addEventListener("pointerdown", markInteracted, { once: true });
-    window.addEventListener("keydown", markInteracted, { once: true });
-
-    timer = window.setTimeout(() => {
-      if (!userInteractedRef.current) onOpen();
-    }, delay);
-
-    return () => {
-      if (timer) window.clearTimeout(timer);
-      window.removeEventListener("pointerdown", markInteracted as any);
-      window.removeEventListener("keydown", markInteracted as any);
-    };
-  }, [enabled, onOpen, userInteractedRef]);
-
-  return null;
-}
+// Auto-open behavior removed: keep About drawer purely user-driven to avoid
+// surprising users. If we want a gentle prompt later, reintroduce a non-modal
+// affordance (tooltip/snackbar) instead.
 
 /** "I-90" → "Interstate 90", "US-2" → "US Highway 2", others pass through. */
 function formatRouteName(name: string): string {
@@ -86,7 +51,6 @@ export default function RouteHeader({
   const [showDrawer, setShowDrawer] = useState(false);
   const [showInfoDrawer, setShowInfoDrawer] = useState(false);
   const userInteracted = useRef(false);
-  const autoOpened = useRef(false);
   const [draftFromId, setDraftFromId] = useState("");
   const [draftToId, setDraftToId] = useState("");
   const [fetchedRoutes, setFetchedRoutes] = useState<ComputedRoute[]>([]);
@@ -250,19 +214,7 @@ export default function RouteHeader({
         </Offcanvas.Body>
       </Offcanvas>
 
-      {/* Auto-open the info drawer after a short delay unless the user
-          interacts (click/keydown). This improves discoverability while
-          avoiding an immediate interruption for power users. */}
-      <AutoOpenInfo
-        enabled={!showInfoDrawer && !showDrawer && !selectedRoute}
-        onOpen={() => {
-          if (!autoOpened.current && !userInteracted.current) {
-            setShowInfoDrawer(true);
-            autoOpened.current = true;
-          }
-        }}
-        userInteractedRef={userInteracted}
-      />
+      {/* Auto-open disabled — About drawer opens only on explicit user action. */}
 
       <Offcanvas
         show={showDrawer}

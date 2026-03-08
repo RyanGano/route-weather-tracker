@@ -177,10 +177,10 @@ export default function App() {
       <Container>
         {!selectedRoute && !loading && !(fromId && toId && routeSlug) && (
           <>
-            <Alert variant="info" className="mt-2">
+            <p className="text-muted small mt-2">
               Use the <strong>Route</strong> button above to choose your start
               and end city.
-            </Alert>
+            </p>
 
             {/* Distinct home hero — short, eye-catching summary and CTA that
                 opens the About drawer. This avoids duplicating the full
