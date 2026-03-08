@@ -79,31 +79,31 @@ export default function App() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         if (cancelled) return;
-        setUserPos({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-      },
-      () => {
-        /* ignore errors silently; comboboxes will fallback to alpha order */
-      },
-      { maximumAge: 60_000, timeout: 7000 },
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // When navigating directly to a permalink, auto-compute and select the route
-  // once endpoints are available.
-  useEffect(() => {
-    if (urlResolved.current) return;
-    if (!fromId || !toId || !routeSlug) return;
-    if (endpoints.length === 0) return;
-
-    const from = endpoints.find((e) => e.id === fromId);
-    const to = endpoints.find((e) => e.id === toId);
-    if (!from || !to) return;
-
-    urlResolved.current = true;
-
+                <div className="mt-3 mb-4">
+                  <section className="p-3 rounded shadow-sm" style={{ background: "linear-gradient(90deg,#e9f3ff,#f7fbff)" }}>
+                    <h2 className="h4 mb-2">Plan safer mountain-pass trips</h2>
+                    <p className="mb-2">
+                      When to Drive surfaces the best time to cross mountain passes by
+                      combining three key signals:
+                    </p>
+                    <ul className="mb-2">
+                      <li>Live road condition updates from DOT agencies</li>
+                      <li>Short-term weather forecasts focused on pass locations</li>
+                      <li>Active restrictions and advisories that affect travel</li>
+                    </ul>
+                    <div className="d-flex gap-2 align-items-center">
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={() =>
+                          window.dispatchEvent(new CustomEvent("openInfoDrawer"))
+                        }
+                      >
+                        Learn more
+                      </button>
+                      <small className="text-muted">Or use the <strong>Route</strong> button above to get started</small>
+                    </div>
+                  </section>
+                </div>
     computeRoutes(fromId, toId)
       .then((routes) => {
         const match =
@@ -198,16 +198,15 @@ export default function App() {
                   route.
                 </p>
                 <p className="mb-1">
-                  Select a starting city and a destination using the <strong>
-                    Route
-                  </strong>{" "}button, and the app will identify which
+                  Select a starting city and a destination using the{" "}
+                  <strong>Route</strong> button, and the app will identify which
                   passes you'll cross and surface the best window of time to
                   make the drive.
                 </p>
                 <p className="text-muted small mb-0">
                   Data is sourced from state DOT agencies and OpenWeather. This
-                  information is for planning only — always verify with
-                  official agency sources before traveling.
+                  information is for planning only — always verify with official
+                  agency sources before traveling.
                 </p>
               </article>
             </div>

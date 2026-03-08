@@ -147,6 +147,17 @@ export default function RouteHeader({
     setShowDrawer(false);
   }
 
+  // Allow other parts of the page to open the About drawer via a
+  // window-level custom event. The home hero dispatches `openInfoDrawer`.
+  useEffect(() => {
+    function handler() {
+      userInteracted.current = true;
+      setShowInfoDrawer(true);
+    }
+    window.addEventListener("openInfoDrawer", handler as EventListener);
+    return () => window.removeEventListener("openInfoDrawer", handler as EventListener);
+  }, []);
+
   return (
     <>
       <Navbar
