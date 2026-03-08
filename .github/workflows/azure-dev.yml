@@ -45,21 +45,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Install dependencies
-        working-directory: route-weather-tracker-app
-        run: yarn install --frozen-lockfile
-
-      - name: Build
-        working-directory: route-weather-tracker-app
-        env:
-          VITE_API_URL: ${{ vars.VITE_API_URL }}
-        run: yarn build
-
       - name: Deploy to Static Web App
         uses: azure/static-web-apps-deploy@v1
         with:
@@ -68,5 +53,6 @@ jobs:
           action: upload
           app_location: route-weather-tracker-app
           output_location: dist
-          skip_app_build: true
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
 
