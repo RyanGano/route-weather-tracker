@@ -94,7 +94,7 @@
   - Open `App_Service_URL/api/endpoints` in browser
   - Should return a JSON array of cities/route endpoints
 
-- [ ] User: Test the frontend at the SWA default URL
+- [x] User Done: Test the frontend at the SWA default URL
   - Open `Static_Web_App_Default_URL` in browser
   - The route-picker app should load; try a route lookup end-to-end
 
@@ -292,4 +292,4 @@ Static_Web_App_Default_URL: https://green-sand-04ed4421e.6.azurestaticapps.net
 
 Managed_Identity_Object_ID: 5e06153c-12cb-4aee-a340-ecdd688658cf
 
-SWA_CNAME_Target: [add here — shown during custom domain setup in portal]
+SWA_CNAME_Target: green-sand-04ed4421e.6.azurestaticapps.net

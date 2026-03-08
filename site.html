@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>When to Drive</title>
+    <script>
+      (function () {
+        var mq = window.matchMedia("(prefers-color-scheme: dark)");
+        document.documentElement.setAttribute(
+          "data-bs-theme",
+          mq.matches ? "dark" : "light",
+        );
+        mq.addEventListener("change", function (e) {
+          document.documentElement.setAttribute(
+            "data-bs-theme",
+            e.matches ? "dark" : "light",
+          );
+        });
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!-- Crawlable, static site summary for SEO and users without JS. -->
+    <noscript>
+      <section
+        aria-labelledby="about-heading"
+        style="padding: 1rem; max-width: 720px; margin: 0.5rem"
+      >
+          <h2 style="font-size:1.125rem;margin-bottom:0.5rem;">Plan safer mountain-pass trips</h2>
+          <p style="margin:0 0 0.5rem 0;"><strong>When to Drive</strong> combines live DOT pass conditions, short-term weather forecasts, and active travel advisories to help you pick the best time to travel.</p>
+          <p style="margin:0;color:#6c757d;font-size:0.9rem;">Use the Route button to choose an origin and destination. Always verify with official agency sources before traveling.</p>
+      </section>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

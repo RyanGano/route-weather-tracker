@@ -18,6 +18,10 @@
     "git rev-parse": true,
     "dotnet run": true,
     "Receive-Job": true,
-    "Start-Job": true
+    "Start-Job": true,
+    "/^cd route-weather-tracker-app ; yarn$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
   }
 }
