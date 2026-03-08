@@ -45,6 +45,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install and build frontend
+        run: |
+          cd route-weather-tracker-app
+          yarn install --frozen-lockfile
+          yarn build
+
       - name: Deploy to Static Web App
         uses: azure/static-web-apps-deploy@v1
         with:
