@@ -176,10 +176,42 @@ export default function App() {
       />
       <Container>
         {!selectedRoute && !loading && !(fromId && toId && routeSlug) && (
-          <Alert variant="info" className="mt-2">
-            Use the <strong>Route</strong> button above to choose your start and
-            end city.
-          </Alert>
+          <>
+            <Alert variant="info" className="mt-2">
+              Use the <strong>Route</strong> button above to choose your start
+              and end city.
+            </Alert>
+
+            {/* Inline info for SEO and first-time visitors. This content is
+                visible on the page (not only in the drawer) so search engines
+                and users landing on the root URL immediately see what the
+                site does. */}
+            <div className="mt-3 mb-4">
+              <article aria-labelledby="about-heading">
+                <h2 id="about-heading" className="h5 mb-2">
+                  What is When to Drive?
+                </h2>
+                <p className="mb-1">
+                  <strong>When to Drive</strong> helps you plan mountain pass
+                  crossings by showing current road conditions, weather
+                  forecasts, and active restrictions for every pass along your
+                  route.
+                </p>
+                <p className="mb-1">
+                  Select a starting city and a destination using the <strong>
+                    Route
+                  </strong>{" "}button, and the app will identify which
+                  passes you'll cross and surface the best window of time to
+                  make the drive.
+                </p>
+                <p className="text-muted small mb-0">
+                  Data is sourced from state DOT agencies and OpenWeather. This
+                  information is for planning only — always verify with
+                  official agency sources before traveling.
+                </p>
+              </article>
+            </div>
+          </>
         )}
         {fromId &&
           toId &&
