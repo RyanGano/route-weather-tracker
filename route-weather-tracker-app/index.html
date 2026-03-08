@@ -24,17 +24,33 @@
   <body>
     <div id="root"></div>
 
-    <!-- Crawlable, static site summary for SEO and users without JS. -->
-    <noscript>
-      <section
-        aria-labelledby="about-heading"
-        style="padding: 1rem; max-width: 720px; margin: 0.5rem"
-      >
-          <h2 style="font-size:1.125rem;margin-bottom:0.5rem;">Plan safer mountain-pass trips</h2>
-          <p style="margin:0 0 0.5rem 0;"><strong>When to Drive</strong> combines live DOT pass conditions, short-term weather forecasts, and active travel advisories to help you pick the best time to travel.</p>
-          <p style="margin:0;color:#6c757d;font-size:0.9rem;">Use the Route button to choose an origin and destination. Always verify with official agency sources before traveling.</p>
-      </section>
-    </noscript>
-    <script type="module" src="/src/main.tsx"></script>
+    <!-- Visible hero for all users (fallback if app JS fails). -->
+    <section style="padding:1rem;max-width:720px;margin:0.5rem; background: linear-gradient(90deg,#e9f3ff,#f7fbff); border-radius:6px;">
+      <h2 style="font-size:1.125rem;margin-bottom:0.5rem;">Plan safer mountain-pass trips</h2>
+      <p style="margin:0 0 0.5rem 0;"><strong>When to Drive</strong> combines live DOT pass conditions, short-term weather forecasts, and active travel advisories to help you pick the best time to travel.</p>
+      <p style="margin:0;color:#6c757d;font-size:0.9rem;">Use the Route button to choose an origin and destination. Always verify with official agency sources before traveling.</p>
+    </section>
+
+    <!-- Load the dev module only on localhost; production should serve a built bundle. -->
+    <script>
+      (function () {
+        try {
+          var host = window.location.hostname;
+          if (host === "localhost" || host === "127.0.0.1") {
+            var s = document.createElement("script");
+            s.type = "module";
+            s.src = "/src/main.tsx";
+            document.body.appendChild(s);
+          } else {
+            // In production the site should be deployed with a built bundle.
+            // If the app is unexpectedly loading raw source files, avoid
+            // attempting to run them (they are TypeScript and will fail).
+            console.warn("Skipping dev module load on non-localhost host:", host);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      })();
+    </script>
   </body>
 </html>
