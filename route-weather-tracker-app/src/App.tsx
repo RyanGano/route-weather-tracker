@@ -186,10 +186,7 @@ export default function App() {
                 opens the About drawer. This avoids duplicating the full
                 explanatory content shown in the drawer. */}
             <div className="mt-3 mb-4">
-              <section
-                className="p-3 rounded shadow-sm"
-                style={{ background: "linear-gradient(90deg,#e9f3ff,#f7fbff)" }}
-              >
+              <section className="p-3 rounded shadow-sm bg-transparent home-hero">
                 <h2 className="h4 mb-2">Plan safer mountain-pass trips</h2>
                 <p className="mb-2">
                   When to Drive surfaces the best time to cross mountain passes by

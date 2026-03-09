@@ -16,3 +16,28 @@
   background-color: rgba(108, 117, 125, 0.06) !important;
   color: inherit;
 }
+
+/* Home hero styles with dark-mode support */
+.home-hero {
+  background: linear-gradient(90deg,#e9f3ff,#f7fbff) !important;
+  color: #212529 !important;
+}
+.home-hero h2 { font-size: 1.125rem; }
+.home-hero ul { margin-bottom: 0.5rem; }
+.home-hero .text-muted { color: #6c757d; }
+
+[data-bs-theme="dark"] .home-hero {
+  background: linear-gradient(90deg,#071124,#0b1a2b) !important;
+  color: #e6eef8 !important;
+}
+[data-bs-theme="dark"] .home-hero .text-muted {
+  color: #bfc9d9 !important;
+}
+
+/* Extra specificity for mobile browsers where Bootstrap may apply
+   background or color defaults; ensure hero stays dark in dark mode */
+[data-bs-theme="dark"] .home-hero,
+[data-bs-theme="dark"] .home-hero * {
+  background-color: transparent !important;
+  color: inherit !important;
+}
