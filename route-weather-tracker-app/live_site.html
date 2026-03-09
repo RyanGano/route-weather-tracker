@@ -5,15 +5,6 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>When to Drive</title>
-    <style>
-      .fallback-hero { background: linear-gradient(90deg,#e9f3ff,#f7fbff); color:#212529; border-radius:6px; }
-      .fallback-hero h2 { font-size:1.125rem;margin-bottom:0.5rem; }
-      .fallback-hero p.lead { margin:0 0 0.5rem 0; }
-      .fallback-hero p.note { margin:0;color:#6c757d;font-size:0.9rem; }
-      [data-bs-theme="dark"] .fallback-hero { background: linear-gradient(90deg,#071124,#0b1a2b); color:#e6eef8; }
-      [data-bs-theme="dark"] .fallback-hero p.note { color:#bfc9d9; }
-    </style>
-
     <script>
       (function () {
         var mq = window.matchMedia("(prefers-color-scheme: dark)");
@@ -34,10 +25,27 @@
     <div id="root"></div>
 
     <!-- Visible hero for all users (fallback if app JS fails). -->
-    <section class="fallback-hero" style="padding:1rem;max-width:720px;margin:0.5rem;">
-      <h2>Plan safer mountain-pass trips</h2>
-      <p class="lead"><strong>When to Drive</strong> combines live DOT pass conditions, short-term weather forecasts, and active travel advisories to help you pick the best time to travel.</p>
-      <p class="note">Use the Route button to choose an origin and destination. Always verify with official agency sources before traveling.</p>
+    <section
+      style="
+        padding: 1rem;
+        max-width: 720px;
+        margin: 0.5rem;
+        background: linear-gradient(90deg, #e9f3ff, #f7fbff);
+        border-radius: 6px;
+      "
+    >
+      <h2 style="font-size: 1.125rem; margin-bottom: 0.5rem">
+        Plan safer mountain-pass trips
+      </h2>
+      <p style="margin: 0 0 0.5rem 0">
+        <strong>When to Drive</strong> combines live DOT pass conditions,
+        short-term weather forecasts, and active travel advisories to help you
+        pick the best time to travel.
+      </p>
+      <p style="margin: 0; color: #6c757d; font-size: 0.9rem">
+        Use the Route button to choose an origin and destination. Always verify
+        with official agency sources before traveling.
+      </p>
     </section>
 
     <!-- Load the dev module only on localhost; production should serve a built bundle. -->
@@ -54,7 +62,10 @@
             // In production the site should be deployed with a built bundle.
             // If the app is unexpectedly loading raw source files, avoid
             // attempting to run them (they are TypeScript and will fail).
-            console.warn("Skipping dev module load on non-localhost host:", host);
+            console.warn(
+              "Skipping dev module load on non-localhost host:",
+              host,
+            );
           }
         } catch (e) {
           console.error(e);
