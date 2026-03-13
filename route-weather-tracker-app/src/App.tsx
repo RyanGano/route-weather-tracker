@@ -189,12 +189,14 @@ export default function App() {
               <section className="p-3 rounded shadow-sm bg-transparent home-hero">
                 <h2 className="h4 mb-2">Plan safer mountain-pass trips</h2>
                 <p className="mb-2">
-                  When to Drive surfaces the best time to cross mountain passes by
-                  combining three key signals:
+                  When to Drive surfaces the best time to cross mountain passes
+                  by combining three key signals:
                 </p>
                 <ul className="mb-2">
                   <li>Live road condition updates from DOT agencies</li>
-                  <li>Short-term weather forecasts focused on pass locations</li>
+                  <li>
+                    Short-term weather forecasts focused on pass locations
+                  </li>
                   <li>Active restrictions and advisories that affect travel</li>
                 </ul>
                 <div className="d-flex gap-2 align-items-center">
@@ -206,7 +208,10 @@ export default function App() {
                   >
                     Learn more
                   </button>
-                  <small className="text-muted">Or use the <strong>Route</strong> button above to get started</small>
+                  <small className="text-muted">
+                    Or use the <strong>Route</strong> button above to get
+                    started
+                  </small>
                 </div>
               </section>
             </div>

@@ -6,6 +6,7 @@ import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Spinner from "react-bootstrap/Spinner";
+import Placeholder from "react-bootstrap/Placeholder";
 import type { ComputedRoute, RouteEndpoint } from "../types/routeTypes";
 import { endpointLabel } from "../utils/formatters";
 import { computeRoutes } from "../services/passService";
@@ -225,67 +226,86 @@ export default function RouteHeader({
           <Offcanvas.Title>Choose Route</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-          <div className="d-flex flex-column gap-2">
-            <CityCombobox
-              label="From"
-              endpoints={endpoints}
-              value={draftFromId}
-              onChange={setDraftFromId}
-              disabled={endpoints.length === 0}
-              placeholder="Type a city or state…"
-              exclude={draftToId}
-              userPos={userPos}
-            />
-
-            <div className="d-flex align-items-center justify-content-center">
-              <Button
-                variant="outline-secondary"
-                onClick={() => {
-                  const a = draftFromId;
-                  const b = draftToId;
-                  setDraftFromId(b);
-                  setDraftToId(a);
-                }}
-                aria-label="Swap draft origin and destination"
-                title="Swap"
-                className="d-flex align-items-center justify-content-center"
-                style={{ lineHeight: 0, padding: "0.18rem" }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                  style={{ display: "block" }}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={1.8}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  {/* Left: taller up arrow with a tail/shaft */}
-                  <path d="M7.5 19 V5" />
-                  <path d="M4.5 8.5 L7.5 5.5 L10.5 8.5" />
-
-                  {/* Right: taller down arrow with a tail/shaft */}
-                  <path d="M16.5 5 V19" />
-                  <path d="M13.5 15.5 L16.5 18.5 L19.5 15.5" />
-                </svg>
-              </Button>
+          {endpoints.length === 0 ? (
+            // Show a lightweight skeleton while city endpoint data is loading
+            <div className="p-2">
+              <Placeholder as="div" animation="glow">
+                <Placeholder xs={10} className="mb-2" />
+                <Placeholder xs={8} className="mb-3" />
+                <Placeholder xs={10} className="mb-2" />
+                <Placeholder xs={12} className="mb-3" />
+              </Placeholder>
+              <div className="mt-2">
+                <Placeholder as="div" animation="glow">
+                  <Placeholder xs={12} className="mb-2" />
+                  <Placeholder xs={10} className="mb-2" />
+                  <Placeholder xs={8} className="mb-2" />
+                </Placeholder>
+              </div>
             </div>
+          ) : (
+            <div className="d-flex flex-column gap-2">
+              <CityCombobox
+                label="From"
+                endpoints={endpoints}
+                value={draftFromId}
+                onChange={setDraftFromId}
+                disabled={endpoints.length === 0}
+                placeholder="Type a city or state…"
+                exclude={draftToId}
+                userPos={userPos}
+              />
 
-            <CityCombobox
-              label="To"
-              endpoints={endpoints}
-              value={draftToId}
-              onChange={setDraftToId}
-              disabled={endpoints.length === 0}
-              placeholder="Type a city or state…"
-              exclude={draftFromId}
-              userPos={userPos}
-            />
-          </div>
+              <div className="d-flex align-items-center justify-content-center">
+                <Button
+                  variant="outline-secondary"
+                  onClick={() => {
+                    const a = draftFromId;
+                    const b = draftToId;
+                    setDraftFromId(b);
+                    setDraftToId(a);
+                  }}
+                  aria-label="Swap draft origin and destination"
+                  title="Swap"
+                  className="d-flex align-items-center justify-content-center"
+                  style={{ lineHeight: 0, padding: "0.18rem" }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    style={{ display: "block" }}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.8}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    {/* Left: taller up arrow with a tail/shaft */}
+                    <path d="M7.5 19 V5" />
+                    <path d="M4.5 8.5 L7.5 5.5 L10.5 8.5" />
+
+                    {/* Right: taller down arrow with a tail/shaft */}
+                    <path d="M16.5 5 V19" />
+                    <path d="M13.5 15.5 L16.5 18.5 L19.5 15.5" />
+                  </svg>
+                </Button>
+              </div>
+
+              <CityCombobox
+                label="To"
+                endpoints={endpoints}
+                value={draftToId}
+                onChange={setDraftToId}
+                disabled={endpoints.length === 0}
+                placeholder="Type a city or state…"
+                exclude={draftFromId}
+                userPos={userPos}
+              />
+            </div>
+          )}
 
           {draftFrom && draftTo && draftFrom.id !== draftTo.id && (
             <div className="mt-3">
