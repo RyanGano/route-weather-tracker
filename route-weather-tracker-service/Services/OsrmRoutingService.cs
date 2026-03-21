@@ -176,6 +176,14 @@ public class OsrmRoutingService : IRoutingService
       _logger.LogError(ex, "OSRM response parse error for {Origin} → {Dest}", origin.Name, destination.Name);
       return [];
     }
+    catch (Exception ex)
+    {
+      // Catch-all to prevent unexpected resilience/circuit-breaker exceptions
+      // from bubbling up and causing a 500 response. Treat as a missing
+      // route result so callers can continue and surface partial results.
+      _logger.LogWarning(ex, "OSRM unexpected error for {Origin} → {Dest}", origin.Name, destination.Name);
+      return [];
+    }
   }
 
   // ── Private helpers ──────────────────────────────────────────────────────

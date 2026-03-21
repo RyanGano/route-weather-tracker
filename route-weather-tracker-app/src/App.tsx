@@ -8,10 +8,12 @@ import Card from "react-bootstrap/Card";
 import RouteHeader from "./components/RouteHeader";
 import RouteStatus from "./components/RouteStatus";
 import PassCard from "./components/PassCard";
+import PassLoadError from "./components/PassLoadError";
 import { RefreshProvider } from "./contexts/RefreshContext";
 import {
   getRouteEndpoints,
   getPassesByIds,
+  getPassById,
   computeRoutes,
 } from "./services/passService";
 import type { PassSummary } from "./types/passTypes";
@@ -132,13 +134,11 @@ export default function App() {
         setError(null);
         const data = await getPassesByIds(selectedRoute!.passIds);
         if (!cancelled) setPasses(data);
-      } catch (err) {
+      } catch {
         if (!cancelled) {
-          setError(
-            err instanceof Error
-              ? err.message
-              : "Unable to load pass data. The backend service may be unavailable.",
-          );
+          // Surface a generic, user-friendly message rather than raw error
+          // text (e.g. our simulated-failure message).
+          setError("There was an error loading pass information.");
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -150,6 +150,18 @@ export default function App() {
       cancelled = true;
     };
   }, [selectedRoute]);
+
+  // Retry loading a single pass by id and merge it into state
+  async function retryPass(passId: string) {
+    const pass = await getPassById(passId);
+    setPasses((prev) => {
+      const exists = prev.some((p) => p.info.id === passId);
+      if (exists) return prev.map((p) => (p.info.id === passId ? pass : p));
+      return [...prev, pass];
+    });
+  }
+
+  // (development helpers removed)
 
   function handleRouteChange(
     from: RouteEndpoint,
@@ -260,9 +272,24 @@ export default function App() {
         {!loading && !error && (
           <>
             <RouteStatus passes={passes} />
-            {passes.map((pass) => (
-              <PassCard key={pass.info.id} pass={pass} />
-            ))}
+            {selectedRoute
+              ? selectedRoute.passIds.map((id, idx) => {
+                  const pass = passes.find((p) => p.info.id === id);
+                  const passName = selectedRoute.passNames?.[idx];
+                  return pass ? (
+                    <PassCard key={id} pass={pass} />
+                  ) : (
+                    <PassLoadError
+                      key={id}
+                      passId={id}
+                      passName={passName}
+                      onRetry={() => retryPass(id)}
+                    />
+                  );
+                })
+              : passes.map((pass) => (
+                  <PassCard key={pass.info.id} pass={pass} />
+                ))}
           </>
         )}
       </Container>

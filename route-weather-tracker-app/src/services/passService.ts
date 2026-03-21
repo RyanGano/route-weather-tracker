@@ -69,7 +69,9 @@ export async function computeRoutes(
  * Fetches full PassSummary objects for a list of pass IDs returned by computeRoutes.
  * Calls the existing /api/passes endpoint with each ID in parallel.
  */
-export async function getPassesByIds(passIds: string[]): Promise<PassSummary[]> {
+export async function getPassesByIds(
+  passIds: string[],
+): Promise<PassSummary[]> {
   if (passIds.length === 0) return [];
   const results = await Promise.all(
     passIds.map((id) =>
@@ -80,4 +82,10 @@ export async function getPassesByIds(passIds: string[]): Promise<PassSummary[]> 
     ),
   );
   return results.filter((p): p is PassSummary => p !== null);
+}
+
+/** Fetch a single pass by id. Throws on error so callers can surface per-pass failures. */
+export async function getPassById(id: string): Promise<PassSummary> {
+  const response = await api.get<PassSummary>(`/api/passes/${id}`);
+  return response.data;
 }

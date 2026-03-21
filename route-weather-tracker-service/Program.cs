@@ -11,10 +11,22 @@ var builder = WebApplication.CreateBuilder(args);
 //   - Production: Managed Identity on the Container App + KeyVaultUri env var
 // The Managed Identity must hold the "Key Vault Secrets User" role on the vault.
 var keyVaultUri = builder.Configuration["KeyVaultUri"];
-if (string.IsNullOrWhiteSpace(keyVaultUri))
-    throw new InvalidOperationException(
-        "KeyVaultUri is not configured. Set it via User Secrets (local) or as an environment variable (Azure).");
-builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
+if (!string.IsNullOrWhiteSpace(keyVaultUri))
+{
+    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
+}
+else
+{
+    // In development, allow running without Key Vault configured so local
+    // frontend/backends can be exercised without requiring Azure auth. In
+    // non-development environments, fail fast to avoid misconfiguration.
+    if (!builder.Environment.IsDevelopment())
+    {
+        throw new InvalidOperationException(
+            "KeyVaultUri is not configured. Set it via User Secrets (local) or as an environment variable (Azure)."
+        );
+    }
+}
 
 // ----- Aspire service defaults (OpenTelemetry, health checks, service discovery) -----
 builder.AddServiceDefaults();
@@ -53,7 +65,13 @@ builder.Services.AddScoped<IPassAggregatorService, PassAggregatorService>();
 
 // ----- Routing services (OSRM + geometric pass matching) -----
 builder.Services.AddSingleton<IPassLocatorService, PassLocatorService>();
-builder.Services.AddHttpClient<IRoutingService, OsrmRoutingService>();
+// Configure the routing HttpClient with a slightly higher timeout to tolerate
+// intermittent OSRM delays. Resilience policies still apply, but this helps
+// avoid spurious timeout failures during local and CI runs.
+builder.Services.AddHttpClient<IRoutingService, OsrmRoutingService>(c =>
+{
+    c.Timeout = TimeSpan.FromSeconds(30);
+});
 
 // ----- Controllers and OpenAPI -----
 builder.Services.AddControllers();

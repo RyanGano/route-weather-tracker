@@ -1,5 +1,5 @@
 import type { CameraImage } from "../types/passTypes";
-import { useRefresh } from "../contexts/RefreshContext";
+import { useRefresh } from "../contexts/refreshContextCore";
 
 interface WebcamViewerProps {
   cameras: CameraImage[];

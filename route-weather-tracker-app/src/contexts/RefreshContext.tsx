@@ -1,16 +1,7 @@
-import { createContext, useContext, useEffect, useState } from "react";
-
-const REFRESH_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes
-
-interface RefreshState {
-  cacheBuster: number;
-  lastUpdated: Date;
-}
-
-const RefreshContext = createContext<RefreshState>({
-  cacheBuster: Date.now(),
-  lastUpdated: new Date(),
-});
+import { useEffect, useState } from "react";
+import { REFRESH_INTERVAL_MS } from "./refreshConstants";
+import type { RefreshState } from "./refreshConstants";
+import { RefreshContext } from "./refreshContextCore";
 
 /**
  * Provides a single shared refresh timer for all webcam images in the tree.
@@ -35,6 +26,5 @@ export function RefreshProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function useRefresh(): RefreshState {
-  return useContext(RefreshContext);
-}
+// `useRefresh` is now exported from `refreshContextCore.ts` so this file
+// only exports the provider component (satisfies react-refresh rule).
