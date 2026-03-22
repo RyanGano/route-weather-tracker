@@ -57,12 +57,12 @@ jobs:
           yarn install --frozen-lockfile
           yarn build
         env:
-          VITE_API_URL: ${{ vars.VITE_API_URL }}
-          VITE_ADS_ENABLED: ${{ vars.VITE_ADS_ENABLED }}
-          VITE_AMAZON_ASSOCIATE_TAG: ${{ vars.VITE_AMAZON_ASSOCIATE_TAG }}
-          VITE_BOOKING_AFFILIATE_ID: ${{ vars.VITE_BOOKING_AFFILIATE_ID }}
-          VITE_ADSENSE_PUBLISHER_ID: ${{ vars.VITE_ADSENSE_PUBLISHER_ID }}
-          VITE_ADSENSE_AD_UNIT_ID: ${{ vars.VITE_ADSENSE_AD_UNIT_ID }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_ADS_ENABLED: ${{ secrets.VITE_ADS_ENABLED }}
+          VITE_AMAZON_ASSOCIATE_TAG: ${{ secrets.VITE_AMAZON_ASSOCIATE_TAG }}
+          VITE_BOOKING_AFFILIATE_ID: ${{ secrets.VITE_BOOKING_AFFILIATE_ID }}
+          VITE_ADSENSE_PUBLISHER_ID: ${{ secrets.VITE_ADSENSE_PUBLISHER_ID }}
+          VITE_ADSENSE_AD_UNIT_ID: ${{ secrets.VITE_ADSENSE_AD_UNIT_ID }}
 
       - name: Deploy to Static Web App
         uses: azure/static-web-apps-deploy@v1
