@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 import App from "./App.tsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
 
 // Fire a best-effort warmup request to the backend as early as possible so
 // the service can populate caches while the frontend finishes loading.
@@ -15,10 +16,10 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
+        <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/:fromId/:toId/:routeSlug" element={<App />} />
         <Route path="*" element={<App />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
 );
-

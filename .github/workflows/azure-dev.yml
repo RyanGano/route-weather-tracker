@@ -21,7 +21,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.x'
+          dotnet-version: "10.x"
 
       - name: Publish
         run: dotnet publish route-weather-tracker-service/route-weather-tracker-service.csproj -c Release -o ./publish
@@ -48,14 +48,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'yarn'
+          node-version: "20"
+          cache: "yarn"
 
       - name: Install and build frontend
         run: |
           cd route-weather-tracker-app
           yarn install --frozen-lockfile
           yarn build
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_ADS_ENABLED: ${{ vars.VITE_ADS_ENABLED }}
+          VITE_AMAZON_ASSOCIATE_TAG: ${{ vars.VITE_AMAZON_ASSOCIATE_TAG }}
+          VITE_BOOKING_AFFILIATE_ID: ${{ vars.VITE_BOOKING_AFFILIATE_ID }}
+          VITE_ADSENSE_PUBLISHER_ID: ${{ vars.VITE_ADSENSE_PUBLISHER_ID }}
+          VITE_ADSENSE_AD_UNIT_ID: ${{ vars.VITE_ADSENSE_AD_UNIT_ID }}
 
       - name: Deploy to Static Web App
         uses: azure/static-web-apps-deploy@v1
@@ -65,6 +72,3 @@ jobs:
           action: upload
           app_location: route-weather-tracker-app
           output_location: dist
-        env:
-          VITE_API_URL: ${{ vars.VITE_API_URL }}
-

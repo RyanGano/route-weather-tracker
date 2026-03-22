@@ -4,6 +4,8 @@ import Alert from "react-bootstrap/Alert";
 import type { PassSummary } from "../types/passTypes";
 import { TravelRestriction } from "../types/passTypes";
 import { formatRestriction } from "../utils/formatters";
+import { useAdConfig } from "../contexts/AdContext";
+import { getPassOffer } from "../utils/adContextUtils";
 import WebcamViewer from "./WebcamViewer";
 import WeatherDisplay from "./WeatherDisplay";
 // NWS links are provided by the backend via `pass.weatherForecastUrl`.
@@ -59,6 +61,8 @@ function conditionBadge(condition: string | undefined) {
 
 export default function PassCard({ pass }: PassCardProps) {
   const { info, condition, cameras, weather } = pass;
+  const adConfig = useAdConfig();
+  const passOffer = getPassOffer(pass, adConfig);
   const hasRestriction =
     condition &&
     (condition.eastboundRestriction !== TravelRestriction.None ||
@@ -123,6 +127,26 @@ export default function PassCard({ pass }: PassCardProps) {
               )}
             </span>
           </div>
+          {passOffer && (
+            <div className="mt-2">
+              <a
+                href={passOffer.url}
+                target="_blank"
+                rel="noopener noreferrer sponsored"
+                className="text-decoration-none small"
+              >
+                {passOffer.emoji} {passOffer.headline} &#8599;
+              </a>
+              {passOffer.provider === "amazon" && (
+                <span
+                  className="text-muted ms-2"
+                  style={{ fontSize: "0.7rem" }}
+                >
+                  (Amazon Associate link)
+                </span>
+              )}
+            </div>
+          )}
         </Alert>
       )}
 

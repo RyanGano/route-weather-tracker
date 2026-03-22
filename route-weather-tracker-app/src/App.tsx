@@ -5,11 +5,14 @@ import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
 import Placeholder from "react-bootstrap/Placeholder";
 import Card from "react-bootstrap/Card";
+import { Link } from "react-router-dom";
 import RouteHeader from "./components/RouteHeader";
 import RouteStatus from "./components/RouteStatus";
 import PassCard from "./components/PassCard";
 import PassLoadError from "./components/PassLoadError";
+import AdBanner from "./components/AdBanner";
 import { RefreshProvider } from "./contexts/RefreshContext";
+import { AdProvider } from "./contexts/AdContext";
 import {
   getRouteEndpoints,
   getPassesByIds,
@@ -177,122 +180,136 @@ export default function App() {
   }
 
   return (
-    <RefreshProvider>
-      <RouteHeader
-        endpoints={endpoints}
-        selectedFrom={selectedFrom}
-        selectedTo={selectedTo}
-        selectedRoute={selectedRoute}
-        userPos={userPos}
-        onRouteChange={handleRouteChange}
-      />
-      <Container>
-        {!selectedRoute && !loading && !(fromId && toId && routeSlug) && (
-          <>
-            <p className="text-muted small mt-2">
-              Use the <strong>Route</strong> button above to choose your start
-              and end city.
-            </p>
+    <AdProvider>
+      <RefreshProvider>
+        <RouteHeader
+          endpoints={endpoints}
+          selectedFrom={selectedFrom}
+          selectedTo={selectedTo}
+          selectedRoute={selectedRoute}
+          userPos={userPos}
+          onRouteChange={handleRouteChange}
+        />
+        <Container>
+          {!selectedRoute && !loading && !(fromId && toId && routeSlug) && (
+            <>
+              <p className="text-muted small mt-2">
+                Use the <strong>Route</strong> button above to choose your start
+                and end city.
+              </p>
 
-            {/* Distinct home hero — short, eye-catching summary and CTA that
+              {/* Distinct home hero — short, eye-catching summary and CTA that
                 opens the About drawer. This avoids duplicating the full
                 explanatory content shown in the drawer. */}
-            <div className="mt-3 mb-4">
-              <section className="p-3 rounded shadow-sm bg-transparent home-hero">
-                <h2 className="h4 mb-2">Plan safer mountain-pass trips</h2>
-                <p className="mb-2">
-                  When to Drive surfaces the best time to cross mountain passes
-                  by combining three key signals:
-                </p>
-                <ul className="mb-2">
-                  <li>Live road condition updates from DOT agencies</li>
-                  <li>
-                    Short-term weather forecasts focused on pass locations
-                  </li>
-                  <li>Active restrictions and advisories that affect travel</li>
-                </ul>
-                <div className="d-flex gap-2 align-items-center">
-                  <button
-                    className="btn btn-primary btn-sm"
-                    onClick={() =>
-                      window.dispatchEvent(new CustomEvent("openInfoDrawer"))
-                    }
-                  >
-                    Learn more
-                  </button>
-                  <small className="text-muted">
-                    Or use the <strong>Route</strong> button above to get
-                    started
-                  </small>
+              <div className="mt-3 mb-4">
+                <section className="p-3 rounded shadow-sm bg-transparent home-hero">
+                  <h2 className="h4 mb-2">Plan safer mountain-pass trips</h2>
+                  <p className="mb-2">
+                    When to Drive surfaces the best time to cross mountain
+                    passes by combining three key signals:
+                  </p>
+                  <ul className="mb-2">
+                    <li>Live road condition updates from DOT agencies</li>
+                    <li>
+                      Short-term weather forecasts focused on pass locations
+                    </li>
+                    <li>
+                      Active restrictions and advisories that affect travel
+                    </li>
+                  </ul>
+                  <div className="d-flex gap-2 align-items-center">
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={() =>
+                        window.dispatchEvent(new CustomEvent("openInfoDrawer"))
+                      }
+                    >
+                      Learn more
+                    </button>
+                    <small className="text-muted">
+                      Or use the <strong>Route</strong> button above to get
+                      started
+                    </small>
+                  </div>
+                </section>
+              </div>
+            </>
+          )}
+          {fromId &&
+            toId &&
+            routeSlug &&
+            !selectedRoute &&
+            !loading &&
+            endpoints.length > 0 && (
+              <>
+                <div className="d-flex align-items-center gap-2 mb-3 text-muted">
+                  <Spinner animation="border" size="sm" />
+                  <span>Loading route and pass conditions…</span>
                 </div>
-              </section>
-            </div>
-          </>
-        )}
-        {fromId &&
-          toId &&
-          routeSlug &&
-          !selectedRoute &&
-          !loading &&
-          endpoints.length > 0 && (
+                <PassCardSkeleton />
+              </>
+            )}
+
+          {loading && (
             <>
               <div className="d-flex align-items-center gap-2 mb-3 text-muted">
                 <Spinner animation="border" size="sm" />
-                <span>Loading route and pass conditions…</span>
+                <span>Loading pass conditions…</span>
               </div>
+              <PassCardSkeleton />
+              <PassCardSkeleton />
               <PassCardSkeleton />
             </>
           )}
 
-        {loading && (
-          <>
-            <div className="d-flex align-items-center gap-2 mb-3 text-muted">
-              <Spinner animation="border" size="sm" />
-              <span>Loading pass conditions…</span>
-            </div>
-            <PassCardSkeleton />
-            <PassCardSkeleton />
-            <PassCardSkeleton />
-          </>
-        )}
+          {!loading && error && (
+            <Alert variant="danger">
+              <Alert.Heading>Unable to load pass data</Alert.Heading>
+              <p>{error}</p>
+            </Alert>
+          )}
 
-        {!loading && error && (
-          <Alert variant="danger">
-            <Alert.Heading>Unable to load pass data</Alert.Heading>
-            <p>{error}</p>
-          </Alert>
-        )}
+          {!loading && !error && selectedRoute && passes.length === 0 && (
+            <Alert variant="warning">
+              No pass data returned from the service.
+            </Alert>
+          )}
 
-        {!loading && !error && selectedRoute && passes.length === 0 && (
-          <Alert variant="warning">
-            No pass data returned from the service.
-          </Alert>
-        )}
-
-        {!loading && !error && (
-          <>
-            <RouteStatus passes={passes} />
-            {selectedRoute
-              ? selectedRoute.passIds.map((id, idx) => {
-                  const pass = passes.find((p) => p.info.id === id);
-                  const passName = selectedRoute.passNames?.[idx];
-                  return pass ? (
-                    <PassCard key={id} pass={pass} />
-                  ) : (
-                    <PassLoadError
-                      key={id}
-                      passId={id}
-                      passName={passName}
-                      onRetry={() => retryPass(id)}
-                    />
-                  );
-                })
-              : passes.map((pass) => (
-                  <PassCard key={pass.info.id} pass={pass} />
-                ))}
-          </>
-        )}
-      </Container>
-    </RefreshProvider>
+          {!loading && !error && (
+            <>
+              <RouteStatus passes={passes} />
+              <AdBanner
+                passes={passes}
+                destination={selectedTo}
+                route={selectedRoute}
+              />
+              {selectedRoute
+                ? selectedRoute.passIds.map((id, idx) => {
+                    const pass = passes.find((p) => p.info.id === id);
+                    const passName = selectedRoute.passNames?.[idx];
+                    return pass ? (
+                      <PassCard key={id} pass={pass} />
+                    ) : (
+                      <PassLoadError
+                        key={id}
+                        passId={id}
+                        passName={passName}
+                        onRetry={() => retryPass(id)}
+                      />
+                    );
+                  })
+                : passes.map((pass) => (
+                    <PassCard key={pass.info.id} pass={pass} />
+                  ))}
+            </>
+          )}
+          <footer className="mt-5 py-3 border-top text-muted small text-center">
+            <Link to="/privacy">Privacy Policy</Link>
+            <span className="mx-2">·</span>
+            <span>© {new Date().getFullYear()} When to Drive</span>
+          </footer>
+        </Container>
+      </RefreshProvider>
+    </AdProvider>
   );
 }
