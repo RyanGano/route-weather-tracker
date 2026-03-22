@@ -72,4 +72,3 @@ jobs:
           action: upload
           app_location: route-weather-tracker-app
           output_location: dist
-          skip_app_build: true
