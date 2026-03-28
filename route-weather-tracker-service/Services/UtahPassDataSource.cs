@@ -1,50 +1,76 @@
-using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using route_weather_tracker_service.Models;
 
 namespace route_weather_tracker_service.Services;
 
 /// <summary>
-/// Utah pass data source. Uses the public UDOT ArcGIS Road_Conditions FeatureServer
-/// to discover cameras for Utah passes. The ArcGIS REST service requires no key.
+/// Utah pass data source.
+/// Primary: udotcameras.com processed GeoJSON — proximity search by pass coordinates
+/// returns direct UDOT Cctv snapshot image URLs for cameras within 15 km of the pass summit,
+/// preferring cameras on the same highway, sorted by distance.
+/// Fallback: udotcameras.com homepage HTML scraper.
 /// </summary>
 public class UtahPassDataSource : IPassDataSource
 {
     private readonly IHttpClientFactory _httpFactory;
     private readonly ILogger<UtahPassDataSource> _logger;
 
-    // FeatureServer query that returns road condition features (includes fields)
-    private const string ArcGisQueryUrl =
-            "https://services.arcgis.com/Vl0VBqVpJSB0FpLN/arcgis/rest/services/Road_Conditions/FeatureServer/0/query?where=1%3D1&outFields=*&f=json";
-
-    // Fallback public site that aggregates UDOT camera links; used only if ArcGIS finds no images
-    private const string UdotCamerasUrl = "https://udotcameras.com/";
-    // Processed GeoJSON of UDOT cameras used by udotcameras frontend
+    // Processed GeoJSON of UDOT cameras — each feature has an ImageUrl that returns a live road snapshot
     private const string UdotGeoJsonUrl = "https://udotcameras.com/cctv_locations_processed_classified.geojson";
+    // Fallback: udotcameras.com site HTML
+    private const string UdotCamerasUrl = "https://udotcameras.com/";
+
+    // Include cameras within this radius (km) of the pass summit
+    private const double MaxCameraDistanceKm = 15.0;
+    // Return at most this many cameras per pass
+    private const int MaxCameras = 5;
 
     private static readonly IReadOnlySet<string> UtPassIds =
-            new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            {
-                        "parleys",
-                        "soldier-summit",
-                        "sardine",
-                        "cedar-mountain",
-                        "beaver-canyon",
-                        "pine-valley",
-            };
+        new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "parleys",
+            "soldier-summit",
+            "sardine",
+            "cedar-mountain",
+            "beaver-canyon",
+            "pine-valley",
+        };
 
-    // Simple mapping of passId -> substrings expected to appear in the ArcGIS feature
-    // attributes (field values like NAME, ROUTE, LOCATION, or DESCRIPTION).
-    private static readonly Dictionary<string, string[]> CameraLocationFilters = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["parleys"] = ["Parleys", "Parleys Canyon", "I-80 Parleys"],
-        ["soldier-summit"] = ["Soldier Summit", "Soldier Summit"],
-        ["sardine"] = ["Sardine", "Sardine Summit"],
-        ["cedar-mountain"] = ["Cedar Mountain", "Cedar Mountain Summit"],
-        ["beaver-canyon"] = ["Beaver Canyon", "Beaver Canyon Summit"],
-        ["pine-valley"] = ["Pine Valley", "Pine Valley Summit"],
-    };
+    // Pass summit coordinates — used for proximity filtering against the GeoJSON
+    private static readonly IReadOnlyDictionary<string, (double Lat, double Lon)> PassCoordinates =
+        new Dictionary<string, (double Lat, double Lon)>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["parleys"]        = (40.6897, -111.7437),
+            ["soldier-summit"] = (39.8358, -110.9294),
+            ["sardine"]        = (41.6347, -111.8491),
+            ["cedar-mountain"] = (37.6315, -112.9621),
+            ["beaver-canyon"]  = (38.3980, -112.4614),
+            ["pine-valley"]    = (37.2650, -113.6968),
+        };
+
+    // Highway keywords used to sort on-highway cameras first
+    private static readonly IReadOnlyDictionary<string, string> PassHighwayKeywords =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["parleys"]        = "I-80",
+            ["soldier-summit"] = "US-6",
+            ["sardine"]        = "US-91",
+            ["cedar-mountain"] = "UT-14",
+            ["beaver-canyon"]  = "UT-153",
+            ["pine-valley"]    = "I-15",
+        };
+
+    // Text filters for the HTML scraper fallback only
+    private static readonly IReadOnlyDictionary<string, string[]> CameraLocationFilters =
+        new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["parleys"]        = ["Parleys", "Parleys Canyon"],
+            ["soldier-summit"] = ["Soldier Summit"],
+            ["sardine"]        = ["Sardine", "Sardine Summit"],
+            ["cedar-mountain"] = ["Cedar Mountain"],
+            ["beaver-canyon"]  = ["Beaver Canyon"],
+            ["pine-valley"]    = ["Pine Valley"],
+        };
 
     public IReadOnlySet<string> SupportedPassIds => UtPassIds;
 
@@ -55,170 +81,153 @@ public class UtahPassDataSource : IPassDataSource
     }
 
     public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
-            Task.FromResult<PassCondition?>(null);
+        Task.FromResult<PassCondition?>(null);
 
     public async Task<List<CameraImage>> GetCamerasAsync(string passId, CancellationToken ct = default)
     {
-        if (!CameraLocationFilters.TryGetValue(passId, out var filters))
-            return new List<CameraImage>();
+        if (!PassCoordinates.TryGetValue(passId, out var coords))
+            return [];
 
-        var client = _httpFactory.CreateClient("utah-pass-client");
-        try
-        {
-            using var resp = await client.GetAsync(ArcGisQueryUrl, ct);
-            resp.EnsureSuccessStatusCode();
-            await using var stream = await resp.Content.ReadAsStreamAsync(ct);
-            using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
+        PassHighwayKeywords.TryGetValue(passId, out var highway);
 
-            if (!doc.RootElement.TryGetProperty("features", out var features) || features.ValueKind != JsonValueKind.Array)
-                return new List<CameraImage>();
-
-            var cameras = new List<CameraImage>();
-
-            foreach (var feat in features.EnumerateArray())
-            {
-                if (!feat.TryGetProperty("attributes", out var attr) || attr.ValueKind != JsonValueKind.Object)
-                    continue;
-
-                // Build a searchable text blob from attribute string values
-                var searchable = new List<string>();
-                foreach (var prop in attr.EnumerateObject())
-                {
-                    if (prop.Value.ValueKind == JsonValueKind.String)
-                        searchable.Add(prop.Value.GetString() ?? string.Empty);
-                }
-                var searchableText = string.Join(" ", searchable);
-
-                if (!filters.Any(f => searchableText.Contains(f, StringComparison.OrdinalIgnoreCase)))
-                    continue;
-
-                // Try to find a URL in attributes that looks like an image
-                string? imageUrl = null;
-                foreach (var prop in attr.EnumerateObject())
-                {
-                    if (prop.Value.ValueKind != JsonValueKind.String) continue;
-                    var s = prop.Value.GetString() ?? string.Empty;
-                    if (s.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || s.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var lower = s.ToLowerInvariant();
-                        if (lower.Contains(".jpg") || lower.Contains(".jpeg") || lower.Contains(".png") || lower.Contains("/cameras/") || lower.Contains("/camera/"))
-                        {
-                            imageUrl = s;
-                            break;
-                        }
-                    }
-                }
-
-                if (string.IsNullOrWhiteSpace(imageUrl))
-                    continue;
-
-                // Description: pick the most likely name/title field
-                var description = attr.TryGetProperty("CAMERA_NAME", out var cn) ? cn.GetString() ?? string.Empty :
-                                                    attr.TryGetProperty("NAME", out var n) ? n.GetString() ?? string.Empty :
-                                                    attr.TryGetProperty("LOCATION", out var loc) ? loc.GetString() ?? string.Empty :
-                                                    searchableText;
-
-                var cameraId = attr.TryGetProperty("OBJECTID", out var oid) ? oid.ToString() : StableId(imageUrl);
-
-                cameras.Add(new CameraImage
-                {
-                    CameraId = cameraId ?? StableId(imageUrl),
-                    Description = description,
-                    ImageUrl = imageUrl,
-                    FetchedAt = DateTime.UtcNow
-                });
-            }
-
-            if (cameras.Count == 0)
-            {
-                // Try fallback to udotcameras.com when ArcGIS returns no image URLs
-                var fallback = await GetCamerasFromUdotCamerasAsync(passId, filters, ct);
-                if (fallback?.Count > 0)
-                    return fallback;
-            }
-
+        // Primary: GeoJSON proximity search — returns cameras with direct road-snapshot ImageUrls
+        var cameras = await GetCamerasFromUdotGeoJsonAsync(coords.Lat, coords.Lon, highway, ct);
+        if (cameras.Count > 0)
             return cameras;
-        }
-        catch (HttpRequestException ex)
-        {
-            _logger.LogError(ex, "HTTP error fetching UDOT ArcGIS data for pass {PassId}", passId);
-            return new List<CameraImage>();
-        }
-        catch (JsonException ex)
-        {
-            _logger.LogError(ex, "Failed to parse UDOT ArcGIS response for pass {PassId}", passId);
-            return new List<CameraImage>();
-        }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unexpected error fetching UDOT cameras for pass {PassId}", passId);
-            return new List<CameraImage>();
-        }
+
+        // Last resort: HTML scraper fallback
+        if (CameraLocationFilters.TryGetValue(passId, out var filters))
+            cameras = await GetCamerasFromUdotCamerasHtmlAsync(passId, filters, ct);
+
+        return cameras;
     }
 
-    // If ArcGIS did not return any cameras for a pass, try the public udotcameras.com page
-    // and heuristically locate nearby image URLs by searching for the pass filter text.
-    private async Task<List<CameraImage>> GetCamerasFromUdotCamerasAsync(string passId, string[] filters, CancellationToken ct)
+    private async Task<List<CameraImage>> GetCamerasFromUdotGeoJsonAsync(
+        double passLat, double passLon, string? highwayKeyword, CancellationToken ct)
     {
         try
         {
-            // First try the processed GeoJSON which contains structured camera entries
-            var geo = await GetCamerasFromUdotGeoJsonAsync(filters, ct);
-            if (geo?.Count > 0)
-                return geo;
+            var client = _httpFactory.CreateClient("utah-pass-client");
+            using var resp = await client.GetAsync(UdotGeoJsonUrl, ct);
+            if (!resp.IsSuccessStatusCode) return [];
 
-            // Fallback: try scraping homepage for image tags
+            await using var stream = await resp.Content.ReadAsStreamAsync(ct);
+            using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
+            if (!doc.RootElement.TryGetProperty("features", out var features) || features.ValueKind != JsonValueKind.Array)
+                return [];
+
+            var candidates = new List<(double DistKm, bool HighwayMatch, string ImageUrl, string Location, string Id)>();
+
+            foreach (var feat in features.EnumerateArray())
+            {
+                if (!feat.TryGetProperty("properties", out var props) || props.ValueKind != JsonValueKind.Object)
+                    continue;
+
+                // Skip disabled cameras
+                if (props.TryGetProperty("Status", out var status) &&
+                    status.ValueKind == JsonValueKind.String &&
+                    !string.Equals(status.GetString(), "Enabled", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                // Must have a direct image URL
+                if (!props.TryGetProperty("ImageUrl", out var iuProp) || iuProp.ValueKind != JsonValueKind.String)
+                    continue;
+                var imageUrl = iuProp.GetString();
+                if (string.IsNullOrWhiteSpace(imageUrl)) continue;
+
+                // Must have numeric lat/lon
+                if (!props.TryGetProperty("Latitude", out var latProp) || latProp.ValueKind != JsonValueKind.Number) continue;
+                if (!props.TryGetProperty("Longitude", out var lonProp) || lonProp.ValueKind != JsonValueKind.Number) continue;
+
+                var dist = HaversineKm(passLat, passLon, latProp.GetDouble(), lonProp.GetDouble());
+                if (dist > MaxCameraDistanceKm) continue;
+
+                var location = props.TryGetProperty("Location", out var locProp) && locProp.ValueKind == JsonValueKind.String
+                    ? (locProp.GetString() ?? string.Empty).Trim()
+                    : imageUrl;
+
+                var roadway  = props.TryGetProperty("Roadway", out var rwProp)  && rwProp.ValueKind  == JsonValueKind.String ? rwProp.GetString()  ?? string.Empty : string.Empty;
+                var altName  = props.TryGetProperty("ALT_NAME_1A", out var anProp) && anProp.ValueKind == JsonValueKind.String ? anProp.GetString() ?? string.Empty : string.Empty;
+                var hwMatch  = !string.IsNullOrEmpty(highwayKeyword) &&
+                               (roadway.Contains(highwayKeyword, StringComparison.OrdinalIgnoreCase) ||
+                                altName.Contains(highwayKeyword,  StringComparison.OrdinalIgnoreCase));
+
+                var id = props.TryGetProperty("Id", out var idProp) ? idProp.ToString() : StableId(imageUrl);
+
+                candidates.Add((dist, hwMatch, imageUrl, location, id));
+            }
+
+            if (candidates.Count == 0) return [];
+
+            return candidates
+                .OrderBy(c => c.HighwayMatch ? 0 : 1)
+                .ThenBy(c => c.DistKm)
+                .Take(MaxCameras)
+                .Select(c => new CameraImage
+                {
+                    CameraId    = c.Id,
+                    Description = c.Location,
+                    ImageUrl    = c.ImageUrl,
+                    FetchedAt   = DateTime.UtcNow
+                })
+                .ToList();
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Failed to fetch UDOT GeoJSON cameras");
+            return [];
+        }
+    }
+
+    private async Task<List<CameraImage>> GetCamerasFromUdotCamerasHtmlAsync(
+        string passId, string[] filters, CancellationToken ct)
+    {
+        try
+        {
             var client = _httpFactory.CreateClient("utah-pass-client");
             var html = await client.GetStringAsync(UdotCamerasUrl, ct);
-            if (string.IsNullOrWhiteSpace(html))
-                return new List<CameraImage>();
+            if (string.IsNullOrWhiteSpace(html)) return [];
 
-            // Find src attributes and choose nearest to filter text
-            var srcRe = new System.Text.RegularExpressions.Regex("src\\s*=\\s*[\"']([^\"']+)[\"']", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-            var imgMatches = new List<(int pos, string url)>();
+            var srcRe = new System.Text.RegularExpressions.Regex(
+                "src\\s*=\\s*[\"']([^\"']+)[\"']",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+            var imgMatches = new List<(int Pos, string Url)>();
             foreach (System.Text.RegularExpressions.Match m in srcRe.Matches(html))
             {
                 var url = m.Groups[1].Value;
                 if (string.IsNullOrWhiteSpace(url)) continue;
-                var norm = url.StartsWith("//") ? "https:" + url : url.StartsWith("/") ? (UdotCamerasUrl.TrimEnd('/') + url) : url;
+                var norm = url.StartsWith("//") ? "https:" + url
+                         : url.StartsWith("/")  ? UdotCamerasUrl.TrimEnd('/') + url
+                         : url;
                 imgMatches.Add((m.Index, norm));
             }
 
             var cameras = new List<CameraImage>();
-            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var seen    = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var f in filters)
             {
                 var idx = html.IndexOf(f, StringComparison.OrdinalIgnoreCase);
                 if (idx < 0) continue;
 
-                int bestDist = int.MaxValue;
-                string? bestUrl = null;
-                // prefer images within a local window
+                string? bestUrl  = null;
+                int     bestDist = int.MaxValue;
                 foreach (var t in imgMatches)
                 {
-                    var d = Math.Abs(t.pos - idx);
-                    if (d < bestDist)
-                    {
-                        bestDist = d;
-                        bestUrl = t.url;
-                    }
+                    var d = Math.Abs(t.Pos - idx);
+                    if (d < bestDist) { bestDist = d; bestUrl = t.Url; }
                 }
 
-                if (string.IsNullOrWhiteSpace(bestUrl)) continue;
-                if (seen.Contains(bestUrl)) continue;
+                if (string.IsNullOrWhiteSpace(bestUrl) || seen.Contains(bestUrl)) continue;
                 seen.Add(bestUrl);
-
                 cameras.Add(new CameraImage
                 {
-                    CameraId = StableId(bestUrl),
+                    CameraId    = StableId(bestUrl),
                     Description = f,
-                    ImageUrl = bestUrl,
-                    FetchedAt = DateTime.UtcNow
+                    ImageUrl    = bestUrl,
+                    FetchedAt   = DateTime.UtcNow
                 });
             }
 
@@ -226,69 +235,27 @@ public class UtahPassDataSource : IPassDataSource
         }
         catch (Exception ex)
         {
-            _logger.LogDebug(ex, "UDOT cameras fallback failed for {PassId}", passId);
-            return new List<CameraImage>();
+            _logger.LogDebug(ex, "UDOT cameras HTML fallback failed for {PassId}", passId);
+            return [];
         }
     }
 
-    private async Task<List<CameraImage>> GetCamerasFromUdotGeoJsonAsync(string[] filters, CancellationToken ct)
+    // Haversine great-circle distance in kilometres
+    private static double HaversineKm(double lat1, double lon1, double lat2, double lon2)
     {
-        try
-        {
-            var client = _httpFactory.CreateClient("utah-pass-client");
-            using var resp = await client.GetAsync(UdotGeoJsonUrl, ct);
-            if (!resp.IsSuccessStatusCode) return new List<CameraImage>();
-            await using var stream = await resp.Content.ReadAsStreamAsync(ct);
-            using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
-            if (!doc.RootElement.TryGetProperty("features", out var features) || features.ValueKind != JsonValueKind.Array)
-                return new List<CameraImage>();
-
-            var cameras = new List<CameraImage>();
-            foreach (var feat in features.EnumerateArray())
-            {
-                if (!feat.TryGetProperty("properties", out var props) || props.ValueKind != JsonValueKind.Object)
-                    continue;
-
-                // Build searchable text
-                var searchable = new List<string>();
-                foreach (var p in props.EnumerateObject())
-                {
-                    if (p.Value.ValueKind == JsonValueKind.String)
-                        searchable.Add(p.Value.GetString() ?? string.Empty);
-                }
-                var searchableText = string.Join(' ', searchable);
-                if (!filters.Any(f => searchableText.Contains(f, StringComparison.OrdinalIgnoreCase)))
-                    continue;
-
-                // Try common image url fields
-                string? imageUrl = null;
-                if (props.TryGetProperty("ImageUrl", out var iu) && iu.ValueKind == JsonValueKind.String)
-                    imageUrl = iu.GetString();
-                else if (props.TryGetProperty("ImageURL", out var iu2) && iu2.ValueKind == JsonValueKind.String)
-                    imageUrl = iu2.GetString();
-                else if (props.TryGetProperty("Url", out var u3) && u3.ValueKind == JsonValueKind.String)
-                    imageUrl = u3.GetString();
-
-                if (string.IsNullOrWhiteSpace(imageUrl))
-                    continue;
-
-                var desc = props.TryGetProperty("name", out var nm) && nm.ValueKind == JsonValueKind.String ? nm.GetString() ?? string.Empty : searchableText;
-                cameras.Add(new CameraImage { CameraId = StableId(imageUrl), Description = desc, ImageUrl = imageUrl, FetchedAt = DateTime.UtcNow });
-            }
-
-            return cameras;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogDebug(ex, "Failed to fetch udot geojson");
-            return new List<CameraImage>();
-        }
+        const double R = 6371.0;
+        var dLat = (lat2 - lat1) * Math.PI / 180.0;
+        var dLon = (lon2 - lon1) * Math.PI / 180.0;
+        var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                Math.Cos(lat1 * Math.PI / 180.0) * Math.Cos(lat2 * Math.PI / 180.0) *
+                Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+        return R * 2.0 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1.0 - a));
     }
 
     private static string StableId(string imageUrl)
     {
         var bytes = System.Security.Cryptography.SHA256.HashData(
-                System.Text.Encoding.UTF8.GetBytes(imageUrl));
+            System.Text.Encoding.UTF8.GetBytes(imageUrl));
         return Convert.ToHexString(bytes[..8]).ToLowerInvariant();
     }
 }

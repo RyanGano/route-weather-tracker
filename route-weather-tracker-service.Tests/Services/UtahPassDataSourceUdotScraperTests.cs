@@ -4,7 +4,6 @@ using System.Text;
 using Moq;
 using Moq.Protected;
 using route_weather_tracker_service.Services;
-using route_weather_tracker_service.Models;
 using Xunit;
 
 namespace route_weather_tracker_service.Tests.Services;
@@ -12,32 +11,28 @@ namespace route_weather_tracker_service.Tests.Services;
 public class UtahPassDataSourceUdotScraperTests
 {
     [Fact]
-    public async Task GetCamerasAsync_FallsBackToUdotCameras_WhenArcGisEmpty()
+    public async Task GetCamerasAsync_FallsBackToHtml_WhenGeoJsonFails()
     {
-        // Arrange: ArcGIS response is empty features array
-        var arcJson = "{ \"features\": [] }";
-
-        // First handler: ArcGIS call
+        // Arrange:
+        //   Call 1: GeoJSON returns 404 (unavailable)
+        //   Call 2: udotcameras HTML contains a Parleys image tag
         var handler = new Mock<HttpMessageHandler>();
         handler.Protected()
             .SetupSequence<Task<HttpResponseMessage>>("SendAsync",
                 ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
-            .ReturnsAsync(new HttpResponseMessage
-            {
-                StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(arcJson, Encoding.UTF8, "application/json")
-            })
-            // Second call: udotcameras HTML
+            // GeoJSON — not found
             .ReturnsAsync(new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.NotFound,
-                Content = new StringContent(string.Empty, Encoding.UTF8, "text/plain")
+                Content    = new StringContent(string.Empty, Encoding.UTF8, "text/plain")
             })
-            // Third call: udotcameras HTML
+            // HTML fallback — contains a road camera image near the "Parleys" keyword
             .ReturnsAsync(new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent("<html>Parleys <img src=\"/images/parleys_cam.jpg\"></html>", Encoding.UTF8, "text/html")
+                Content    = new StringContent(
+                    "<html><body>Parleys <img src=\"/images/parleys_cam.jpg\"></body></html>",
+                    Encoding.UTF8, "text/html")
             });
 
         var client = new HttpClient(handler.Object);
@@ -46,7 +41,7 @@ public class UtahPassDataSourceUdotScraperTests
         factoryMock.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(client);
 
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UtahPassDataSource>>();
-        var svc = new UtahPassDataSource(factoryMock.Object, loggerMock.Object);
+        var svc  = new UtahPassDataSource(factoryMock.Object, loggerMock.Object);
 
         // Act
         var cams = await svc.GetCamerasAsync("parleys");
