@@ -162,7 +162,8 @@ public static class PassRegistry
             Latitude = 48.3139,
             Longitude = -112.9964,
             State = "MT",
-            HasOfficialConditions = false
+            HasOfficialConditions = false,
+            OfficialUrl = "https://travinfo.mdt.mt.gov/"
         },
         new PassInfo
         {
@@ -173,7 +174,8 @@ public static class PassRegistry
             Latitude = 48.6959,
             Longitude = -113.7181,
             State = "MT",
-            HasOfficialConditions = false
+            HasOfficialConditions = false,
+            OfficialUrl = "https://travinfo.mdt.mt.gov/"
         },
         new PassInfo
         {
@@ -184,7 +186,8 @@ public static class PassRegistry
             Latitude = 46.5950,
             Longitude = -112.4440,
             State = "MT",
-            HasOfficialConditions = false
+            HasOfficialConditions = false,
+            OfficialUrl = "https://travinfo.mdt.mt.gov/"
         },
         new PassInfo
         {
@@ -647,7 +650,7 @@ public static class PassRegistry
             Longitude = -111.7437,
             State = "UT",
             HasOfficialConditions = false,
-            OfficialUrl = "https://udottraffic.utah.gov"
+            OfficialUrl = "https://www.udottraffic.utah.gov/map/#camera-90759"
         },
         new PassInfo
         {
@@ -659,7 +662,7 @@ public static class PassRegistry
             Longitude = -110.9294,
             State = "UT",
             HasOfficialConditions = false,
-            OfficialUrl = "https://udottraffic.utah.gov"
+            OfficialUrl = "https://www.udottraffic.utah.gov/map/#camera-91505"
         },
         new PassInfo
         {
@@ -671,7 +674,7 @@ public static class PassRegistry
             Longitude = -111.8491,
             State = "UT",
             HasOfficialConditions = false,
-            OfficialUrl = "https://udottraffic.utah.gov"
+            OfficialUrl = "https://www.udottraffic.utah.gov/map/#camera-91326"
         },
         new PassInfo
         {
@@ -683,7 +686,7 @@ public static class PassRegistry
             Longitude = -112.9621,
             State = "UT",
             HasOfficialConditions = false,
-            OfficialUrl = "https://udottraffic.utah.gov"
+            OfficialUrl = "https://www.udottraffic.utah.gov/map/#camera-91099"
         },
         new PassInfo
         {
