@@ -23,7 +23,7 @@ public class UtahPassDataSource : IPassDataSource
     // Include cameras within this radius (km) of the pass summit
     private const double MaxCameraDistanceKm = 15.0;
     // Return at most this many cameras per pass
-    private const int MaxCameras = 5;
+    private const int MaxCameras = 2;
 
     private static readonly IReadOnlySet<string> UtPassIds =
         new HashSet<string>(StringComparer.OrdinalIgnoreCase)

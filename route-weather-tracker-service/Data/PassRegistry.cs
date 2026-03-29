@@ -198,7 +198,8 @@ public static class PassRegistry
             Latitude = 47.0392,
             Longitude = -112.5256,
             State = "MT",
-            HasOfficialConditions = false
+            HasOfficialConditions = false,
+            OfficialUrl = "https://travinfo.mdt.mt.gov/"
         },
         new PassInfo
         {
@@ -209,7 +210,8 @@ public static class PassRegistry
             Latitude = 45.7269,
             Longitude = -113.8699,
             State = "MT/ID",
-            HasOfficialConditions = false
+            HasOfficialConditions = false,
+            OfficialUrl = "https://travinfo.mdt.mt.gov/"
         },
         new PassInfo
         {
@@ -220,7 +222,8 @@ public static class PassRegistry
             Latitude = 45.9099,
             Longitude = -112.7756,
             State = "MT",
-            HasOfficialConditions = false
+            HasOfficialConditions = false,
+            OfficialUrl = "https://travinfo.mdt.mt.gov/"
         },
 
         // ── Oregon — NWS weather; full ODOT TripCheck integration pending ────────
