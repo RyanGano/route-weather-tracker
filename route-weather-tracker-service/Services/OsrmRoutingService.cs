@@ -60,6 +60,22 @@ public class OsrmRoutingService : IRoutingService
         waypointSets.Add([origin, hub, destination]);
     }
 
+    // Add a small set of canonical corridor hubs to surface common long-distance
+    // alternatives OSRM may omit for certain origin/destination pairs. This helps
+    // ensure corridors like I-80 via Salt Lake City / Parleys Canyon are offered
+    // for west-to-west trips where relevant.
+    var canonicalHubs = new[] { "salt-lake-city", "st-regis", "price", "albuquerque" };
+    foreach (var hubId in canonicalHubs)
+    {
+      var hub = RouteEndpointRegistry.GetById(hubId);
+      if (hub is null) continue;
+      if (hub.Id == origin.Id || hub.Id == destination.Id) continue;
+      // Avoid duplicating an existing waypoint set
+      if (waypointSets.Any(wps => wps.Count == 3 && wps[1].Id.Equals(hub.Id, StringComparison.OrdinalIgnoreCase)))
+        continue;
+      waypointSets.Add([origin, hub, destination]);
+    }
+
     // Fetch all waypoint sequences in parallel.
     var fetchTasks = waypointSets
         .Select(wps => FetchFromOsrmAsync(wps, origin, destination, ct));

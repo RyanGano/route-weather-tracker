@@ -21,14 +21,30 @@ public class PassLocatorService : IPassLocatorService
 
     var matched = new List<(string Id, double PositionKm)>();
 
+    // Compute a conservative bounding-box once as a cheap pre-filter.
+    // Use the provided threshold (km) to expand the box in degrees so
+    // passes that are within `thresholdKm` of the route aren't accidentally
+    // excluded by a too-tight fixed margin.
+    var minLatCoord = coords.Min(c => c[1]);
+    var maxLatCoord = coords.Max(c => c[1]);
+    var minLonCoord = coords.Min(c => c[0]);
+    var maxLonCoord = coords.Max(c => c[0]);
+
+    // Degrees per km approximations
+    const double kmPerDegLat = 110.574; // approx km per degree latitude
+    var meanLatRad = ((minLatCoord + maxLatCoord) / 2.0) * Math.PI / 180.0;
+    var kmPerDegLon = 111.320 * Math.Cos(meanLatRad); // approx km per degree longitude
+
+    var latMarginDeg = Math.Max(0.5, thresholdKm / kmPerDegLat + 0.5);
+    var lonMarginDeg = Math.Max(1.0, thresholdKm / Math.Max(1e-6, kmPerDegLon) + 1.0);
+
+    var minLat = minLatCoord - latMarginDeg;
+    var maxLat = maxLatCoord + latMarginDeg;
+    var minLon = minLonCoord - lonMarginDeg;
+    var maxLon = maxLonCoord + lonMarginDeg;
+
     foreach (var pass in PassRegistry.Passes)
     {
-      // Fast bounding-box pre-filter before the full segment scan
-      var minLat = coords.Min(c => c[1]) - 0.5;
-      var maxLat = coords.Max(c => c[1]) + 0.5;
-      var minLon = coords.Min(c => c[0]) - 1.0;  // longitude degrees are wider
-      var maxLon = coords.Max(c => c[0]) + 1.0;
-
       if (pass.Latitude < minLat || pass.Latitude > maxLat ||
           pass.Longitude < minLon || pass.Longitude > maxLon)
         continue;
