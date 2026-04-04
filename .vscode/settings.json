@@ -23,6 +23,7 @@
       "approve": true,
       "matchCommandLine": true
     },
-    "true": true
+    "true": true,
+    "yarn audit": true
   }
 }
