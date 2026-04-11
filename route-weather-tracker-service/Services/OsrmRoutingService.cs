@@ -64,6 +64,15 @@ public class OsrmRoutingService : IRoutingService
     // alternatives OSRM may omit for certain origin/destination pairs. This helps
     // ensure corridors like I-80 via Salt Lake City / Parleys Canyon are offered
     // for west-to-west trips where relevant.
+    //
+    // Geographic relevance guard: only add a hub waypoint when routing through
+    // it is at most 50% longer than the direct Haversine distance. This prevents
+    // adding hubs that are completely off-route (e.g. adding Albuquerque as a
+    // waypoint for a Stanwood→Kalispell trip would triple the distance and hit
+    // the OSRM demo server with an unnecessary long-distance request).
+    var directKm = PassLocatorService.HaversineKm(
+        origin.Latitude, origin.Longitude,
+        destination.Latitude, destination.Longitude);
     var canonicalHubs = new[] { "salt-lake-city", "st-regis", "price", "albuquerque" };
     foreach (var hubId in canonicalHubs)
     {
@@ -73,6 +82,12 @@ public class OsrmRoutingService : IRoutingService
       // Avoid duplicating an existing waypoint set
       if (waypointSets.Any(wps => wps.Count == 3 && wps[1].Id.Equals(hub.Id, StringComparison.OrdinalIgnoreCase)))
         continue;
+      // Skip hubs where the via-distance is more than 1.5× the direct distance
+      var viaKm = PassLocatorService.HaversineKm(
+          origin.Latitude, origin.Longitude, hub.Latitude, hub.Longitude) +
+          PassLocatorService.HaversineKm(
+          hub.Latitude, hub.Longitude, destination.Latitude, destination.Longitude);
+      if (viaKm > directKm * 1.5) continue;
       waypointSets.Add([origin, hub, destination]);
     }
 
