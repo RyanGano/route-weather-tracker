@@ -8,7 +8,11 @@ import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
 
 // Fire a best-effort warmup request to the backend as early as possible so
 // the service can populate caches while the frontend finishes loading.
-void fetch("/api/warmup").catch(() => {
+// Use the same base URL as the axios API client so the request reaches the
+// backend when the frontend is deployed separately (e.g. Azure Static Web App
+// + App Service). A relative URL would hit the static host (404).
+const _warmupBase = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
+void fetch(`${_warmupBase}/api/warmup`).catch(() => {
   /* ignore errors; warmup is optional */
 });
 
