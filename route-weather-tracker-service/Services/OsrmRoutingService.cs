@@ -70,8 +70,8 @@ public class OsrmRoutingService : IRoutingService
     // If every single request failed to connect, the routing service is down.
     // Throw so the controller can return 503 instead of an empty 200.
     if (allResults.All(r => r is null))
-        throw new RoutingServiceUnavailableException(
-            $"OSRM routing service is unreachable for {origin.Name} \u2192 {destination.Name}.");
+      throw new RoutingServiceUnavailableException(
+          $"OSRM routing service is unreachable for {origin.Name} \u2192 {destination.Name}.");
 
     var allRoutes = allResults
         .Where(r => r is not null)

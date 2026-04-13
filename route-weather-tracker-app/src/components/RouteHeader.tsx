@@ -143,7 +143,8 @@ export default function RouteHeader({
       setShowInfoDrawer(true);
     }
     window.addEventListener("openInfoDrawer", handler as EventListener);
-    return () => window.removeEventListener("openInfoDrawer", handler as EventListener);
+    return () =>
+      window.removeEventListener("openInfoDrawer", handler as EventListener);
   }, []);
 
   return (
@@ -339,7 +340,9 @@ export default function RouteHeader({
                 </div>
               ) : routeError ? (
                 <div className="text-danger small py-2">
-                  <span aria-hidden className="me-1">⚠️</span>
+                  <span aria-hidden className="me-1">
+                    ⚠️
+                  </span>
                   {routeError}
                 </div>
               ) : fetchedRoutes.length === 0 ? (

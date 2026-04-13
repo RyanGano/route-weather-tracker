@@ -8,5 +8,5 @@ namespace route_weather_tracker_service.Services;
 /// </summary>
 public sealed class RoutingServiceUnavailableException : Exception
 {
-    public RoutingServiceUnavailableException(string message) : base(message) { }
+  public RoutingServiceUnavailableException(string message) : base(message) { }
 }
