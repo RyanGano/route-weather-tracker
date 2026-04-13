@@ -63,15 +63,24 @@ builder.Services.AddScoped<IPassDataSource, VirginiaPassDataSource>();
 builder.Services.AddScoped<IPassDataSource, NcTnPassDataSource>();
 builder.Services.AddScoped<IPassAggregatorService, PassAggregatorService>();
 
-// ----- Routing services (OSRM + geometric pass matching) -----
+// ----- Routing services (OpenRouteService + geometric pass matching) -----
 builder.Services.AddSingleton<IPassLocatorService, PassLocatorService>();
-// Configure the routing HttpClient with a slightly higher timeout to tolerate
-// intermittent OSRM delays. Resilience policies still apply, but this helps
-// avoid spurious timeout failures during local and CI runs.
-builder.Services.AddHttpClient<IRoutingService, OsrmRoutingService>(c =>
+// OpenRouteService requires an Authorization header with the API key.
+// The global standard resilience handler has a 10-second per-attempt timeout
+// which is too short for some ORS responses. Remove it and use a plain
+// 30-second HttpClient timeout instead — ORS is reliable enough not to need
+// automatic retries, and retrying on timeouts just multiplies wait time.
+#pragma warning disable EXTEXP0001 // RemoveAllResilienceHandlers is experimental but stable enough for this use
+var orsApiKey = builder.Configuration["OpenRouteServiceApiKey"] ?? string.Empty;
+builder.Services.AddHttpClient<IRoutingService, OpenRouteServiceRoutingService>(c =>
 {
     c.Timeout = TimeSpan.FromSeconds(30);
-});
+    // TryAddWithoutValidation bypasses .NET header format validation;
+    // ORS accepts the bare JWT token string as the Authorization value.
+    c.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", orsApiKey);
+})
+.RemoveAllResilienceHandlers();
+#pragma warning restore EXTEXP0001
 
 // ----- Controllers and OpenAPI -----
 builder.Services.AddControllers();

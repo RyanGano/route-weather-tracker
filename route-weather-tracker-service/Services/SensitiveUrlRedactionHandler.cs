@@ -10,12 +10,13 @@ namespace route_weather_tracker_service.Services;
 /// </summary>
 public class SensitiveUrlRedactionHandler : DelegatingHandler
 {
-  // Matches the value portion of ?appid=... or &appid=... (OpenWeatherMap)
-  // and ?AccessCode=... or &AccessCode=... (WSDOT)
+  // Matches the value portion of ?appid=... or &appid=... (OpenWeatherMap),
+  // ?AccessCode=... (WSDOT), and ?api_key=... (OpenRouteService).
   private static readonly Regex[] Patterns =
   [
     new(@"(?<=[?&]appid=)[^&]+",       RegexOptions.Compiled),
     new(@"(?<=[?&]AccessCode=)[^&]+",  RegexOptions.Compiled | RegexOptions.IgnoreCase),
+    new(@"(?<=[?&]api_key=)[^&]+",     RegexOptions.Compiled | RegexOptions.IgnoreCase),
   ];
 
   protected override async Task<HttpResponseMessage> SendAsync(

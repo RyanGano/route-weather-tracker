@@ -40,7 +40,14 @@ public class RoutesController : ControllerBase
     if (toEp is null)
       return BadRequest($"Unknown destination '{to}'. Valid ids: {string.Join(", ", RouteEndpointRegistry.Endpoints.Select(e => e.Id))}");
 
-    var routes = await _routing.GetRoutesAsync(fromEp, toEp, ct);
-    return Ok(routes);
+    try
+    {
+      var routes = await _routing.GetRoutesAsync(fromEp, toEp, ct);
+      return Ok(routes);
+    }
+    catch (RoutingServiceUnavailableException ex)
+    {
+      return StatusCode(503, new { error = ex.Message });
+    }
   }
 }

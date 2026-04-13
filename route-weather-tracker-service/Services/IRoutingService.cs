@@ -13,9 +13,11 @@ public interface IRoutingService
 {
   /// <summary>
   /// Returns up to three route options between <paramref name="origin"/> and
-  /// <paramref name="destination"/>, ordered by OSRM recommendation score.
+  /// <paramref name="destination"/>, ordered by distance.
   /// Each route includes the matched mountain pass IDs along its geometry.
-  /// Returns an empty list if OSRM is unreachable or returns no results.
+  /// Returns an empty list if the routing engine responds but finds no routes.
+  /// Throws <see cref="RoutingServiceUnavailableException"/> if the backend
+  /// cannot be reached at all (timeouts, network errors, etc.).
   /// </summary>
   Task<List<ComputedRoute>> GetRoutesAsync(
       RouteEndpoint origin,

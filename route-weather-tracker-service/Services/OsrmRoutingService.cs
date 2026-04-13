@@ -60,42 +60,23 @@ public class OsrmRoutingService : IRoutingService
         waypointSets.Add([origin, hub, destination]);
     }
 
-    // Add a small set of canonical corridor hubs to surface common long-distance
-    // alternatives OSRM may omit for certain origin/destination pairs. This helps
-    // ensure corridors like I-80 via Salt Lake City / Parleys Canyon are offered
-    // for west-to-west trips where relevant.
-    //
-    // Geographic relevance guard: only add a hub waypoint when routing through
-    // it is at most 50% longer than the direct Haversine distance. This prevents
-    // adding hubs that are completely off-route (e.g. adding Albuquerque as a
-    // waypoint for a Stanwood→Kalispell trip would triple the distance and hit
-    // the OSRM demo server with an unnecessary long-distance request).
-    var directKm = PassLocatorService.HaversineKm(
-        origin.Latitude, origin.Longitude,
-        destination.Latitude, destination.Longitude);
-    var canonicalHubs = new[] { "salt-lake-city", "st-regis", "price", "albuquerque" };
-    foreach (var hubId in canonicalHubs)
-    {
-      var hub = RouteEndpointRegistry.GetById(hubId);
-      if (hub is null) continue;
-      if (hub.Id == origin.Id || hub.Id == destination.Id) continue;
-      // Avoid duplicating an existing waypoint set
-      if (waypointSets.Any(wps => wps.Count == 3 && wps[1].Id.Equals(hub.Id, StringComparison.OrdinalIgnoreCase)))
-        continue;
-      // Skip hubs where the via-distance is more than 1.5× the direct distance
-      var viaKm = PassLocatorService.HaversineKm(
-          origin.Latitude, origin.Longitude, hub.Latitude, hub.Longitude) +
-          PassLocatorService.HaversineKm(
-          hub.Latitude, hub.Longitude, destination.Latitude, destination.Longitude);
-      if (viaKm > directKm * 1.5) continue;
-      waypointSets.Add([origin, hub, destination]);
-    }
-
     // Fetch all waypoint sequences in parallel.
+    // FetchFromOsrmAsync returns null when OSRM was unreachable (timeout/network)
+    // and [] when it responded but found no routes for that waypoint set.
     var fetchTasks = waypointSets
         .Select(wps => FetchFromOsrmAsync(wps, origin, destination, ct));
-    var allRouteLists = await Task.WhenAll(fetchTasks);
-    var allRoutes = allRouteLists.SelectMany(r => r).ToList();
+    var allResults = await Task.WhenAll(fetchTasks);
+
+    // If every single request failed to connect, the routing service is down.
+    // Throw so the controller can return 503 instead of an empty 200.
+    if (allResults.All(r => r is null))
+        throw new RoutingServiceUnavailableException(
+            $"OSRM routing service is unreachable for {origin.Name} \u2192 {destination.Name}.");
+
+    var allRoutes = allResults
+        .Where(r => r is not null)
+        .SelectMany(r => r!)
+        .ToList();
 
     if (allRoutes.Count == 0) return [];
 
@@ -139,7 +120,7 @@ public class OsrmRoutingService : IRoutingService
   /// the response into <see cref="ComputedRoute"/> objects. Routes are returned
   /// with temporary IDs — the caller re-indexes after merging all results.
   /// </summary>
-  private async Task<List<ComputedRoute>> FetchFromOsrmAsync(
+  private async Task<List<ComputedRoute>?> FetchFromOsrmAsync(
       IReadOnlyList<RouteEndpoint> waypoints,
       RouteEndpoint origin,
       RouteEndpoint destination,
@@ -199,21 +180,25 @@ public class OsrmRoutingService : IRoutingService
     }
     catch (HttpRequestException ex)
     {
+      // HttpRequestException can mean DNS/connection failure or a non-success
+      // HTTP status from OSRM. Either way we couldn't get usable results.
       _logger.LogError(ex, "OSRM HTTP error for {Origin} → {Dest}", origin.Name, destination.Name);
-      return [];
+      return null;
     }
     catch (JsonException ex)
     {
       _logger.LogError(ex, "OSRM response parse error for {Origin} → {Dest}", origin.Name, destination.Name);
-      return [];
+      return null;
     }
     catch (Exception ex)
     {
-      // Catch-all to prevent unexpected resilience/circuit-breaker exceptions
-      // from bubbling up and causing a 500 response. Treat as a missing
-      // route result so callers can continue and surface partial results.
+      // Rethrow if the caller's own CancellationToken was cancelled (e.g. user
+      // navigated away) rather than treating it as a service failure.
+      if (ct.IsCancellationRequested) throw;
+      // Polly wraps timeouts as TimeoutRejectedException (not TaskCanceledException)
+      // so we catch them here. Return null so the caller can detect unreachability.
       _logger.LogWarning(ex, "OSRM unexpected error for {Origin} → {Dest}", origin.Name, destination.Name);
-      return [];
+      return null;
     }
   }
 

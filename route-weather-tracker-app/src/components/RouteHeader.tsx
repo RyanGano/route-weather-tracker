@@ -56,6 +56,7 @@ export default function RouteHeader({
   const [draftToId, setDraftToId] = useState("");
   const [fetchedRoutes, setFetchedRoutes] = useState<ComputedRoute[]>([]);
   const [computing, setComputing] = useState(false);
+  const [routeError, setRouteError] = useState<string | null>(null);
 
   // Sync drafts when the drawer opens
   useEffect(() => {
@@ -69,16 +70,38 @@ export default function RouteHeader({
   useEffect(() => {
     if (!draftFromId || !draftToId || draftFromId === draftToId) {
       setFetchedRoutes([]);
+      setRouteError(null);
       return;
     }
     let cancelled = false;
     setComputing(true);
+    setRouteError(null);
     computeRoutes(draftFromId, draftToId)
       .then((routes) => {
         if (!cancelled) setFetchedRoutes(routes);
       })
-      .catch(() => {
-        if (!cancelled) setFetchedRoutes([]);
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setFetchedRoutes([]);
+        // Axios surfaces 503 as an error with response.status === 503.
+        const status =
+          err != null &&
+          typeof err === "object" &&
+          "response" in err &&
+          err.response != null &&
+          typeof err.response === "object" &&
+          "status" in err.response
+            ? (err.response as { status: number }).status
+            : null;
+        if (status === 503) {
+          setRouteError(
+            "The routing service is temporarily unavailable. Please try again later.",
+          );
+        } else {
+          setRouteError(
+            "Unable to load routes. Please check your connection and try again.",
+          );
+        }
       })
       .finally(() => {
         if (!cancelled) setComputing(false);
@@ -313,6 +336,11 @@ export default function RouteHeader({
                 <div className="d-flex align-items-center gap-2 text-muted py-2">
                   <Spinner animation="border" size="sm" />
                   <span className="small">Finding routes…</span>
+                </div>
+              ) : routeError ? (
+                <div className="text-danger small py-2">
+                  <span aria-hidden className="me-1">⚠️</span>
+                  {routeError}
                 </div>
               ) : fetchedRoutes.length === 0 ? (
                 <p className="text-muted small mb-0">
