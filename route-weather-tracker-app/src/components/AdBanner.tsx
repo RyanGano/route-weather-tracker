@@ -21,6 +21,11 @@ interface Props {
 export default function AdBanner({ passes, destination, route }: Props) {
   const config = useAdConfig();
 
+  // Do not render any ad-related UI until the user has selected a route.
+  // This ensures we don't load ad scripts or units when the app is on the
+  // home/landing view and the user hasn't picked a route yet.
+  if (!route) return null;
+
   if (!config.adsEnabled) return null;
 
   const offer = getContextualOffer(passes, destination, route, config);

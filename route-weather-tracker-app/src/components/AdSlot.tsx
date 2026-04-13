@@ -13,16 +13,32 @@ export default function AdSlot({ publisherId, adUnitId }: Props) {
     if (pushed.current) return;
     pushed.current = true;
 
-    // The AdSense script is loaded from index.html <head>.
-    // Just push the ad unit config so AdSense fills the slot.
-    try {
-      (
-        (window as { adsbygoogle?: unknown[] }).adsbygoogle ??
-        ((window as { adsbygoogle?: unknown[] }).adsbygoogle = [])
-      ).push({});
-    } catch {
-      // Script not yet loaded; AdSense will auto-fill once it is
+    if (!publisherId) return;
+
+    const win = window as unknown as { adsbygoogle?: unknown[] };
+
+    function pushAd() {
+      try {
+        (win.adsbygoogle ?? (win.adsbygoogle = [])).push({});
+      } catch {}
     }
+
+    // If the AdSense script is already present, just push the config.
+    if ((window as any).adsbygoogle) {
+      pushAd();
+      return;
+    }
+
+    // Dynamically inject the AdSense script so we only load it when an ad
+    // slot is actually shown (i.e. after the user selects a route).
+    const script = document.createElement("script");
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisherId}`;
+    script.onload = () => {
+      pushAd();
+    };
+    document.head.appendChild(script);
   }, [publisherId]);
 
   return (

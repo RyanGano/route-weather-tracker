@@ -15,11 +15,9 @@
         html, body { background-color: #ffffff; }
       }
     </style>
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=%VITE_ADSENSE_PUBLISHER_ID%"
-      crossorigin="anonymous"
-    ></script>
+    <!-- AdSense script is loaded dynamically by the app only when an ad slot
+         is actually rendered (i.e. after the user selects a route). This
+         prevents loading ad runner if no route has been chosen. -->
     <script>
       (function () {
         var mq = window.matchMedia("(prefers-color-scheme: dark)");
