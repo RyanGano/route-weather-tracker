@@ -74,7 +74,8 @@ public class WsdotService : IWsdotService
         PassId = passId,
         RoadCondition = root.TryGetProperty("RoadCondition", out var rc) ? rc.GetString() ?? "Unknown" : "Unknown",
         WeatherCondition = root.TryGetProperty("WeatherCondition", out var wc) ? wc.GetString() ?? "Unknown" : "Unknown",
-        TemperatureFahrenheit = root.TryGetProperty("TemperatureInFahrenheit", out var temp) ? temp.GetInt32() : 0,
+        TemperatureFahrenheit = root.TryGetProperty("TemperatureInFahrenheit", out var temp)
+            && temp.ValueKind == JsonValueKind.Number ? temp.GetInt32() : 0,
         EastboundRestriction = restriction.Eastbound,
         WestboundRestriction = restriction.Westbound,
         EastboundRestrictionText = restriction.EastboundText,
