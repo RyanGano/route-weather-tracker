@@ -33,11 +33,18 @@ function restrictionBadge(restriction: TravelRestriction, text?: string) {
 
 function conditionBadge(condition: string | undefined) {
   if (!condition) return null;
+  // For long advisory text, show a short label with the full text in a tooltip.
+  const isLong = condition.length > 40;
+  const truncated = condition.slice(0, 40);
+  const lastSpace = truncated.lastIndexOf(" ");
+  const label = isLong
+    ? (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + "…"
+    : condition;
   const lower = condition.toLowerCase();
   if (lower.includes("bare") || lower.includes("dry")) {
     return (
-      <Badge bg="success" className="ms-1">
-        {condition}
+      <Badge bg="success" className="ms-1" title={isLong ? condition : undefined}>
+        {label}
       </Badge>
     );
   }
@@ -47,14 +54,14 @@ function conditionBadge(condition: string | undefined) {
     lower.includes("slush")
   ) {
     return (
-      <Badge bg="warning" text="dark" className="ms-1">
-        {condition}
+      <Badge bg="warning" text="dark" className="ms-1" title={isLong ? condition : undefined}>
+        {label}
       </Badge>
     );
   }
   return (
-    <Badge bg="secondary" className="ms-1">
-      {condition}
+    <Badge bg="secondary" className="ms-1" title={isLong ? condition : undefined}>
+      {label}
     </Badge>
   );
 }
@@ -70,9 +77,12 @@ export default function PassCard({ pass }: PassCardProps) {
 
   return (
     <Card className="mb-4 shadow-sm">
-      <Card.Header className="d-flex justify-content-between align-items-center bg-secondary bg-opacity-10">
-        <div className="d-flex align-items-center gap-2 flex-wrap">
+      <Card.Header className="bg-secondary bg-opacity-10">
+        <div className="d-flex justify-content-between align-items-start">
           <span className="fs-5 fw-bold">{info.name}</span>
+          {condition && conditionBadge(condition.roadCondition)}
+        </div>
+        <div className="d-flex align-items-center gap-2 flex-wrap mt-1">
           <Badge bg="secondary">{info.highway}</Badge>
           <Badge bg="light" text="dark">
             {info.elevationFeet.toLocaleString()} ft
@@ -89,20 +99,18 @@ export default function PassCard({ pass }: PassCardProps) {
               Official &#8599;
             </a>
           )}
-
           {pass.weatherSource === "nws" && pass.weatherForecastUrl && (
             <a
               href={pass.weatherForecastUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={`badge bg-info text-decoration-none ${info.officialUrl ? "ms-2" : ""}`}
+              className="badge bg-info text-decoration-none"
               title="NWS forecast"
             >
               Weather &#8599;
             </a>
           )}
         </div>
-        {condition && conditionBadge(condition.roadCondition)}
       </Card.Header>
 
       {hasRestriction && (
