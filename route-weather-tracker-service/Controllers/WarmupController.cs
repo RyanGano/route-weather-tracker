@@ -21,6 +21,7 @@ public class WarmupController : ControllerBase
   /// an Accepted result while warming continues in the background.
   /// </summary>
   [HttpGet]
+  [HttpHead]
   public IActionResult Get()
   {
     // Fire-and-forget: populate aggregator caches without delaying the client.
