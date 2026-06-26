@@ -8,4 +8,6 @@ Process for changes: Edit, build, test, fix tests, repeat, commit, push, watch t
 
 Always commit and push every change without being asked — this includes small edits and edits to docs/CLAUDE.md itself. Push to origin/main by default; only use a branch if asked, in which case push to that branch and create a pull request.
 
+Exception — if a change does not feel ready, push it to a branch and open a PR instead of pushing to main, then let me know. A change may not be ready when: (1) we are iterating on the work; (2) adding instructions is ongoing and not complete — in this case ask whether it's complete, whether I'd like a branch, or to just keep working locally; (3) the change is only for plan mode or it otherwise seems like more instructions are coming (e.g. I say "I want to try something out" or "let's play around with an idea").
+
 For architecture, commands, deployment, and secrets, read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) when a request needs that detail.
