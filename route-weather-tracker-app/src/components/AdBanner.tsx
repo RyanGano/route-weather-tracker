@@ -1,4 +1,4 @@
-import { useAdConfig } from "../contexts/AdContext";
+import { useAdConfig } from "../contexts/adContextCore";
 import { getContextualOffer } from "../utils/adContextUtils";
 import ContextualOfferCard from "./ContextualOfferCard";
 import AdSlot from "./AdSlot";

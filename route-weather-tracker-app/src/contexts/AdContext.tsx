@@ -1,13 +1,6 @@
-import { createContext, useContext, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import type { AdConfig } from "../types/adTypes";
-
-const AdContext = createContext<AdConfig>({
-  adsEnabled: false,
-  amazonTag: "",
-  bookingAid: "",
-  adsensePublisherId: "",
-  adsenseAdUnitId: "",
-});
+import { AdContext } from "./adContextCore";
 
 export function AdProvider({ children }: { children: ReactNode }) {
   const config: AdConfig = {
@@ -19,8 +12,4 @@ export function AdProvider({ children }: { children: ReactNode }) {
   };
 
   return <AdContext.Provider value={config}>{children}</AdContext.Provider>;
-}
-
-export function useAdConfig(): AdConfig {
-  return useContext(AdContext);
 }

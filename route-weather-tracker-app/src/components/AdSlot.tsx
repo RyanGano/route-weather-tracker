@@ -20,11 +20,13 @@ export default function AdSlot({ publisherId, adUnitId }: Props) {
     function pushAd() {
       try {
         (win.adsbygoogle ?? (win.adsbygoogle = [])).push({});
-      } catch {}
+      } catch {
+        // AdSense not ready or blocked; nothing actionable to do.
+      }
     }
 
     // If the AdSense script is already present, just push the config.
-    if ((window as any).adsbygoogle) {
+    if (win.adsbygoogle) {
       pushAd();
       return;
     }

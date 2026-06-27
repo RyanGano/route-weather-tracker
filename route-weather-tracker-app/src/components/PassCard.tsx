@@ -4,7 +4,7 @@ import Alert from "react-bootstrap/Alert";
 import type { PassSummary } from "../types/passTypes";
 import { TravelRestriction } from "../types/passTypes";
 import { formatRestriction } from "../utils/formatters";
-import { useAdConfig } from "../contexts/AdContext";
+import { useAdConfig } from "../contexts/adContextCore";
 import { getPassOffer } from "../utils/adContextUtils";
 import WebcamViewer from "./WebcamViewer";
 import WeatherDisplay from "./WeatherDisplay";
