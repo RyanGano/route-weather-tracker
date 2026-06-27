@@ -66,9 +66,16 @@ official source exists (`HasOfficialConditions = false`).
 | WY | ➖ NWS | ❌ none yet | — (WYDOT ArcGIS pending) | none |
 | UT | ➖ NWS | ✅ UDOT | `udotcameras.com/...processed.geojson` | none |
 | NV | ➖ NWS | ❌ none yet | — (NDOT ArcGIS pending) | none |
-| NM | ➖ NWS | ✅ NM Roads | `servicev5.nmroads.com/.../GetCameraInfo` | none |
+| NM | ➖ NWS | ✅ NM Roads¹ | `servicev5.nmroads.com/.../GetCameraInfo` | none |
 | VA | ➖ NWS | ❌ none yet | — (VDOT 511 pending, needs key) | key |
 | NC/TN | ➖ NWS | ❌ none yet | — (NCDOT/TDOT pending) | TN needs key |
+
+¹ The NM Roads API returns `{ "cameraInfo": [ … ] }` (not a bare array), and its
+snapshot host `ss.nmroads.com` is **HTTP-only**. HTTP-only snapshots are served to
+the HTTPS frontend through the allowlisted proxy `GET /api/cameras/image?url=…`
+([`CamerasController`](../route-weather-tracker-service/Controllers/CamerasController.cs),
+applied client-side by `proxiedCameraUrl`). Raton, Glorieta, and Tijeras have
+cameras within ~2–8 km; Emory and Apache Summit have none within range (~105 km+).
 
 States still showing ❌ cameras are the highest-value next targets. Caltrans (CA)
 proves the pattern: a key-free, per-district JSON feed + proximity matching. The
