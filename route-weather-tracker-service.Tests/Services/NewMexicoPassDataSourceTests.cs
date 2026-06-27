@@ -178,6 +178,33 @@ public class NewMexicoPassDataSourceTests
     }
 
     [Fact]
+    public async Task GetCamerasAsync_ParsesLiveCameraInfoRootShape()
+    {
+        // The live API wraps cameras in { "cameraInfo": [ … ] } rather than a bare
+        // array. A camera ~2 km from Raton Pass (36.9977, -104.5076).
+        var json = """
+            {
+              "cameraInfo": [
+                {
+                  "title": "I-25 @ Raton Pass",
+                  "name": "I-25@RatonPass",
+                  "lat": 37.015,
+                  "lon": -104.508,
+                  "snapshotFile": "http://ss.nmroads.com/snapshots/i25_ratonpass.jpg",
+                  "enabled": true
+                }
+              ]
+            }
+            """;
+        var sut = BuildSut(json);
+        var cams = await sut.GetCamerasAsync("raton");
+
+        Assert.Single(cams);
+        Assert.Equal("I-25@RatonPass", cams[0].CameraId);
+        Assert.Contains("ss.nmroads.com", cams[0].ImageUrl, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public async Task GetCamerasAsync_ReturnsEmpty_WhenCameraHasNoSnapshotFile()
     {
         var json = """

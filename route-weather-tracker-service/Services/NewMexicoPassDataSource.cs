@@ -70,11 +70,19 @@ public class NewMexicoPassDataSource : IPassDataSource
             await using var stream = await resp.Content.ReadAsStreamAsync(ct);
             using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
 
-            if (doc.RootElement.ValueKind != JsonValueKind.Array) return [];
+            // The live API returns { "cameraInfo": [ … ] }; older/test fixtures use a
+            // bare array. Accept either so a schema tweak doesn't silently drop cameras.
+            JsonElement cameras;
+            if (doc.RootElement.ValueKind == JsonValueKind.Array)
+                cameras = doc.RootElement;
+            else if (doc.RootElement.TryGetProperty("cameraInfo", out var ci) && ci.ValueKind == JsonValueKind.Array)
+                cameras = ci;
+            else
+                return [];
 
             var candidates = new List<(double DistKm, CameraImage Cam)>();
 
-            foreach (var cam in doc.RootElement.EnumerateArray())
+            foreach (var cam in cameras.EnumerateArray())
             {
                 if (cam.TryGetProperty("enabled", out var enabledProp) && !enabledProp.GetBoolean())
                     continue;

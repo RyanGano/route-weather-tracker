@@ -63,6 +63,9 @@ builder.Services.AddScoped<IPassDataSource, VirginiaPassDataSource>();
 builder.Services.AddScoped<IPassDataSource, NcTnPassDataSource>();
 builder.Services.AddScoped<IPassAggregatorService, PassAggregatorService>();
 
+// HTTP client used by CamerasController to proxy HTTP-only camera snapshots.
+builder.Services.AddHttpClient("camera-proxy");
+
 // ----- Routing services (OpenRouteService + geometric pass matching) -----
 builder.Services.AddSingleton<IPassLocatorService, PassLocatorService>();
 // OpenRouteService requires an Authorization header with the API key.

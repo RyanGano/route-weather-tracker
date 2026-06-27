@@ -13,6 +13,19 @@ const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 
 const api = axios.create({ baseURL: BASE_URL });
 
+/**
+ * Some DOT camera snapshots are only served over plain HTTP (e.g.
+ * ss.nmroads.com). On the HTTPS site the browser blocks those as mixed content,
+ * so route them through the backend's HTTPS image proxy. HTTPS URLs are returned
+ * unchanged.
+ */
+export function proxiedCameraUrl(imageUrl: string): string {
+  if (imageUrl.startsWith("http://")) {
+    return `${BASE_URL}/api/cameras/image?url=${encodeURIComponent(imageUrl)}`;
+  }
+  return imageUrl;
+}
+
 /** Returns all known route endpoints (cities), ordered west to east. */
 export async function getRouteEndpoints(): Promise<RouteEndpoint[]> {
   const response = await api.get<RouteEndpoint[]>("/api/endpoints");

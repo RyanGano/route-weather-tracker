@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { CameraImage } from "../types/passTypes";
 import { useRefresh } from "../contexts/refreshContextCore";
+import { proxiedCameraUrl } from "../services/passService";
 
 interface WebcamViewerProps {
   cameras: CameraImage[];
@@ -49,7 +50,10 @@ export default function WebcamViewer({ cameras }: WebcamViewerProps) {
                 </div>
               ) : (
                 <img
-                  src={withCacheBuster(cam.imageUrl, cacheBuster)}
+                  src={withCacheBuster(
+                    proxiedCameraUrl(cam.imageUrl),
+                    cacheBuster,
+                  )}
                   alt={cam.description || "Roadside camera"}
                   className="img-fluid rounded border"
                   style={{
