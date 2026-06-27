@@ -43,7 +43,7 @@ public class UtahPassDataSource : IPassDataSource
             ["parleys"]        = (40.6897, -111.7437),
             ["soldier-summit"] = (39.8358, -110.9294),
             ["sardine"]        = (41.6347, -111.8491),
-            ["cedar-mountain"] = (37.6315, -112.9621),
+            ["cedar-mountain"] = (37.6333, -112.8424),
             ["beaver-canyon"]  = (38.3980, -112.4614),
             ["pine-valley"]    = (37.2650, -113.6968),
         };

@@ -40,7 +40,7 @@ public class MontanaPassDataSource : IPassDataSource
         {
             ["marias"]          = (48.3139, -112.9964),
             ["logan-pass"]      = (48.6959, -113.7181),
-            ["macdonald"]       = (46.5950, -112.4440),
+            ["macdonald"]       = (46.5615, -112.3089),
             ["rogers-pass-mt"]  = (47.0392, -112.5256),
             ["chief-joseph-mt"] = (45.7269, -113.8699),
             ["homestake"]       = (45.9099, -112.7756),

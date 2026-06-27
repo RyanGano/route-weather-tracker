@@ -36,7 +36,7 @@ public class NewMexicoPassDataSource : IPassDataSource
             ["tijeras"]       = (35.0698, -106.3855),
             ["raton"]         = (36.9977, -104.5076),
             ["apache-summit"] = (34.1350, -109.8490),
-            ["emory"]         = (32.9019, -107.6856),
+            ["emory"]         = (32.9243, -107.7889),
         };
 
     public IReadOnlySet<string> SupportedPassIds => NmPassIds;

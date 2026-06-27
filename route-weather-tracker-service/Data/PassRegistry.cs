@@ -56,8 +56,8 @@ public static class PassRegistry
             Name = "Washington Pass",
             Highway = "WA-20",
             ElevationFeet = 5477,
-            Latitude = 48.5195,
-            Longitude = -120.6653,
+            Latitude = 48.5226,
+            Longitude = -120.6553,
             State = "WA",
             OfficialUrl = "https://wsdot.com/travel/real-time/mountainpasses/washington"
         },
@@ -67,8 +67,8 @@ public static class PassRegistry
             Name = "Rainy Pass",
             Highway = "WA-20",
             ElevationFeet = 4855,
-            Latitude = 48.5195,
-            Longitude = -120.7364,
+            Latitude = 48.5158,
+            Longitude = -120.7365,
             State = "WA",
             HasOfficialConditions = false
         },
@@ -89,8 +89,8 @@ public static class PassRegistry
             Name = "Fourth of July Pass",
             Highway = "I-90",
             ElevationFeet = 3081,
-            Latitude = 47.5333,
-            Longitude = -116.3667,
+            Latitude = 47.6212,
+            Longitude = -116.5230,
             State = "ID",
             OfficialUrl = "https://511.idaho.gov/List/Cameras?search=july"
         },
@@ -135,8 +135,8 @@ public static class PassRegistry
             Name = "Banner Summit",
             Highway = "ID-21",
             ElevationFeet = 6989,
-            Latitude = 44.2608,
-            Longitude = -114.9731,
+            Latitude = 44.3060,
+            Longitude = -115.2317,
             State = "ID",
             HasOfficialConditions = false
         },
@@ -146,8 +146,8 @@ public static class PassRegistry
             Name = "Galena Summit",
             Highway = "ID-75",
             ElevationFeet = 8701,
-            Latitude = 43.8742,
-            Longitude = -114.6978,
+            Latitude = 43.8704,
+            Longitude = -114.7128,
             State = "ID",
             HasOfficialConditions = false
         },
@@ -183,8 +183,8 @@ public static class PassRegistry
             Name = "MacDonald Pass",
             Highway = "US-12",
             ElevationFeet = 6325,
-            Latitude = 46.5950,
-            Longitude = -112.4440,
+            Latitude = 46.5615,
+            Longitude = -112.3089,
             State = "MT",
             HasOfficialConditions = false,
             OfficialUrl = "https://travinfo.mdt.mt.gov/"
@@ -233,8 +233,8 @@ public static class PassRegistry
             Name = "Santiam Pass",
             Highway = "US-20",
             ElevationFeet = 4817,
-            Latitude = 44.4194,
-            Longitude = -121.9946,
+            Latitude = 44.4248,
+            Longitude = -121.8455,
             State = "OR",
             HasOfficialConditions = false,
             OfficialUrl = "https://tripcheck.com/Pages/RoadConditions"
@@ -268,9 +268,9 @@ public static class PassRegistry
             Id = "deadman",
             Name = "Deadman Pass",
             Highway = "I-84",
-            ElevationFeet = 4193,
-            Latitude = 45.6952,
-            Longitude = -118.6489,
+            ElevationFeet = 3640,
+            Latitude = 45.6005,
+            Longitude = -118.5040,
             State = "OR",
             HasOfficialConditions = false,
             OfficialUrl = "https://tripcheck.com/Pages/RoadConditions"
@@ -293,8 +293,8 @@ public static class PassRegistry
             Name = "Mt. Hood Corridor",
             Highway = "US-26",
             ElevationFeet = 3670,
-            Latitude = 45.2939,
-            Longitude = -121.7467,
+            Latitude = 45.3035,
+            Longitude = -121.7548,
             State = "OR",
             HasOfficialConditions = false,
             OfficialUrl = "https://tripcheck.com/Pages/RoadConditions"
@@ -319,8 +319,8 @@ public static class PassRegistry
             Name = "Eisenhower/Johnson Tunnel",
             Highway = "I-70",
             ElevationFeet = 11013,
-            Latitude = 39.6846,
-            Longitude = -105.9066,
+            Latitude = 39.6789,
+            Longitude = -105.9348,
             State = "CO",
             HasOfficialConditions = false,
             OfficialUrl = "https://cotrip.org"
@@ -355,8 +355,8 @@ public static class PassRegistry
             Name = "Rabbit Ears Pass",
             Highway = "US-40",
             ElevationFeet = 9426,
-            Latitude = 40.3818,
-            Longitude = -106.5839,
+            Latitude = 40.3841,
+            Longitude = -106.6118,
             State = "CO",
             HasOfficialConditions = false,
             OfficialUrl = "https://cotrip.org"
@@ -391,8 +391,8 @@ public static class PassRegistry
             Name = "Red Mountain Pass",
             Highway = "US-550",
             ElevationFeet = 11018,
-            Latitude = 37.9057,
-            Longitude = -107.7214,
+            Latitude = 37.8989,
+            Longitude = -107.7119,
             State = "CO",
             HasOfficialConditions = false,
             OfficialUrl = "https://cotrip.org"
@@ -403,8 +403,8 @@ public static class PassRegistry
             Name = "La Veta Pass",
             Highway = "US-160",
             ElevationFeet = 9413,
-            Latitude = 37.4946,
-            Longitude = -105.0055,
+            Latitude = 37.6134,
+            Longitude = -105.1894,
             State = "CO",
             HasOfficialConditions = false,
             OfficialUrl = "https://cotrip.org"
@@ -451,8 +451,8 @@ public static class PassRegistry
             Name = "Fremont Pass",
             Highway = "CO-91",
             ElevationFeet = 11318,
-            Latitude = 39.3780,
-            Longitude = -106.2075,
+            Latitude = 39.3675,
+            Longitude = -106.1876,
             State = "CO",
             HasOfficialConditions = false,
             OfficialUrl = "https://cotrip.org"
@@ -463,8 +463,8 @@ public static class PassRegistry
             Name = "Poncha Pass",
             Highway = "US-285",
             ElevationFeet = 9010,
-            Latitude = 38.3536,
-            Longitude = -106.0897,
+            Latitude = 38.4222,
+            Longitude = -106.0881,
             State = "CO",
             HasOfficialConditions = false,
             OfficialUrl = "https://cotrip.org"
@@ -500,9 +500,9 @@ public static class PassRegistry
             Id = "cajon",
             Name = "Cajon Pass",
             Highway = "I-15",
-            ElevationFeet = 4190,
-            Latitude = 34.3166,
-            Longitude = -117.4629,
+            ElevationFeet = 3777,
+            Latitude = 34.3253,
+            Longitude = -117.4287,
             State = "CA",
             HasOfficialConditions = false,
             OfficialUrl = "https://roads.dot.ca.gov/"
@@ -599,8 +599,8 @@ public static class PassRegistry
             Name = "Snowy Range Pass",
             Highway = "WY-130",
             ElevationFeet = 10847,
-            Latitude = 41.3681,
-            Longitude = -106.1989,
+            Latitude = 41.3424,
+            Longitude = -106.2997,
             State = "WY",
             HasOfficialConditions = false,
             OfficialUrl = "https://wyoroad.info"
@@ -623,8 +623,8 @@ public static class PassRegistry
             Name = "Powder River Pass",
             Highway = "US-16",
             ElevationFeet = 9666,
-            Latitude = 44.2002,
-            Longitude = -107.0838,
+            Latitude = 44.1497,
+            Longitude = -107.0795,
             State = "WY",
             HasOfficialConditions = false,
             OfficialUrl = "https://wyoroad.info"
@@ -635,8 +635,8 @@ public static class PassRegistry
             Name = "Beartooth Pass",
             Highway = "US-212",
             ElevationFeet = 10947,
-            Latitude = 45.0030,
-            Longitude = -109.4561,
+            Latitude = 44.9690,
+            Longitude = -109.4713,
             State = "WY/MT",
             HasOfficialConditions = false,
             OfficialUrl = "https://wyoroad.info"
@@ -685,8 +685,8 @@ public static class PassRegistry
             Name = "Cedar Canyon",
             Highway = "UT-14",
             ElevationFeet = 9240,
-            Latitude = 37.6315,
-            Longitude = -112.9621,
+            Latitude = 37.6333,
+            Longitude = -112.8424,
             State = "UT",
             HasOfficialConditions = false,
             OfficialUrl = "https://www.udottraffic.utah.gov/map/#camera-91099"
@@ -747,8 +747,8 @@ public static class PassRegistry
             Name = "Golconda Summit",
             Highway = "I-80",
             ElevationFeet = 5145,
-            Latitude = 40.9396,
-            Longitude = -117.5048,
+            Latitude = 40.9209,
+            Longitude = -117.3923,
             State = "NV",
             HasOfficialConditions = false,
             OfficialUrl = "https://nvroads.com"
@@ -759,8 +759,8 @@ public static class PassRegistry
             Name = "Palisade Canyon",
             Highway = "I-80",
             ElevationFeet = 4540,
-            Latitude = 40.5280,
-            Longitude = -116.2037,
+            Latitude = 40.6102,
+            Longitude = -116.1987,
             State = "NV",
             HasOfficialConditions = false,
             OfficialUrl = "https://nvroads.com"
@@ -821,8 +821,8 @@ public static class PassRegistry
             Name = "Emory Pass",
             Highway = "NM-152",
             ElevationFeet = 8228,
-            Latitude = 32.9019,
-            Longitude = -107.6856,
+            Latitude = 32.9243,
+            Longitude = -107.7889,
             State = "NM",
             HasOfficialConditions = false,
             OfficialUrl = "https://nmroads.com"
@@ -870,9 +870,9 @@ public static class PassRegistry
             Id = "shenandoah-gap",
             Name = "Front Royal (Skyline Dr)",
             Highway = "US-340",
-            ElevationFeet = 1460,
-            Latitude = 38.9201,
-            Longitude = -78.1944,
+            ElevationFeet = 1900,
+            Latitude = 38.8717,
+            Longitude = -78.2047,
             State = "VA",
             HasOfficialConditions = false,
             OfficialUrl = "https://511virginia.org"
@@ -889,7 +889,7 @@ public static class PassRegistry
             Longitude = -83.4265,
             State = "NC/TN",
             HasOfficialConditions = false,
-            OfficialUrl = "https://www.nps.gov/grsm/planyourvisit/parkreads.htm"
+            OfficialUrl = "https://www.nps.gov/grsm/planyourvisit/temproadclose.htm"
         },
         new PassInfo
         {
@@ -909,8 +909,8 @@ public static class PassRegistry
             Name = "Clinch Mountain",
             Highway = "US-11W",
             ElevationFeet = 3074,
-            Latitude = 36.5000,
-            Longitude = -82.8000,
+            Latitude = 36.4311,
+            Longitude = -83.1709,
             State = "TN",
             HasOfficialConditions = false,
             OfficialUrl = "https://www.tn511.com"
@@ -918,11 +918,11 @@ public static class PassRegistry
         new PassInfo
         {
             Id = "santeelah",
-            Name = "Wayah Bald",
+            Name = "Winding Stair Gap",
             Highway = "US-64",
-            ElevationFeet = 4180,
-            Latitude = 35.1700,
-            Longitude = -83.6400,
+            ElevationFeet = 3770,
+            Latitude = 35.1199,
+            Longitude = -83.5483,
             State = "NC",
             HasOfficialConditions = false,
             OfficialUrl = "https://drivenc.gov"
@@ -937,7 +937,7 @@ public static class PassRegistry
             Longitude = -83.4985,
             State = "NC/TN",
             HasOfficialConditions = false,
-            OfficialUrl = "https://www.nps.gov/grsm/planyourvisit/parkreads.htm"
+            OfficialUrl = "https://www.nps.gov/grsm/planyourvisit/temproadclose.htm"
         }
     ];
 

@@ -5,6 +5,12 @@ to the Route Weather Tracker. Each state section describes the public data sourc
 known passes, and implementation checklist. Work through states in priority order;
 each completed state should be committed as its own git commit before moving on.
 
+> **Source of truth:** for current pass coordinates, data sources, and camera
+> coverage, see [`docs/passes.md`](docs/passes.md) and the machine-checked
+> [`docs/passes-validation.md`](docs/passes-validation.md) (run
+> `python tools/validate_passes.py`). The per-state coordinate tables below are
+> historical planning references and may lag the registry.
+
 ---
 
 ## Architecture Overview ✅
@@ -405,7 +411,12 @@ feat(mt): add Montana passes and MDT data source
 
 ---
 
-## California (CA) ✅ (scaffold — NWS weather; Caltrans chain-control integration pending)
+## California (CA) ✅ (live Caltrans CCTV cameras; NWS weather; chain-control integration still pending)
+
+> **Cameras implemented** in `CaliforniaPassDataSource` using the key-free
+> per-district CCTV feeds (`cwwp2.dot.ca.gov/data/dN/cctv/cctvStatusDNN.json`).
+> See [`docs/passes.md`](docs/passes.md) for verified per-pass coverage. Chain
+> control (`dot.ca.gov/dN/chaincontrol/chaincontrol.json`) is the remaining piece.
 
 ### Data Source
 
