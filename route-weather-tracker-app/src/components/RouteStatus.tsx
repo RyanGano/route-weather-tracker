@@ -49,22 +49,13 @@ function getSeverity(description: string, iconCode: string): Severity {
   return 0;
 }
 
-function severityVariant(s: Severity): string {
-  if (s >= 5) return "danger";
-  if (s >= 3) return "warning";
-  return "success";
+/** Join names as "A", "A and B", or "A, B, and C". */
+function formatList(names: string[]): string {
+  if (names.length === 0) return "";
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
 }
-
-function severityIcon(s: Severity): string {
-  if (s >= 5) return "🌨️";
-  if (s >= 4) return "❄️";
-  if (s >= 3) return "⛈️";
-  if (s >= 2) return "🌧️";
-  if (s >= 1) return "🌥️";
-  return "✅";
-}
-
-// (removed unused `capitalize`) Kept inline text formatting in messages.
 
 /** "today", "tomorrow", or weekday name for offsets ≥ 2 */
 function dayLabel(offset: number, date: Date): string {
@@ -251,53 +242,92 @@ export default function RouteStatus({ passes }: Props) {
     };
   });
 
-  // Helper collections for multi-option recommendations
-  const allClearOffsets: number[] = []; // no snow (severity < 4) on every pass and every pass has data
-  const driveableOffsets: number[] = []; // every pass has severity < BAD_THRESHOLD (and every pass provided data)
-  const avgHighByOffset = new Map<number, number>();
+  // Offsets that have any forecast/condition data at all.
+  const dataOffsets: number[] = [];
   for (let i = 0; i < LOOK_AHEAD_DAYS; i++) {
-    const entries = perOffset.get(i) || [];
-    // Consider an offset for recommendations when at least one pass provided data.
-    // This is less strict than requiring every pass to provide a forecast,
-    // but still avoids suggesting a day with no information.
-    if (entries.length > 0) {
-      const allNoSnow = entries.every((e) => e.severity < 4);
-      const allDriveable = entries.every((e) => e.severity < BAD_THRESHOLD);
-      if (allNoSnow) allClearOffsets.push(i);
-      if (allDriveable) driveableOffsets.push(i);
-      const avgHigh =
-        entries.reduce((s, e) => s + (e.high ?? 0), 0) / entries.length;
-      avgHighByOffset.set(i, avgHigh);
-    }
+    if ((perOffset.get(i) || []).length > 0) dataOffsets.push(i);
   }
 
   if (slots.length === 0) return null;
 
-  const nowSlot = slots[0];
-  const badNow = nowSlot.severity >= BAD_THRESHOLD;
+  // ── Headline: what's happening RIGHT NOW ───────────────────────────────────
+  // Live DOT restrictions are the most reliable and actionable signal, so they
+  // drive the headline ahead of (less certain) weather forecasts. We deliberately
+  // avoid calling routine winter snow "unsafe" — a snowy pass is usually driveable
+  // with chains. Red is reserved for closures and severe/blizzard conditions.
+  const closedNames: string[] = [];
+  const chainNames: string[] = [];
+  for (const p of passes) {
+    if (!p.condition) continue;
+    const worst = Math.max(
+      p.condition.eastboundRestriction,
+      p.condition.westboundRestriction,
+    );
+    if (worst === TravelRestriction.Closed) closedNames.push(p.info.name);
+    else if (
+      worst === TravelRestriction.ChainsRequired ||
+      worst === TravelRestriction.TiresOrTraction
+    )
+      chainNames.push(p.info.name);
+  }
 
+  const nowSeverity = slots[0].severity;
   let variant: string;
   let icon: string;
   let message: string;
 
-  // Prioritize explicit safe-day messaging (grouped). We consider a day "safe"
-  // only when every pass provided data and each pass reports severity < BAD_THRESHOLD.
-  if (driveableOffsets.length === LOOK_AHEAD_DAYS) {
+  if (closedNames.length > 0) {
+    variant = "danger";
+    icon = "🚧";
+    const list = formatList(closedNames);
+    message = `${list} ${closedNames.length === 1 ? "is" : "are"} closed right now — check the official pass page before heading out.`;
+  } else if (nowSeverity >= 5) {
+    variant = "danger";
+    icon = "🌨️";
+    message =
+      "Severe winter weather on the passes right now — travel only if necessary.";
+  } else if (chainNames.length > 0) {
+    variant = "warning";
+    icon = "❄️";
+    message = `Chains or traction tires required on ${formatList(chainNames)} — doable with the right gear.`;
+  } else if (nowSeverity >= 4) {
+    variant = "warning";
+    icon = "❄️";
+    message =
+      "Snow or ice around the passes right now — carry chains and take it slow.";
+  } else if (nowSeverity >= BAD_THRESHOLD) {
+    variant = "warning";
+    icon = "⛈️";
+    message =
+      "Thunderstorms near the passes right now — watch for sudden downpours.";
+  } else if (nowSeverity >= 2) {
+    variant = "success";
+    icon = "🌧️";
+    message = "Wet but open — roads may be slick, but the passes are driveable.";
+  } else {
     variant = "success";
     icon = "✅";
-    message = "All days look great — pack snacks and go anytime this week!";
-  } else if (driveableOffsets.length > 0) {
-    const formatted = formatOffsets(driveableOffsets.slice(0, 3), slots);
-    variant = badNow ? severityVariant(nowSlot.severity) : "success";
-    icon = badNow ? severityIcon(nowSlot.severity) : "✅";
-    message = badNow
-      ? `Currently poor — best safe windows: ${formatted}.`
-      : `${formatted} ${driveableOffsets.length === 1 ? "is" : "are"} safe to drive across all passes.`;
-  } else {
-    // No explicit safe days found
-    variant = badNow ? severityVariant(nowSlot.severity) : "warning";
-    icon = badNow ? severityIcon(nowSlot.severity) : "⚠️";
-    message = `No days in the next ${LOOK_AHEAD_DAYS} days are considered safe to drive across all passes based on current road conditions and forecasts.`;
+    message = "Passes are clear right now — good to go.";
+  }
+
+  // ── Secondary line: the calmest day(s) to cross this week ────────────────────
+  // Always frames a positive recommendation (the least-severe days) instead of
+  // declaring days "unsafe", which is unhelpful for mountain passes in winter.
+  let windowLine: string | null = null;
+  if (dataOffsets.length > 0) {
+    const bestSeverity = Math.min(...dataOffsets.map((i) => slots[i].severity));
+    // Treat anything up to light rain as equally fine; otherwise surface the
+    // least-bad days available.
+    const threshold = Math.max(bestSeverity, 2);
+    const calm = dataOffsets.filter((i) => slots[i].severity <= threshold);
+    if (calm.length === LOOK_AHEAD_DAYS && bestSeverity <= 2) {
+      windowLine =
+        "The whole week looks good — pack snacks and go whenever suits you.";
+    } else if (bestSeverity >= 4) {
+      windowLine = `Wintry all week. Calmest days to cross: ${formatOffsets(calm.slice(0, 3), slots)}.`;
+    } else {
+      windowLine = `Calmest days to cross this week: ${formatOffsets(calm.slice(0, 3), slots)}.`;
+    }
   }
 
   // Collect passes with active restrictions for the overview banner
@@ -328,13 +358,18 @@ export default function RouteStatus({ passes }: Props) {
     <>
       <Alert
         variant={variant}
-        className="py-2 d-flex align-items-center gap-2 mb-1"
+        className="py-2 d-flex align-items-start gap-2 mb-1"
       >
         <span role="img" aria-label="status" style={{ fontSize: "1.25rem" }}>
           {icon}
         </span>
         <div>
-          <strong>Best time to drive:</strong> {message}
+          <div>
+            <strong>Right now:</strong> {message}
+          </div>
+          {windowLine && (
+            <div className="small mt-1 opacity-75">📅 {windowLine}</div>
+          )}
         </div>
       </Alert>
 
