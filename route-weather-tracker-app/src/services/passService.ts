@@ -9,7 +9,7 @@ import type {
 
 // Aspire injects VITE_API_URL at runtime with the backend's service-discovered URL.
 // Fallback to empty string so the Vite dev-server proxy can also be used.
-const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
+const BASE_URL = import.meta.env.VITE_API_URL ?? "";
 
 const api = axios.create({ baseURL: BASE_URL });
 
@@ -56,9 +56,9 @@ export async function getAllPasses(
   highway?: string,
 ): Promise<PassSummary[]> {
   const params: Record<string, string> = {};
-  if (from) params.from = from;
-  if (to) params.to = to;
-  if (highway) params.highway = highway;
+  if (from) params["from"] = from;
+  if (to) params["to"] = to;
+  if (highway) params["highway"] = highway;
   const response = await api.get<PassSummary[]>("/api/passes", { params });
   return response.data;
 }
