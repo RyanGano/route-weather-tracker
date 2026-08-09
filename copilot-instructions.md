@@ -1,11 +1,15 @@
 Copilot instructions for this repository:
 
-- Use `yarn` for all Node dependency management and scripts (do not use `npm`).
-- To install frontend dependencies, run `cd route-weather-tracker-app && yarn`.
-- To start the frontend in development mode, run `cd route-weather-tracker-app && yarn dev`.
-- When updating contributor docs or CI, prefer `yarn` commands and lockfile (`yarn.lock`).
+- Use `npm` for all Node dependency management and scripts (do not use `yarn` or
+  `pnpm`). A `preinstall` guard and yarn's own `packageManager` check will fail
+  the command if you do.
+- To install frontend dependencies, run `cd route-weather-tracker-app && npm install`.
+- To start the frontend in development mode, run `cd route-weather-tracker-app && npm run dev`.
+- When updating contributor docs or CI, prefer `npm` commands and the lockfile
+  (`package-lock.json`).
+- Passing flags through a script needs `--`: `npm run lint -- --fix`.
 
-- Verify UI changes locally before committing: start the frontend (`yarn dev`),
+- Verify UI changes locally before committing: start the frontend (`npm run dev`),
   confirm the new UI behavior in a browser (or fetch the root HTML), and run
   any relevant unit or smoke tests. Commit only after a local verification.
 
@@ -15,15 +19,18 @@ Copilot instructions for this repository:
     frontend job before deploying:
 
     - `cd route-weather-tracker-app`
-    - `yarn install --frozen-lockfile`
-    - `yarn build`
+    - `npm ci`
+    - `npm run build`
 
     The built output (`route-weather-tracker-app/dist`) is what should be deployed
     to the static host. Do NOT deploy raw `/src` files — browsers cannot execute
     TypeScript source and serving them causes the MIME-type/module errors we saw.
 
-    I updated `.github/workflows/azure-dev.yml` to run `yarn build` before
-    deployment. If you use a different workflow or staging branch, mirror the same
-    build steps there.
+    `.github/workflows/azure-dev.yml` runs `npm ci` before deployment. If you use
+    a different workflow or staging branch, mirror the same build steps there.
 
-Rationale: the project uses Yarn and includes a `yarn.lock`; using Yarn ensures consistent installs and reproducible lockfile behavior across environments.
+Rationale: the project standardized on npm and commits a `package-lock.json`.
+It previously used yarn 1.x, which has been maintenance-only since 2020 and
+emits Node deprecation warnings from its own code with no fix forthcoming.
+Running a second package manager regenerates a competing lockfile and a
+divergent dependency tree.

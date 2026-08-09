@@ -9,21 +9,21 @@
     "dotnet new": true,
     "dotnet sln": true,
     "dotnet test": true,
-    "yarn add": true,
-    "yarn install": true,
+    "npm install": true,
+    "npm ci": true,
     "dotnet package": true,
     "npx tsc": true,
     "git push": true,
-    "yarn build": true,
+    "npm run": true,
     "git rev-parse": true,
     "dotnet run": true,
     "Receive-Job": true,
     "Start-Job": true,
-    "/^cd route-weather-tracker-app ; yarn$/": {
+    "/^cd route-weather-tracker-app ; npm install$/": {
       "approve": true,
       "matchCommandLine": true
     },
     "true": true,
-    "yarn audit": true
+    "npm audit": true
   }
 }

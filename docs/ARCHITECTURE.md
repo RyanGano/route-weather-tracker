@@ -8,7 +8,7 @@ Read this when a request needs detail beyond the summary in `CLAUDE.md`.
 
 ## Commands
 
-Use **`yarn`** for all frontend Node work — never `npm` (a `yarn.lock` is committed).
+Use **`npm`** for all frontend Node work — never `yarn` or `pnpm` (a `package-lock.json` is committed). A `preinstall` guard rejects the others with the npm equivalent of what you tried; see `route-weather-tracker-app/scripts/ensure-npm.cjs`.
 
 Run everything together (API + Vite frontend + Aspire dashboard at `http://localhost:18888`):
 ```bash
@@ -17,11 +17,11 @@ dotnet run --project route-weather-tracker-service.AppHost
 
 Frontend only (from `route-weather-tracker-app/`):
 ```bash
-yarn install          # or: yarn install --frozen-lockfile (CI)
-yarn dev              # Vite dev server
-yarn build            # tsc -b && vite build  → dist/  (this is what gets deployed)
-yarn lint             # eslint .
-yarn preview          # serve the production build with SPA + /api proxy
+npm install           # or: npm ci (CI — installs exactly what the lockfile says)
+npm run dev           # Vite dev server
+npm run build         # tsc -b && vite build  → dist/  (this is what gets deployed)
+npm run lint          # eslint .
+npm run preview       # serve the production build with SPA + /api proxy
 ```
 
 Backend tests (xUnit + Moq, from repo root):
@@ -57,4 +57,4 @@ Build the backend alone: `dotnet build route-weather-tracker-service/route-weath
 Secrets resolve through Azure Key Vault via `DefaultAzureCredential` (`az login` locally; Managed Identity in prod). `KeyVaultUri` is set via user-secrets (local) or `azd env set` (prod) and baked in by AppHost. In Development the app runs without Key Vault; in non-Development a missing `KeyVaultUri` fails fast. Required secrets: `WsdotApiKey`, `OpenRouteServiceApiKey` (and historically `OpenWeatherApiKey`).
 
 ### Deployment
-GitHub Actions (`.github/workflows/azure-dev.yml`) deploys on push to `main`: backend via `dotnet publish` → Azure App Service, frontend via `yarn install --frozen-lockfile` + build → Azure Static Web App. **Deploy the built `dist/`, never raw `/src`** (browsers can't execute the TS source). Frontend build-time `VITE_*` vars (API URL, ad/affiliate IDs) are supplied as GitHub Actions vars.
+GitHub Actions (`.github/workflows/azure-dev.yml`) deploys on push to `main`: backend via `dotnet publish` → Azure App Service, frontend via `npm ci` + build → Azure Static Web App. **Deploy the built `dist/`, never raw `/src`** (browsers can't execute the TS source). Frontend build-time `VITE_*` vars (API URL, ad/affiliate IDs) are supplied as GitHub Actions vars.
