@@ -1,10 +1,7 @@
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using route_weather_tracker_service.Data;
 using route_weather_tracker_service.Services;
-using route_weather_tracker_service.Models;
-using Xunit;
 
 namespace route_weather_tracker_service.Tests;
 
@@ -20,7 +17,7 @@ public class RoutingIntegrationTests
   /// </summary>
   private static string? GetApiKey()
   {
-    var fromEnv = System.Environment.GetEnvironmentVariable("OpenRouteServiceApiKey");
+    var fromEnv = Environment.GetEnvironmentVariable("OpenRouteServiceApiKey");
     if (!string.IsNullOrWhiteSpace(fromEnv)) return fromEnv;
 
     // Load from the service project's user secrets (local dev).
@@ -33,7 +30,7 @@ public class RoutingIntegrationTests
 
   private static OpenRouteServiceRoutingService CreateService(string apiKey)
   {
-    var http = new System.Net.Http.HttpClient();
+    var http = new HttpClient();
     http.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", apiKey);
     var passLocator = new PassLocatorService();
     var logger = new NullLogger<OpenRouteServiceRoutingService>();
@@ -53,13 +50,13 @@ public class RoutingIntegrationTests
     Assert.NotNull(dest);
 
     var routes = await svc.GetRoutesAsync(origin!, dest!);
-    System.Console.WriteLine($"Seattle→Amarillo: {routes.Count} routes");
+    Console.WriteLine($"Seattle→Amarillo: {routes.Count} routes");
     foreach (var r in routes)
-      System.Console.WriteLine($"Route {r.Name}: passes=[{string.Join(",", r.PassIds)}]");
+      Console.WriteLine($"Route {r.Name}: passes=[{string.Join(",", r.PassIds)}]");
 
     Assert.NotEmpty(routes);
 
-    var union = new System.Collections.Generic.HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
+    var union = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     foreach (var r in routes) foreach (var p in r.PassIds) union.Add(p);
 
     // ORS routes Seattle→Amarillo via I-90/I-82/I-84/I-25.
@@ -83,7 +80,7 @@ public class RoutingIntegrationTests
     var routes = await svc.GetRoutesAsync(origin!, dest!);
     Assert.NotEmpty(routes);
 
-    var union2 = new System.Collections.Generic.HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
+    var union2 = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     foreach (var r in routes) foreach (var p in r.PassIds) union2.Add(p);
 
     // ORS routes Spokane→Amarillo via I-90 east through Montana then I-25 south.
