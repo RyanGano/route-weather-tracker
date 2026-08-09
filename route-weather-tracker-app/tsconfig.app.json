@@ -17,6 +17,7 @@
 
     /* Linting */
     "strict": true,
+    "exactOptionalPropertyTypes": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noUnusedLocals": true,
