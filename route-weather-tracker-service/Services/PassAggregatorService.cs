@@ -10,23 +10,16 @@ namespace route_weather_tracker_service.Services;
 /// Aggregates data from WSDOT, Idaho 511, and OpenWeatherMap into PassSummary objects.
 /// Results are cached for 5 minutes to avoid hammering free-tier APIs.
 /// </summary>
-public class PassAggregatorService : IPassAggregatorService
+public class PassAggregatorService(
+    IEnumerable<IPassDataSource> dataSources,
+    INwsService nws,
+    IMemoryCache cache) : IPassAggregatorService
 {
-  private readonly IReadOnlyList<IPassDataSource> _dataSources;
-  private readonly INwsService _nws;
-  private readonly IMemoryCache _cache;
+  private readonly IReadOnlyList<IPassDataSource> _dataSources = [.. dataSources];
+  private readonly INwsService _nws = nws;
+  private readonly IMemoryCache _cache = cache;
   private readonly ConcurrentDictionary<string, SemaphoreSlim> _locks = new();
   private static readonly TimeSpan CacheTtl = TimeSpan.FromMinutes(5);
-
-  public PassAggregatorService(
-      IEnumerable<IPassDataSource> dataSources,
-      INwsService nws,
-      IMemoryCache cache)
-  {
-    _dataSources = [.. dataSources];
-    _nws = nws;
-    _cache = cache;
-  }
 
   public Task<List<PassSummary>> GetAllPassesAsync(CancellationToken ct = default) =>
       GetPassesAsync(PassRegistry.Passes.Select(p => p.Id), ct);

@@ -5,16 +5,10 @@ namespace route_weather_tracker_service.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class WarmupController : ControllerBase
+public class WarmupController(IPassAggregatorService aggregator, ILogger<WarmupController> logger) : ControllerBase
 {
-  private readonly IPassAggregatorService _aggregator;
-  private readonly ILogger<WarmupController> _logger;
-
-  public WarmupController(IPassAggregatorService aggregator, ILogger<WarmupController> logger)
-  {
-    _aggregator = aggregator;
-    _logger = logger;
-  }
+  private readonly IPassAggregatorService _aggregator = aggregator;
+  private readonly ILogger<WarmupController> _logger = logger;
 
   /// <summary>
   /// Triggers a background warmup of cached pass data. Returns quickly with

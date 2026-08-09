@@ -12,23 +12,16 @@ namespace route_weather_tracker_service.Services;
 /// No API key required. Demo server: https://router.project-osrm.org
 /// Rate limit: ~10 req/s fair-use. For high traffic, self-host OSRM.
 /// </summary>
-public class OsrmRoutingService : IRoutingService
+public class OsrmRoutingService(
+    HttpClient http,
+    IPassLocatorService passLocator,
+    ILogger<OsrmRoutingService> logger) : IRoutingService
 {
   private const string OsrmBase = "https://router.project-osrm.org";
 
-  private readonly HttpClient _http;
-  private readonly IPassLocatorService _passLocator;
-  private readonly ILogger<OsrmRoutingService> _logger;
-
-  public OsrmRoutingService(
-      HttpClient http,
-      IPassLocatorService passLocator,
-      ILogger<OsrmRoutingService> logger)
-  {
-    _http = http;
-    _passLocator = passLocator;
-    _logger = logger;
-  }
+  private readonly HttpClient _http = http;
+  private readonly IPassLocatorService _passLocator = passLocator;
+  private readonly ILogger<OsrmRoutingService> _logger = logger;
 
   public async Task<List<ComputedRoute>> GetRoutesAsync(
       RouteEndpoint origin,

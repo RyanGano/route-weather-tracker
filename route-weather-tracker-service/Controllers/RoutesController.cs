@@ -6,11 +6,9 @@ namespace route_weather_tracker_service.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class RoutesController : ControllerBase
+public class RoutesController(IRoutingService routing) : ControllerBase
 {
-  private readonly IRoutingService _routing;
-
-  public RoutesController(IRoutingService routing) => _routing = routing;
+  private readonly IRoutingService _routing = routing;
 
   /// <summary>Returns all known highway routes (I-90, US-2, etc.).</summary>
   [HttpGet]

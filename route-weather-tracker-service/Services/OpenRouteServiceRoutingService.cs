@@ -15,23 +15,16 @@ namespace route_weather_tracker_service.Services;
 /// The key is read from configuration key "OpenRouteServiceApiKey" and sent as
 /// the Authorization header. Register via IRoutingService in Program.cs.
 /// </summary>
-public class OpenRouteServiceRoutingService : IRoutingService
+public class OpenRouteServiceRoutingService(
+    HttpClient http,
+    IPassLocatorService passLocator,
+    ILogger<OpenRouteServiceRoutingService> logger) : IRoutingService
 {
   private const string OrsBase = "https://api.openrouteservice.org";
 
-  private readonly HttpClient _http;
-  private readonly IPassLocatorService _passLocator;
-  private readonly ILogger<OpenRouteServiceRoutingService> _logger;
-
-  public OpenRouteServiceRoutingService(
-      HttpClient http,
-      IPassLocatorService passLocator,
-      ILogger<OpenRouteServiceRoutingService> logger)
-  {
-    _http = http;
-    _passLocator = passLocator;
-    _logger = logger;
-  }
+  private readonly HttpClient _http = http;
+  private readonly IPassLocatorService _passLocator = passLocator;
+  private readonly ILogger<OpenRouteServiceRoutingService> _logger = logger;
 
   public async Task<List<ComputedRoute>> GetRoutesAsync(
       RouteEndpoint origin,
