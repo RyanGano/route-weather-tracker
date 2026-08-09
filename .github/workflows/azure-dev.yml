@@ -34,6 +34,8 @@ jobs:
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: "10.x"
+          cache: true
+          cache-dependency-path: "**/*.csproj"
 
       - name: Publish
         run: dotnet publish route-weather-tracker-service/route-weather-tracker-service.csproj -c Release -o ./publish
