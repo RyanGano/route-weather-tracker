@@ -1,0 +1,74 @@
+name: CI
+
+# Build, lint and test on every PR into main, and on main itself. The deploy
+# workflow (azure-dev.yml) only publishes — `dotnet publish` does not run tests,
+# so before this workflow existed nothing in CI ever executed the test suites.
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Superseded PR runs are safe to cancel — nothing here deploys.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend (.NET)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.x"
+          cache: true
+          cache-dependency-path: "**/*.csproj"
+
+      - name: Restore
+        run: dotnet restore route-weather-tracker.slnx
+
+      - name: Build
+        run: dotnet build route-weather-tracker.slnx -c Release --no-restore
+
+      - name: Test
+        run: dotnet test route-weather-tracker.slnx -c Release --no-build --verbosity normal
+
+  frontend:
+    name: Frontend (React)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: route-weather-tracker-app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: route-weather-tracker-app/.nvmrc
+          cache: "npm"
+          cache-dependency-path: route-weather-tracker-app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test:ci
+
+      - name: Build
+        run: npm run build
