@@ -14,7 +14,7 @@ var api = builder.AddProject<Projects.route_weather_tracker_service>("api")
     .WithEnvironment("KeyVaultUri", keyVaultUri);
 
 builder.AddViteApp("frontend", "../route-weather-tracker-app")
-       .WithYarn()
+       .WithNpm()
        .WithReference(api)
        .WaitFor(api)
        .WithEnvironment("BROWSER", "none")
