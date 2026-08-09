@@ -68,7 +68,7 @@ public class PassAggregatorService(
 
       var nwsResult = await nwsTask;
       var weather = nwsResult;
-      var weatherSource = nwsResult != null ? "nws" : null;
+      var weatherSource = nwsResult is not null ? "nws" : null;
 
       var condition = await conditionTask ?? DeriveCondition(passId, weather);
 
