@@ -43,7 +43,7 @@ public class NwsService(HttpClient http, ILogger<NwsService> logger) : INwsServi
       string currentDesc = string.Empty;
       string currentIcon = string.Empty;
 
-      if (hourlyDoc != null)
+      if (hourlyDoc is not null)
       {
         var periods = hourlyDoc.RootElement.GetProperty("properties").GetProperty("periods");
         var first = periods.EnumerateArray().FirstOrDefault();
@@ -57,7 +57,7 @@ public class NwsService(HttpClient http, ILogger<NwsService> logger) : INwsServi
 
       // Build daily forecasts from forecastDoc periods (which are day/night entries)
       var daily = new List<WeatherForecastDay>();
-      if (forecastDoc != null)
+      if (forecastDoc is not null)
       {
         var periods = forecastDoc.RootElement.GetProperty("properties").GetProperty("periods").EnumerateArray().ToList();
         var groups = periods.GroupBy(p => DateTimeOffset.Parse(p.GetProperty("startTime").GetString()!).Date).Take(7);
@@ -85,7 +85,7 @@ public class NwsService(HttpClient http, ILogger<NwsService> logger) : INwsServi
       }
 
       // Fallbacks: if we didn't get current from hourly, try forecastDoc first item
-      if (string.IsNullOrEmpty(currentDesc) && forecastDoc != null)
+      if (string.IsNullOrEmpty(currentDesc) && forecastDoc is not null)
       {
         var first = forecastDoc.RootElement.GetProperty("properties").GetProperty("periods").EnumerateArray().FirstOrDefault();
         if (first.ValueKind != JsonValueKind.Undefined)
