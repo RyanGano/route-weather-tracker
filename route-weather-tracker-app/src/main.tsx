@@ -11,7 +11,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
 // Use the same base URL as the axios API client so the request reaches the
 // backend when the frontend is deployed separately (e.g. Azure Static Web App
 // + App Service). A relative URL would hit the static host (404).
-const _warmupBase = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
+const _warmupBase = import.meta.env.VITE_API_URL ?? "";
 void fetch(`${_warmupBase}/api/warmup`).catch(() => {
   /* ignore errors; warmup is optional */
 });
