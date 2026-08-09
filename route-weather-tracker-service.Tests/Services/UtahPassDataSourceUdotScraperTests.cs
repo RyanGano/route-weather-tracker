@@ -1,10 +1,8 @@
 using System.Net;
-using System.Net.Http;
 using System.Text;
 using Moq;
 using Moq.Protected;
 using route_weather_tracker_service.Services;
-using Xunit;
 
 namespace route_weather_tracker_service.Tests.Services;
 

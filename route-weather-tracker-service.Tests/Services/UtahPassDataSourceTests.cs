@@ -1,12 +1,8 @@
 using System.Net;
-using System.Net.Http;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using route_weather_tracker_service.Services;
-using Xunit;
 
 namespace route_weather_tracker_service.Tests.Services;
 
