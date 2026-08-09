@@ -8,6 +8,8 @@
     "node": ">=22"
   },
   "scripts": {
+    "preinstall": "node scripts/ensure-npm.cjs",
+    "prebuild": "node scripts/ensure-npm.cjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
