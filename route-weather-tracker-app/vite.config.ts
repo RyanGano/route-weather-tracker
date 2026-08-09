@@ -1,5 +1,6 @@
 import type { Connect } from "vite";
-import { defineConfig } from "vite";
+// from "vitest/config" rather than "vite" so the `test` block below is typed
+import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 
 /**
@@ -25,6 +26,17 @@ function spaFallback() {
 
 // https://vite.dev/config/
 export default defineConfig({
+  test: {
+    globals: true,
+    environment: "jsdom",
+    // Vitest 4 defaults to the "forks" pool, which fails to start a worker on
+    // Windows here ("Timeout waiting for worker to respond"). Threads start
+    // reliably and run the same tests.
+    pool: "threads",
+    setupFiles: ["./src/test/setup.ts"],
+    include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    css: false,
+  },
   plugins: [react(), spaFallback()],
   server: {
     host: true,
