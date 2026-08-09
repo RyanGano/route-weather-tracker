@@ -11,7 +11,7 @@ Shows current conditions, webcams, and weather forecasts for mountain passes alo
 ## Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- [Node.js 20+](https://nodejs.org/) and [Yarn](https://yarnpkg.com/)
+- [Node.js 22+](https://nodejs.org/) and npm (ships with Node)
 - [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) (for local Key Vault access)
 
 ## Required Secrets
@@ -37,7 +37,7 @@ The following secrets must exist in the `route-weather-tracker-kv` Azure Key Vau
 
    ```bash
    dotnet restore
-   cd route-weather-tracker-app && yarn install && cd ..
+   cd route-weather-tracker-app && npm install && cd ..
    ```
 
 3. Run everything (API + frontend + Aspire dashboard):
