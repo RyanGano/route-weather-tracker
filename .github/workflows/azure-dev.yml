@@ -6,6 +6,14 @@ on:
     branches:
       - main
 
+# Serialize deploys of the same ref so two pushes in quick succession can't
+# race each other onto App Service / Static Web Apps.
+# cancel-in-progress is deliberately false: this workflow deploys, and killing
+# a deploy mid-flight can leave the target half-updated. Queue instead.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 # Read-only by default; each job adds only what it actually needs.
 permissions:
   contents: read
