@@ -15,10 +15,10 @@ namespace route_weather_tracker_service.Services;
 /// NWS-derived conditions (HasOfficialConditions = false). Chain control can be
 /// layered on later via https://www.dot.ca.gov/d{N}/chaincontrol/chaincontrol.json.
 /// </summary>
-public class CaliforniaPassDataSource : IPassDataSource
+public class CaliforniaPassDataSource(IHttpClientFactory httpFactory, ILogger<CaliforniaPassDataSource> logger) : IPassDataSource
 {
-    private readonly IHttpClientFactory _httpFactory;
-    private readonly ILogger<CaliforniaPassDataSource> _logger;
+    private readonly IHttpClientFactory _httpFactory = httpFactory;
+    private readonly ILogger<CaliforniaPassDataSource> _logger = logger;
 
     private const string DistrictFeedFormat = "https://cwwp2.dot.ca.gov/data/d{0}/cctv/cctvStatusD{1}.json";
 
@@ -47,12 +47,6 @@ public class CaliforniaPassDataSource : IPassDataSource
 
     public IReadOnlySet<string> SupportedPassIds { get; } =
         PassMeta.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-    public CaliforniaPassDataSource(IHttpClientFactory httpFactory, ILogger<CaliforniaPassDataSource> logger)
-    {
-        _httpFactory = httpFactory;
-        _logger = logger;
-    }
 
     public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
         Task.FromResult<PassCondition?>(null);

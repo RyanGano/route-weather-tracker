@@ -10,7 +10,7 @@ namespace route_weather_tracker_service.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class CamerasController : ControllerBase
+public class CamerasController(IHttpClientFactory httpFactory, ILogger<CamerasController> logger) : ControllerBase
 {
     // Only hosts known to serve camera snapshots over HTTP-only may be proxied.
     private static readonly HashSet<string> AllowedHosts =
@@ -19,14 +19,8 @@ public class CamerasController : ControllerBase
             "ss.nmroads.com",
         };
 
-    private readonly IHttpClientFactory _httpFactory;
-    private readonly ILogger<CamerasController> _logger;
-
-    public CamerasController(IHttpClientFactory httpFactory, ILogger<CamerasController> logger)
-    {
-        _httpFactory = httpFactory;
-        _logger = logger;
-    }
+    private readonly IHttpClientFactory _httpFactory = httpFactory;
+    private readonly ILogger<CamerasController> _logger = logger;
 
     /// <summary>GET /api/cameras/image?url={absolute-snapshot-url}</summary>
     [HttpGet("image")]

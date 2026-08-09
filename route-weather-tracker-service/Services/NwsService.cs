@@ -8,16 +8,10 @@ namespace route_weather_tracker_service.Services;
 /// Fetches forecasts from the NWS API (https://api.weather.gov).
 /// Returns a PassWeatherForecast compatible with the rest of the service.
 /// </summary>
-public class NwsService : INwsService
+public class NwsService(HttpClient http, ILogger<NwsService> logger) : INwsService
 {
-  private readonly HttpClient _http;
-  private readonly ILogger<NwsService> _logger;
-
-  public NwsService(HttpClient http, ILogger<NwsService> logger)
-  {
-    _http = http;
-    _logger = logger;
-  }
+  private readonly HttpClient _http = http;
+  private readonly ILogger<NwsService> _logger = logger;
 
   public async Task<PassWeatherForecast?> GetForecastAsync(string passId, double latitude, double longitude, CancellationToken ct = default)
   {

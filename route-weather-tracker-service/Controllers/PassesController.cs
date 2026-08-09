@@ -6,16 +6,10 @@ namespace route_weather_tracker_service.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PassesController : ControllerBase
+public class PassesController(IPassAggregatorService aggregator, ILogger<PassesController> logger) : ControllerBase
 {
-  private readonly IPassAggregatorService _aggregator;
-  private readonly ILogger<PassesController> _logger;
-
-  public PassesController(IPassAggregatorService aggregator, ILogger<PassesController> logger)
-  {
-    _aggregator = aggregator;
-    _logger = logger;
-  }
+  private readonly IPassAggregatorService _aggregator = aggregator;
+  private readonly ILogger<PassesController> _logger = logger;
 
   /// <summary>Returns minimal waypoint data for all known passes (id, name, state, longitude, highway).</summary>
   [HttpGet("waypoints")]

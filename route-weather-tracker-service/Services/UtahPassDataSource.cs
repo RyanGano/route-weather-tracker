@@ -10,10 +10,10 @@ namespace route_weather_tracker_service.Services;
 /// preferring cameras on the same highway, sorted by distance.
 /// Fallback: udotcameras.com homepage HTML scraper.
 /// </summary>
-public class UtahPassDataSource : IPassDataSource
+public class UtahPassDataSource(IHttpClientFactory httpFactory, ILogger<UtahPassDataSource> logger) : IPassDataSource
 {
-    private readonly IHttpClientFactory _httpFactory;
-    private readonly ILogger<UtahPassDataSource> _logger;
+    private readonly IHttpClientFactory _httpFactory = httpFactory;
+    private readonly ILogger<UtahPassDataSource> _logger = logger;
 
     // Processed GeoJSON of UDOT cameras — each feature has an ImageUrl that returns a live road snapshot
     private const string UdotGeoJsonUrl = "https://udotcameras.com/cctv_locations_processed_classified.geojson";
@@ -73,12 +73,6 @@ public class UtahPassDataSource : IPassDataSource
         };
 
     public IReadOnlySet<string> SupportedPassIds => UtPassIds;
-
-    public UtahPassDataSource(IHttpClientFactory httpFactory, ILogger<UtahPassDataSource> logger)
-    {
-        _httpFactory = httpFactory;
-        _logger = logger;
-    }
 
     public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
         Task.FromResult<PassCondition?>(null);

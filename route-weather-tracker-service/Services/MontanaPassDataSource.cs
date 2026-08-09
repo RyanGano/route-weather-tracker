@@ -9,10 +9,10 @@ namespace route_weather_tracker_service.Services;
 /// return road-weather camera images for passes within 50 km of the given pass summit.
 /// Images are live JPEGs refreshed by MDT every ~2 minutes.
 /// </summary>
-public class MontanaPassDataSource : IPassDataSource
+public class MontanaPassDataSource(IHttpClientFactory httpFactory, ILogger<MontanaPassDataSource> logger) : IPassDataSource
 {
-    private readonly IHttpClientFactory _httpFactory;
-    private readonly ILogger<MontanaPassDataSource> _logger;
+    private readonly IHttpClientFactory _httpFactory = httpFactory;
+    private readonly ILogger<MontanaPassDataSource> _logger = logger;
 
     // MDT 511 RWIS camera GeoJSON — each feature may have a "cameras" array with live image URLs
     private const string RwisGeoJsonUrl =
@@ -47,12 +47,6 @@ public class MontanaPassDataSource : IPassDataSource
         };
 
     public IReadOnlySet<string> SupportedPassIds => MtPassIds;
-
-    public MontanaPassDataSource(IHttpClientFactory httpFactory, ILogger<MontanaPassDataSource> logger)
-    {
-        _httpFactory = httpFactory;
-        _logger = logger;
-    }
 
     public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
         Task.FromResult<PassCondition?>(null);

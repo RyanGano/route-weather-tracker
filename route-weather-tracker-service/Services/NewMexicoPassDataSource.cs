@@ -9,10 +9,10 @@ namespace route_weather_tracker_service.Services;
 /// within 50 km of the given pass summit.
 /// Images are live JPEGs served by ss.nmroads.com.
 /// </summary>
-public class NewMexicoPassDataSource : IPassDataSource
+public class NewMexicoPassDataSource(IHttpClientFactory httpFactory, ILogger<NewMexicoPassDataSource> logger) : IPassDataSource
 {
-    private readonly IHttpClientFactory _httpFactory;
-    private readonly ILogger<NewMexicoPassDataSource> _logger;
+    private readonly IHttpClientFactory _httpFactory = httpFactory;
+    private readonly ILogger<NewMexicoPassDataSource> _logger = logger;
 
     private const string CameraInfoUrl = "https://servicev5.nmroads.com/RealMapWAR/GetCameraInfo";
     private const double MaxCameraDistanceKm = 50.0;
@@ -40,12 +40,6 @@ public class NewMexicoPassDataSource : IPassDataSource
         };
 
     public IReadOnlySet<string> SupportedPassIds => NmPassIds;
-
-    public NewMexicoPassDataSource(IHttpClientFactory httpFactory, ILogger<NewMexicoPassDataSource> logger)
-    {
-        _httpFactory = httpFactory;
-        _logger = logger;
-    }
 
     public Task<PassCondition?> GetConditionAsync(string passId, CancellationToken ct = default) =>
         Task.FromResult<PassCondition?>(null);

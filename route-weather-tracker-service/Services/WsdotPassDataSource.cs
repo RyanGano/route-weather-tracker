@@ -6,14 +6,12 @@ namespace route_weather_tracker_service.Services;
 /// Adapts IWsdotService as an IPassDataSource for Washington State passes
 /// (Snoqualmie Pass I-90 and Stevens Pass US-2).
 /// </summary>
-public class WsdotPassDataSource : IPassDataSource
+public class WsdotPassDataSource(IWsdotService wsdot) : IPassDataSource
 {
   private static readonly IReadOnlySet<string> _supported =
       new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "snoqualmie", "stevens-pass" };
 
-  private readonly IWsdotService _wsdot;
-
-  public WsdotPassDataSource(IWsdotService wsdot) => _wsdot = wsdot;
+  private readonly IWsdotService _wsdot = wsdot;
 
   public IReadOnlySet<string> SupportedPassIds => _supported;
 
