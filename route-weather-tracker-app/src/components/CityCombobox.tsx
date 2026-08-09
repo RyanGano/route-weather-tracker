@@ -12,7 +12,7 @@ interface Props {
   placeholder?: string;
   /** Endpoint id to exclude from the list (e.g. already-selected other end) */
   exclude?: string;
-  userPos?: { lat: number; lon: number } | null;
+  userPos?: { lat: number; lon: number } | null | undefined;
 }
 
 export default function CityCombobox({

@@ -15,6 +15,13 @@
 
     /* Linting */
     "strict": true,
+    // exactOptionalPropertyTypes is deliberately NOT set here, though it is on
+    // in tsconfig.app.json. The proxy targets in vite.config.ts come from
+    // Aspire's service-discovery env vars and are `string | undefined`, while
+    // Vite's ProxyOptions declares `target?: string | ProxyTargetUrl` without
+    // `| undefined`. Enabling it fails with TS2769 on both proxy blocks, and
+    // the only fixes are a cast or making the proxy conditional (a behavior
+    // change). Revisit if Vite widens the type.
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noUnusedLocals": true,

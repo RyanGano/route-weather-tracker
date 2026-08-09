@@ -124,7 +124,10 @@ export default function RouteStatus({ passes }: Props) {
     Array<{
       passId: string;
       severity: Severity;
-      high?: number;
+      // `| undefined` is explicit because a pass with no forecast high passes
+      // the key through as undefined rather than omitting it
+      // (exactOptionalPropertyTypes distinguishes the two).
+      high?: number | undefined;
       description: string;
     }>
   >();
@@ -135,7 +138,7 @@ export default function RouteStatus({ passes }: Props) {
     // per pass per offset (and can merge in current pass conditions for today).
     const perPass = new Map<
       number,
-      { severity: Severity; high?: number; description: string }
+      { severity: Severity; high?: number | undefined; description: string }
     >();
 
     if (pass.weather) {
