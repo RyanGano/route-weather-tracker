@@ -6,14 +6,18 @@ on:
     branches:
       - main
 
-# Federated credentials (OIDC) — no long-lived secrets needed for Azure auth
+# Read-only by default; each job adds only what it actually needs.
 permissions:
-  id-token: write
   contents: read
 
 jobs:
   deploy-backend:
     runs-on: ubuntu-latest
+    # Federated credentials (OIDC) — no long-lived secrets needed for Azure auth.
+    # Only this job authenticates to Azure that way.
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -41,6 +45,11 @@ jobs:
 
   deploy-frontend:
     runs-on: ubuntu-latest
+    # Uses a deployment token rather than OIDC, so no id-token here. The SWA
+    # action posts status back to the PR/commit, hence pull-requests: write.
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v7
