@@ -48,13 +48,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "yarn"
+          node-version-file: route-weather-tracker-app/.nvmrc
+          cache: "npm"
+          cache-dependency-path: route-weather-tracker-app/package-lock.json
 
       - name: Install dependencies
-        run: |
-          cd route-weather-tracker-app
-          yarn install --frozen-lockfile
+        run: npm ci
+        working-directory: route-weather-tracker-app
 
       - name: Deploy to Static Web App
         uses: azure/static-web-apps-deploy@v1
