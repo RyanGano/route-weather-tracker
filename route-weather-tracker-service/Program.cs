@@ -1,5 +1,6 @@
 using Azure.Identity;
 using Microsoft.AspNetCore.HttpOverrides;
+using route_weather_tracker_service.Controllers;
 using route_weather_tracker_service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -63,8 +64,15 @@ builder.Services.AddScoped<IPassDataSource, VirginiaPassDataSource>();
 builder.Services.AddScoped<IPassDataSource, NcTnPassDataSource>();
 builder.Services.AddScoped<IPassAggregatorService, PassAggregatorService>();
 
-// HTTP client used by CamerasController to proxy HTTP-only camera snapshots.
-builder.Services.AddHttpClient("camera-proxy");
+// HTTP client used by CamerasController to proxy HTTP-only camera snapshots. Redirects are
+// followed by the controller itself, so each hop is checked against its host allow-list, and
+// responses are capped so one request cannot pull an arbitrarily large body through the API.
+builder.Services.AddHttpClient(CamerasController.HttpClientName, c =>
+{
+    c.Timeout = TimeSpan.FromSeconds(15);
+    c.MaxResponseContentBufferSize = CamerasController.MaxImageBytes;
+})
+    .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler { AllowAutoRedirect = false });
 
 // ----- Routing services (OpenRouteService + geometric pass matching) -----
 builder.Services.AddSingleton<IPassLocatorService, PassLocatorService>();
@@ -85,6 +93,9 @@ builder.Services.AddHttpClient<IRoutingService, OpenRouteServiceRoutingService>(
 .RemoveAllResilienceHandlers();
 #pragma warning restore EXTEXP0001
 
+// ----- Rate limiting (per client IP; see RequestLimits) -----
+builder.Services.AddApiRateLimiting();
+
 // ----- Controllers and OpenAPI -----
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
@@ -94,14 +105,25 @@ var allowedOrigins = builder.Configuration
     .GetSection("AllowedOrigins")
     .Get<string[]>() ?? [];
 
+// Development allows any origin so the local front end works on whatever port Vite picks.
+// Everywhere else only the listed origins are allowed, and an empty list is a misconfiguration:
+// fail at startup rather than quietly opening the API to every site.
+var allowAnyOrigin = builder.Environment.IsDevelopment();
+if (!allowAnyOrigin && allowedOrigins.Length == 0)
+{
+    throw new InvalidOperationException(
+        "AllowedOrigins is empty. List the front end's origins in appsettings.json or app settings."
+    );
+}
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
     {
-        if (allowedOrigins.Length > 0)
-            policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
-        else
+        if (allowAnyOrigin)
             policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        else
+            policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
     });
 });
 
@@ -119,6 +141,7 @@ if (app.Environment.IsDevelopment())
 app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedProto });
 app.UseHttpsRedirection();
 app.UseCors("FrontendPolicy");
+app.UseRateLimiter();
 app.UseAuthorization();
 app.MapControllers();
 

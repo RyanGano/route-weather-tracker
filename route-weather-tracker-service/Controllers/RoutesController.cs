@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using route_weather_tracker_service.Data;
 using route_weather_tracker_service.Services;
 
@@ -22,6 +23,7 @@ public class RoutesController(IRoutingService routing) : ControllerBase
   /// <param name="from">Origin endpoint ID (e.g. "seattle").</param>
   /// <param name="to">Destination endpoint ID (e.g. "denver").</param>
   [HttpGet("compute")]
+  [EnableRateLimiting(RequestLimits.RouteComputePolicy)]
   public async Task<IActionResult> Compute(
       [FromQuery] string from,
       [FromQuery] string to,
