@@ -1,0 +1,50 @@
+# Dependency updates. Each ecosystem gets one grouped PR for minor and patch updates and a
+# separate grouped PR for major updates, so routine bumps stay small and breaking ones are
+# reviewed on their own.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/route-weather-tracker-app"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      npm-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+      npm-major:
+        update-types:
+          - "major"
+
+  - package-ecosystem: "nuget"
+    directories:
+      - "/route-weather-tracker-service"
+      - "/route-weather-tracker-service.Tests"
+      - "/route-weather-tracker-service.ServiceDefaults"
+      - "/route-weather-tracker-service.AppHost"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      nuget-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+      nuget-major:
+        update-types:
+          - "major"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      actions-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+      actions-major:
+        update-types:
+          - "major"
